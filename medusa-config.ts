@@ -15,11 +15,11 @@ module.exports = defineConfig({
     databaseName: process.env.DATABASE_NAME,
     redisUrl: process.env.REDIS_URL,
     http: {
-      storeCors: process.env.STORE_CORS! || "http://localhost:8000",
-      adminCors: process.env.ADMIN_CORS! ||"http://localhost:9000",
-      authCors: process.env.AUTH_CORS! || "http://localhost:8000, http://localhost:9000", 
-      jwtSecret: process.env.JWT_SECRET || "supersecret",
-      cookieSecret: process.env.COOKIE_SECRET || "supersecret",
+      storeCors: process.env.STORE_CORS!,
+      adminCors: process.env.ADMIN_CORS!,
+      authCors: process.env.AUTH_CORS!, 
+      jwtSecret: process.env.JWT_SECRET,
+      cookieSecret: process.env.COOKIE_SECRET,
     }
   }
 })
