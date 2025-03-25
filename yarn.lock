@@ -2819,6 +2819,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@medusajs/file-s3@npm:^2.6.1":
+  version: 2.6.1
+  resolution: "@medusajs/file-s3@npm:2.6.1"
+  dependencies:
+    "@aws-sdk/client-s3": "npm:^3.556.0"
+    "@aws-sdk/s3-request-presigner": "npm:^3.556.0"
+    ulid: "npm:^2.3.0"
+  peerDependencies:
+    "@medusajs/framework": 2.6.1
+  checksum: 10c0/1130dad21114cf3b5982d3f0cc9e8e67c77d3af247763c4a0840b5eeea0e73c4c1e887e39d002e54f1c2b320be5c94da80321b7185e03ba715be7d6fcf1d3386
+  languageName: node
+  linkType: hard
+
 "@medusajs/file@npm:^2.6.0":
   version: 2.6.0
   resolution: "@medusajs/file@npm:2.6.0"
@@ -2826,6 +2839,16 @@ __metadata:
     "@medusajs/framework": ^2.4.0
     awilix: ^8.0.1
   checksum: 10c0/98c7c3e78c0378a2e5e2dfe3d7e799e3095dc21c76c3eaf363bd7e8c6717d53d63359656b9cdc365986a97494e2eff6003cc9cb78cef95ad6a993fe64a5115d2
+  languageName: node
+  linkType: hard
+
+"@medusajs/file@npm:^2.6.1":
+  version: 2.6.1
+  resolution: "@medusajs/file@npm:2.6.1"
+  peerDependencies:
+    "@medusajs/framework": 2.6.1
+    awilix: ^8.0.1
+  checksum: 10c0/afe383fde591b7b2a074dbb1dbe40a05a524e669ff5283d24b7382f2cb1a705075f7b44f27221e4b2e37d6bfc59bb50697fd85b604ddfbe05c50331e274120ab
   languageName: node
   linkType: hard
 
@@ -15266,6 +15289,8 @@ __metadata:
     "@medusajs/cache-redis": "npm:^2.6.1"
     "@medusajs/cli": "npm:^2.6.1"
     "@medusajs/event-bus-redis": "npm:^2.6.1"
+    "@medusajs/file": "npm:^2.6.1"
+    "@medusajs/file-s3": "npm:^2.6.1"
     "@medusajs/framework": "npm:^2.6.1"
     "@medusajs/medusa": "npm:2.6.0"
     "@medusajs/test-utils": "npm:2.6.0"
