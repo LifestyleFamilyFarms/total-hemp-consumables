@@ -70,6 +70,21 @@ module.exports = defineConfig({
         ]
       }
     },
+    //Redis Locking Module
+    {
+      resolve: "@medusajs/medusa/locking",
+      options:{
+        providers: [
+          {
+            resolve: "@medusajs/medusa/locking-redis",
+            id: "locking-redis",
+            options:{
+              redisUrl: process.env.LOCKING_REDIS_URL
+            }
+          }
+        ]
+      }
+    },
     // Additional architectural modules can be added here
   ],
 }); 
