@@ -103,6 +103,8 @@ module.exports = defineConfig({
       },
     },
     // Additional architectural modules can be added here
+    //ShipStation
+    //sanity.io / blog
   ],
 }); 
 
