@@ -8,10 +8,12 @@ import {
   FulfillmentOption,
 } from "@medusajs/framework/types"
 import { 
-  GetShippingRatesResponse,
-  ShipStationAddress,
   ShipStationClient 
 } from './client'
+import {
+  GetShippingRatesResponse,
+  ShipStationAddress,
+} from "./types"
 
 export type ShipStationOptions = {
   api_key: string
@@ -108,7 +110,43 @@ class ShipStationProviderService extends AbstractFulfillmentProviderService {
       country_code: to_address.country_code || "",
       address_residential_indicator: "unknown",
     }
-    // TODO create shipment
+    
+    // Sum the package's weight
+    // You can instead create different packages for each item
+    const packageWeight = items.reduce((sum, item) => {
+      // @ts-ignore
+      return sum + (item.variant.weight || 0)
+    }, 0)
+
+    return await this.client.getShippingRates({
+      shipment: {
+        carrier_id: carrier_id,
+        service_code: carrier_service_code,
+        ship_to,
+        ship_from,
+        validate_address: "no_validation",
+        items: items?.map((item) => ({
+          name: item.title,
+          quantity: item.quantity,
+          sku: item.variant_sku || "",
+        })),
+        packages: [{
+          weight: {
+            value: packageWeight,
+            unit: "kilogram",
+          },
+        }],
+        customs: {
+          contents: "merchandise",
+          non_delivery: "return_to_sender",
+        },
+      },
+      rate_options: {
+        carrier_ids: [carrier_id],
+        service_codes: [carrier_service_code],
+        preferred_currency: currency_code as string,
+      },
+    })
   }
 
   // TODO add methods
