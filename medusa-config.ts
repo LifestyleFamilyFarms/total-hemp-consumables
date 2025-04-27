@@ -102,8 +102,26 @@ module.exports = defineConfig({
         ],
       },
     },
+    //ShipStation Fulfillment
+    {
+      resolve: "@medusajs/medusa/fulfillment",
+      options: {
+        providers: [
+          {
+            resolve: "@medusajs/medusa/fulfillment-manual",
+            id: "manual",
+          },
+          {
+            resolve: "./src/modules/shipstation",
+            id: "shipstation",
+            options: {
+              api_key: process.env.SHIPSTATION_API_KEY
+            }
+          }
+        ]
+      }
+    }
     // Additional architectural modules can be added here
-    //ShipStation
     //sanity.io / blog
   ],
 }); 
