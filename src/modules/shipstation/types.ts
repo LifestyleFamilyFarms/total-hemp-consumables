@@ -34,9 +34,9 @@ export type ShipStationAddress = {
       type?: string
       value?: string
     }[]
-  }
+}
 
-  export type Rate = {
+export type Rate = {
     rate_id: string
     shipping_amount: {
       currency: string
@@ -58,8 +58,18 @@ export type ShipStationAddress = {
       currency: string
       amount: number
     }
-  }
+}
 
-  export type RateResponse = {
+export type RateResponse = {
     rates: Rate[]
-  }
+}
+
+export type GetShippingRatesRequest = {
+    shipment_id?: string
+    shipment?: Omit<Shipment, "shipment_id" | "shipment_status">
+    rate_options: {
+      carrier_ids: string[]
+      service_codes: string[]
+      preferred_currency: string
+    }  
+}
