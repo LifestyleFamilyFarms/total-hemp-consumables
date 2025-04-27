@@ -18,7 +18,7 @@ class ShipStationProviderService extends AbstractFulfillmentProviderService {
     this.client = new ShipStationClient(options)
   }
 
-  async getFulfillmentOptions(): Promise<FulfillmentOptions[]> {
+  async getFulfillmentOptions(): Promise<FulfillmentOption[]> {
     const { carriers } = await this.client.getCarriers()
     const fulfillmentOptions: FulfillmentOption[] = []
 
