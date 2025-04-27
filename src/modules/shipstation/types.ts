@@ -35,3 +35,27 @@ export type ShipStationAddress = {
       value?: string
     }[]
   }
+
+  export type Rate = {
+    rate_id: string
+    shipping_amount: {
+      currency: string
+      amount: number
+    }
+    insurance_amount: {
+      currency: string
+      amount: number
+    }
+    confirmation_amount: {
+      currency: string
+      amount: number
+    }
+    other_amount: {
+      currency: string
+      amount: number
+    }
+    tax_amount: {
+      currency: string
+      amount: number
+    }
+  }
