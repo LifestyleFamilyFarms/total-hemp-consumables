@@ -59,3 +59,7 @@ export type ShipStationAddress = {
       amount: number
     }
   }
+
+  export type RateResponse = {
+    rates: Rate[]
+  }
