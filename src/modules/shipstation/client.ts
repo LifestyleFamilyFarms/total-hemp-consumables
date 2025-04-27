@@ -7,6 +7,7 @@ import {
   GetShippingRatesResponse,
   RateResponse,
   Shipment,
+  VoidLabelResponse
 } from "./types"
 
 export class ShipStationClient {
