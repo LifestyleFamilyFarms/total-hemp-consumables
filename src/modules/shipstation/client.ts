@@ -86,6 +86,21 @@ export class ShipStationClient {
     })
   }
 
+  //voidLabel
+
+  async voidLabel(id: string): Promise<VoidLabelResponse> {
+    return await this.sendRequest(`/labels/${id}/void`, {
+      method: "PUT",
+    })
+  }
+
+  //cancelShipment
+  async cancelShipment(id: string): Promise<void> {
+    return await this.sendRequest(`/shipments/${id}/cancel`, {
+      method: "PUT",
+    })
+  }
+
   //MORE METHODS
   
 }
