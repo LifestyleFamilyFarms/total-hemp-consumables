@@ -132,3 +132,9 @@ export type GetShippingRatesResponse = {
       zpl: string
     }
   }
+
+  export type VoidLabelResponse = {
+    approved: boolean
+    message: string
+    reason_code?: string
+  }

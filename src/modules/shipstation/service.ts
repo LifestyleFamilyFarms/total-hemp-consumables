@@ -299,6 +299,10 @@ class ShipStationProviderService extends AbstractFulfillmentProviderService {
     }
   }
 
+  // cancelFulfillment
+
+  
+
   // TODO add methods
 }
 
