@@ -15,3 +15,23 @@ export type Carrier = {
 export type CarriersResponse = {
     carriers: Carrier[]
 }
+
+export type ShipStationAddress = {
+    name: string
+    phone: string
+    email?: string | null
+    company_name?: string | null
+    address_line1: string
+    address_line2?: string | null
+    address_line3?: string | null
+    city_locality: string
+    state_province: string
+    postal_code: string
+    country_code: string
+    address_residential_indicator: "unknown" | "yes" | "no"
+    instructions?: string | null
+    geolocation?: {
+      type?: string
+      value?: string
+    }[]
+  }
