@@ -5,14 +5,19 @@ import {
 import { 
   CalculatedShippingOptionPrice,
   CalculateShippingOptionPriceDTO,
+  CartAddressDTO,
+  CartLineItemDTO,
   CreateShippingOptionDTO,
   FulfillmentOption,
+  OrderLineItemDTO,
+  StockLocationAddressDTO,
 } from "@medusajs/framework/types"
 import { 
   ShipStationClient 
 } from './client'
 import {
   GetShippingRatesResponse,
+  Rate,
   ShipStationAddress,
 } from "./types"
 
@@ -314,3 +319,5 @@ class ShipStationProviderService extends AbstractFulfillmentProviderService {
 }
 
 export default ShipStationProviderService
+
+//Export Module definition
