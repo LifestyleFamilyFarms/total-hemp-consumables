@@ -1,6 +1,9 @@
 import { AbstractFulfillmentProviderService } from "@medusajs/framework/utils"
 import { ShipStationClient } from './client'
-import { FulfillmentOption } from "@medusajs/framework/types"
+import { 
+  FulfillmentOption,
+  CreateShippingOptionDTO
+ } from "@medusajs/framework/types"
 
 export type ShipStationOptions = {
   api_key: string
@@ -35,6 +38,10 @@ class ShipStationProviderService extends AbstractFulfillmentProviderService {
     })
 
     return fulfillmentOptions
+  }
+
+  async canCalculate(data: CreateShippingOptionDTO): Promise<boolean> {
+    return true
   }
 
   // TODO add methods
