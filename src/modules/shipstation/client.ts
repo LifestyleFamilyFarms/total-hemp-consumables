@@ -50,7 +50,6 @@ export class ShipStationClient {
     return await this.sendRequest("/carriers")
   }
 
-
   async getShippingRates(
     data: GetShippingRatesRequest
   ): Promise<GetShippingRatesResponse> {
@@ -75,13 +74,11 @@ export class ShipStationClient {
   }
 
   //getShipment
-
   async getShipment(id: string): Promise<Shipment> {
     return await this.sendRequest(`/labels/shipment/${id}`)
   }
 
   //purchaseLabelForShipment
-
   async purchaseLabelForShipment(id: string): Promise<Label> {
     return await this.sendRequest(`/labels/shipment/${id}`, {
       method: "POST",
@@ -90,6 +87,5 @@ export class ShipStationClient {
   }
 
   //MORE METHODS
-
   
 }
