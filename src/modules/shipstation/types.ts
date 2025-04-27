@@ -73,3 +73,11 @@ export type GetShippingRatesRequest = {
       preferred_currency: string
     }  
 }
+
+export type GetShippingRatesResponse = {
+    shipment_id: string
+    carrier_id?: string
+    service_code?: string
+    external_order_id?: string
+    rate_response: RateResponse
+  }
