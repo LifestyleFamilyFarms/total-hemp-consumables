@@ -81,3 +81,23 @@ export type GetShippingRatesResponse = {
     external_order_id?: string
     rate_response: RateResponse
   }
+
+  export type Shipment = {
+    shipment_id: string
+    carrier_id: string
+    service_code: string
+    ship_to: ShipStationAddress
+    return_to?: ShipStationAddress
+    is_return?: boolean
+    ship_from: ShipStationAddress
+    items?: [
+      {
+        name?: string
+        quantity?: number
+        sku?: string
+      }
+    ]
+    warehouse_id?: string
+    shipment_status: "pending" | "processing" | "label_purchased" | "cancelled"
+    [k: string]: unknown
+  }
