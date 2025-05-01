@@ -41,17 +41,18 @@ class ShipStationProviderService extends AbstractFulfillmentProviderService {
     const { carriers } = await this.client.getCarriers()
     const fulfillmentOptions: FulfillmentOption[] = []
 
-    carriers.filter((carrier) => !carrier.disabled_by_billing_plan)
-    .forEach((carrier) => {
-      carrier.services.forEach((service) => {
-        fulfillmentOptions.push({
-          id: `${carrier.carrier_id}__${service.service_code}`,
-          name: service.name,
-          carrier_id: carrier.carrier_id,
-          carrier_service_code: service.service_code
+    carriers
+      .filter((carrier) => !carrier.disabled_by_billing_plan)
+      .forEach((carrier) => {
+        carrier.services.forEach((service) => {
+          fulfillmentOptions.push({
+            id: `${carrier.carrier_id}__${service.service_code}`,
+            name: service.name,
+            carrier_id: carrier.carrier_id,
+            carrier_service_code: service.service_code
+          })
         })
       })
-    })
 
     return fulfillmentOptions
   }
@@ -164,7 +165,7 @@ class ShipStationProviderService extends AbstractFulfillmentProviderService {
   ): Promise<CalculatedShippingOptionPrice> {
     const { shipment_id } = data as {
       shipment_id?: string
-    } || {}
+    }
     const { carrier_id, carrier_service_code } = optionData as {
       carrier_id: string
       carrier_service_code: string
