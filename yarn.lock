@@ -2933,6 +2933,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@medusajs/js-sdk@npm:^2.7.1":
+  version: 2.7.1
+  resolution: "@medusajs/js-sdk@npm:2.7.1"
+  dependencies:
+    "@medusajs/types": "npm:2.7.1"
+    fetch-event-stream: "npm:^0.1.5"
+    qs: "npm:^6.12.1"
+  checksum: 10c0/24316147dcad57c0764b3b2b935e26a0164e38548bf4c9407feea16bae9bd2186215e7caaf1197c38cc2f8ac29d18197cdc9d59f939f8e218725daff6663eead
+  languageName: node
+  linkType: hard
+
 "@medusajs/link-modules@npm:^2.6.0":
   version: 2.6.0
   resolution: "@medusajs/link-modules@npm:2.6.0"
@@ -3348,6 +3359,24 @@ __metadata:
     vite:
       optional: true
   checksum: 10c0/356819ba354cc3538779848601c6d09d7c3c171c5516098a060c63256dc28b55e23f48a4afa6c64fc61fcd6b2d6e8f8d4307e86990665b978bcb1fa16d7ea3d3
+  languageName: node
+  linkType: hard
+
+"@medusajs/types@npm:2.7.1, @medusajs/types@npm:^2.7.1":
+  version: 2.7.1
+  resolution: "@medusajs/types@npm:2.7.1"
+  dependencies:
+    bignumber.js: "npm:^9.1.2"
+  peerDependencies:
+    awilix: ^8.0.1
+    ioredis: ^5.4.1
+    vite: ^5 || ^6
+  peerDependenciesMeta:
+    ioredis:
+      optional: true
+    vite:
+      optional: true
+  checksum: 10c0/306b1bae7abdfb1ee32b87368aeee50df2063ca9bc1133f7cbeee6d5a6528b3c92ec7bae8524fe40b043cf8e15183828e03aa42b736ce093c69eb59744b95256
   languageName: node
   linkType: hard
 
@@ -15240,8 +15269,10 @@ __metadata:
     "@medusajs/admin-sdk": "npm:2.6.0"
     "@medusajs/cli": "npm:^2.6.1"
     "@medusajs/framework": "npm:^2.6.1"
+    "@medusajs/js-sdk": "npm:^2.7.1"
     "@medusajs/medusa": "npm:2.6.0"
     "@medusajs/test-utils": "npm:2.6.0"
+    "@medusajs/types": "npm:^2.7.1"
     "@mikro-orm/cli": "npm:6.4.3"
     "@mikro-orm/core": "npm:6.4.3"
     "@mikro-orm/knex": "npm:6.4.3"
