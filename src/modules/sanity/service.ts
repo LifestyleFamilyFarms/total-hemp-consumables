@@ -1,7 +1,7 @@
 import {
     Logger,
     ProductDTO,
-  } from "@medusajs/types"
+  } from "@medusajs/framework/types"
 
 import {
     createClient,
