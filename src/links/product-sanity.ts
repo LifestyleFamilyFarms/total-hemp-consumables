@@ -18,7 +18,7 @@ defineLink(
         linkable: {
             serviceName: SANITY_MODULE,
             alias: "sanity_product",
-            primaryKey: "id",
+            primaryKey: "_id",
         }
     },
     /*
