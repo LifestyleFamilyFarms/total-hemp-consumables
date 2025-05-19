@@ -7,6 +7,7 @@ const isProd = process.env.NODE_ENV === 'production';
 module.exports = defineConfig({
   admin: {
     backendUrl: process.env.MEDUSA_BACKEND_URL,
+    disable: process.env.DISABLE_MEDUSA_ADMIN === "true",
     storefrontUrl: process.env.MEDUSA_STOREFRONT_URL,
   },
   projectConfig: {
@@ -14,6 +15,7 @@ module.exports = defineConfig({
     databaseUrl: process.env.DATABASE_URL,
     databaseName: process.env.DATABASE_NAME,
     redisUrl: process.env.REDIS_URL,
+    workerMode: process.env.MEDUSA_WORKER_MODE as "shared" | "worker" | "server",
     http: {
       storeCors: process.env.STORE_CORS!,
       adminCors: process.env.ADMIN_CORS!,
