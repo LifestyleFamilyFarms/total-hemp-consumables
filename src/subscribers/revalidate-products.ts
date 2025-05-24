@@ -8,7 +8,13 @@ import type {
     container,
   }: SubscriberArgs<{ id: string }>) {
     // send request to next.js storefront to revalidate cache
-    await fetch(`${process.env.NEXT_PUBLIC_MEDUSA_URL}/api/revalidate?tags=products`)
+    console.log("Initiating revalidation of products")
+    try {
+        const res = await fetch(`${process.env.STOREFRONT_URL}/api/revalidate?tags=products`)
+        console.log("Revalidate response:", res.status, await res.text())
+      } catch (e) {
+        console.error("Revalidate failed:", e)
+      }
   }  
 
   export const config: SubscriberConfig = {
