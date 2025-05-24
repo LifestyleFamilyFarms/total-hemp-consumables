@@ -12,5 +12,9 @@ import type {
   }  
 
   export const config: SubscriberConfig = {
-    event: "product.updated",
+    event: [ 
+        "product.updated",
+        "product.created",
+        "product.deleted",
+    ],
   }
