@@ -6,8 +6,8 @@ export const { handler, config } = createRevalidateSubscriber({
         "product.updated", 
         "product.created", 
         "product.deleted",
-        "product.variant.updated",
-        "product.variant.created",
-        "product.variant.deleted",
+        "product-variant.updated",
+        "product-variant.created",
+        "product-variant.deleted",
     ],
 })
