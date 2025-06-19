@@ -38,7 +38,7 @@ A subscriber receives an object having the following properties:
 
 ```ts
 import type {
-  SubscriberArgs,
+  SubscriberArgs, 
   SubscriberConfig,
 } from "@medusajs/framework"
 
