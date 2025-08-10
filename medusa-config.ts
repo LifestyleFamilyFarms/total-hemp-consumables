@@ -29,6 +29,24 @@ module.exports = defineConfig({
       : {},
   },
   modules: [
+    //Authorize.net Payment Module
+    {
+      resolve: "@medusajs/medusa/payment",
+      options: {
+        providers: [
+          {
+            resolve: "payment-authorizenet-medusa",
+            id: "authorizenet",
+            options: {
+              api_login_id: process.env.AUTHORIZE_NET_API_LOGIN_ID,
+              transaction_key: process.env.AUTHORIZE_NET_TRANSACTION_KEY,
+              capture: true,
+              environment: process.env.NODE_ENV === "production" ? "production" : "sandbox"
+            }
+          }
+        ]
+      }
+    },
     // Redis Cache Module
     {
       resolve: '@medusajs/medusa/cache-redis',
