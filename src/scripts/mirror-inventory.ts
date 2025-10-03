@@ -159,12 +159,19 @@ async function mirrorInventory() {
             body: { sku },
           })
           .then((r) => r.inventory_item.id)
-        devItemIdBySku.set(sku, devItemId)
-        createdItems++
+        if (devItemId) {
+          devItemIdBySku.set(sku, devItemId)
+          createdItems++
+        }
       } catch (e) {
         console.warn(`Failed to create dev inventory item for sku=${sku}:`, (e as any)?.message || e)
         continue
       }
+    }
+
+    if (!devItemId) {
+      // Could not ensure inventory item exists; skip to avoid type issues
+      continue
     }
 
     // Link item ↔ variant (best-effort)

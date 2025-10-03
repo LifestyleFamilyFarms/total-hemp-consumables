@@ -202,23 +202,23 @@ async function mirror() {
     console.warn(`Stock location mirror skipped:`, (e as any)?.message || e)
   }
   // 0) sales channels: mirror by name and set default store channel
-  const prodChannels = await prod.client
+  const prodChannels: { id: string; name: string }[] = await prod.client
     .fetch<{ sales_channels: { id: string; name: string }[] }>(`/admin/sales-channels`, {
       method: "GET",
       query: { limit: 100 },
     })
-    .then((r) => r.sales_channels || [])
-    .catch(() => [])
+    .then((r) => r.sales_channels ?? [])
+    .catch(() => [] as { id: string; name: string }[])
 
   // Upsert DEV channels and build name→id map
   const devChannelIdByName = new Map<string, string>()
-  const devExisting = await dev.client
+  const devExisting: { id: string; name: string }[] = await dev.client
     .fetch<{ sales_channels: { id: string; name: string }[] }>(`/admin/sales-channels`, {
       method: "GET",
       query: { limit: 100 },
     })
-    .then((r) => r.sales_channels || [])
-    .catch(() => [])
+    .then((r) => r.sales_channels ?? [])
+    .catch(() => [] as { id: string; name: string }[])
 
   for (const sc of prodChannels) {
     const name = sc.name || ""

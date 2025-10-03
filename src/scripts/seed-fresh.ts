@@ -136,7 +136,10 @@ export default async function seedFresh({ container }: ExecArgs) {
 
   // Link stock location to default sales channel
   await linkSalesChannelsToStockLocationWorkflow(container).run({
-    input: { sales_channel_id: defaultChannel.id, stock_location_id: stockLocation.id },
+    input: {
+      id: stockLocation.id,
+      add: [defaultChannel.id],
+    },
   })
 
   // 8) Shipping options (USD flat rates)
