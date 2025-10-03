@@ -118,12 +118,14 @@ class ShipStationProviderService extends AbstractFulfillmentProviderService {
       address_residential_indicator: "unknown",
     }
     
-    // Sum the package's weight
-    // You can instead create different packages for each item
-    const packageWeight = items.reduce((sum, item) => {
+    // Sum the package's weight (Medusa variant.weight is grams)
+    // Convert to kilograms for ShipStation when specifying unit: "kilogram"
+    const totalGrams = items.reduce((sum, item) => {
       // @ts-ignore
-      return sum + (item.variant.weight || 0)
+      const w = Number(item?.variant?.weight) || 0
+      return sum + w
     }, 0)
+    const packageWeightKg = totalGrams / 1000
 
     return await this.client.getShippingRates({
       shipment: {
@@ -139,7 +141,7 @@ class ShipStationProviderService extends AbstractFulfillmentProviderService {
         })),
         packages: [{
           weight: {
-            value: packageWeight,
+            value: packageWeightKg,
             unit: "kilogram",
           },
         }],

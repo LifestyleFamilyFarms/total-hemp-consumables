@@ -55,6 +55,23 @@ async function upsertProductType(value: string) {
   return created.product_type
 }
 
+async function getDefaultSalesChannelId(): Promise<string | undefined> {
+  // Try by name first
+  const list = await sdk.client
+    .fetch<AdminListResponse<{ id: string; name: string }>>(`/admin/sales-channels`, {
+      method: "GET",
+      query: { limit: 50 },
+    })
+    .then((r) => r["sales_channels"] || [])
+    .catch(() => [])
+
+  const byName = list.find((sc) => (sc.name || "").toLowerCase() === "default sales channel")
+  if (byName) return byName.id
+
+  // Fallback: pick first if any
+  return list[0]?.id
+}
+
 async function upsertCategory(name: string, handle: string, parent_category_id?: string) {
   const key = "product_categories"
   const list = await sdk.client
@@ -169,23 +186,28 @@ async function main() {
   {
     const handle = "example-flower"
     const weights = [350, 700, 1400, 2800]
+    const isDevEnv = (process.env.NODE_ENV || "development").startsWith("dev")
+    const salesChannelId = isDevEnv ? await getDefaultSalesChannelId() : undefined
     await upsertProduct({
       title: "Example Flower",
       handle,
       status: "published",
       type_id: typeFlower.id,
       categories: [{ id: catFlower.id }],
+      ...(salesChannelId ? { sales_channels: [{ id: salesChannelId }] } : {}),
       options: [{ title: "Weight", values: weights.map((g) => `${g} g`) }],
       variants: weights
         .map((g) => {
           const v = flowerVariant(g)
+          const isDev = (process.env.NODE_ENV || "development").startsWith("dev")
           return {
             ...v,
             title: v.metadata.weight_label || `${g} g`,
             sku: sku("THC-FLW", handle, g + "g"),
             prices: [{ currency_code: "usd", amount: 2000 }],
-            // inventory is managed separately in v2; omit inventory_quantity to avoid 400s
-            manage_inventory: true,
+            // For dev demos: don't block on inventory
+            manage_inventory: !isDev,
+            allow_backorder: isDev,
           }
         }),
     })
@@ -196,12 +218,15 @@ async function main() {
 
   {
     const handle = "example-edible"
+    const isDevEnv = (process.env.NODE_ENV || "development").startsWith("dev")
+    const salesChannelId = isDevEnv ? await getDefaultSalesChannelId() : undefined
     await upsertProduct({
       title: "Example Edible",
       handle,
       status: "published",
       type_id: typeEdibles.id,
       categories: [{ id: catEdibles.id }],
+      ...(salesChannelId ? { sales_channels: [{ id: salesChannelId }] } : {}),
       options: [
         { title: "Dose (mg)", values: edibleDoses.map((d) => `${d}`) },
         { title: "Pack Size", values: ediblePacks.map((p) => `${p}`) },
@@ -214,7 +239,8 @@ async function main() {
           title: `${v.metadata.dose_mg} mg × ${v.metadata.pack_count}`,
           sku: sku("THC-EDB", handle, `${v.metadata.dose_mg}mg`, v.metadata.pack_count),
           prices: [{ currency_code: "usd", amount: 1500 }],
-          manage_inventory: true,
+          manage_inventory: !(process.env.NODE_ENV || "development").startsWith("dev"),
+          allow_backorder: (process.env.NODE_ENV || "development").startsWith("dev"),
         })),
     })
   }
@@ -222,12 +248,15 @@ async function main() {
   {
     const handle = "example-beverage"
     const servings = [5, 10]
+    const isDevEnv = (process.env.NODE_ENV || "development").startsWith("dev")
+    const salesChannelId = isDevEnv ? await getDefaultSalesChannelId() : undefined
     await upsertProduct({
       title: "Example Beverage",
       handle,
       status: "published",
       type_id: typeBeverages.id,
       categories: [{ id: catBeverages.id }],
+      ...(salesChannelId ? { sales_channels: [{ id: salesChannelId }] } : {}),
       options: [{ title: "Serving (mg)", values: servings.map((s) => `${s}`) }],
       variants: servings.map((s) => {
         const v = beverageVariant(s)
@@ -236,7 +265,8 @@ async function main() {
           title: `${s} mg (12 oz)`,
           sku: sku("THC-BEV", handle, `${s}mg`, "12oz"),
           prices: [{ currency_code: "usd", amount: 799 }],
-          manage_inventory: true,
+          manage_inventory: !(process.env.NODE_ENV || "development").startsWith("dev"),
+          allow_backorder: (process.env.NODE_ENV || "development").startsWith("dev"),
         }
       }),
       metadata: { volume_oz: 12 },
