@@ -1,0 +1,336 @@
+[32minfo[39m:    Watching filesystem to reload dev server on file change
+[32minfo[39m:    Skipping instrumentation registration. No register function found.
+[32minfo[39m:    No link to load from /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/draft-order/.medusa/server/src/links. skipped.
+[32minfo[39m:    Connection to Redis in module 'event-bus-redis' established
+[32minfo[39m:    Connection to Redis in module 'cache-redis' established
+[32minfo[39m:    Connection to Redis in "locking-redis" provider established
+[32minfo[39m:    Locking module: Using "locking-redis" as default.
+[32minfo[39m:    Connection to Redis in module 'workflow-engine-redis' established
+[32minfo[39m:    Connection to Redis PubSub in module 'workflow-engine-redis' established
+[32minfo[39m:    No workflow to load from /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/draft-order/.medusa/server/src/workflows. skipped.
+[32minfo[39m:    No subscriber to load from /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/draft-order/.medusa/server/src/subscribers. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-categories.ts is not a function. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-collections.ts is not a function. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-factory.ts is not a function. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-products.ts is not a function. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-regions.ts is not a function. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-tags.ts is not a function. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-types.ts is not a function. skipped.
+[32minfo[39m:    No job to load from /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/medusa/dist/jobs. skipped.
+[32minfo[39m:    No job to load from /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/draft-order/.medusa/server/src/jobs. skipped.
+- Creating server
+✔ Server is ready on port: 9000 – 6ms
+[32minfo[39m:    Admin URL → http://localhost:9000/app
+[32minfo[39m:    docs/task-002/artifacts/storefront-dev-20251022-154158.log created: Restarting dev server
+[32minfo[39m:    Gracefully shutting down server
+[32minfo[39m:    docs/task-002/artifacts/storefront-dev.pid modified: Restarting dev server
+[32minfo[39m:    docs/task-002/artifacts/storefront-dev-20251022-154158.log modified: Restarting dev server
+[32minfo[39m:    Skipping instrumentation registration. No register function found.
+[32minfo[39m:    No link to load from /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/draft-order/.medusa/server/src/links. skipped.
+[32minfo[39m:    Connection to Redis in module 'event-bus-redis' established
+[32minfo[39m:    Connection to Redis in module 'cache-redis' established
+[32minfo[39m:    Connection to Redis in "locking-redis" provider established
+[32minfo[39m:    Locking module: Using "locking-redis" as default.
+[32minfo[39m:    Connection to Redis in module 'workflow-engine-redis' established
+[32minfo[39m:    Connection to Redis PubSub in module 'workflow-engine-redis' established
+[32minfo[39m:    No workflow to load from /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/draft-order/.medusa/server/src/workflows. skipped.
+[32minfo[39m:    No subscriber to load from /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/draft-order/.medusa/server/src/subscribers. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-categories.ts is not a function. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-collections.ts is not a function. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-factory.ts is not a function. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-products.ts is not a function. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-regions.ts is not a function. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-tags.ts is not a function. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-types.ts is not a function. skipped.
+[32minfo[39m:    No job to load from /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/medusa/dist/jobs. skipped.
+[32minfo[39m:    No job to load from /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/draft-order/.medusa/server/src/jobs. skipped.
+- Creating server
+✔ Server is ready on port: 9000 – 5ms
+[32minfo[39m:    Admin URL → http://localhost:9000/app
+[32minfo[39m:    docs/task-002/artifacts/storefront-dev.pid modified: Restarting dev server
+[32minfo[39m:    Gracefully shutting down server
+[32minfo[39m:    docs/task-002/artifacts/storefront-dev-20251022-154241.log created: Restarting dev server
+[32minfo[39m:    Skipping instrumentation registration. No register function found.
+[32minfo[39m:    No link to load from /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/draft-order/.medusa/server/src/links. skipped.
+[32minfo[39m:    Connection to Redis in module 'event-bus-redis' established
+[32minfo[39m:    Connection to Redis in module 'cache-redis' established
+[32minfo[39m:    Connection to Redis in "locking-redis" provider established
+[32minfo[39m:    Locking module: Using "locking-redis" as default.
+[32minfo[39m:    Connection to Redis in module 'workflow-engine-redis' established
+[32minfo[39m:    Connection to Redis PubSub in module 'workflow-engine-redis' established
+[32minfo[39m:    No workflow to load from /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/draft-order/.medusa/server/src/workflows. skipped.
+[32minfo[39m:    No subscriber to load from /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/draft-order/.medusa/server/src/subscribers. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-categories.ts is not a function. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-collections.ts is not a function. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-factory.ts is not a function. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-products.ts is not a function. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-regions.ts is not a function. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-tags.ts is not a function. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-types.ts is not a function. skipped.
+[32minfo[39m:    No job to load from /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/medusa/dist/jobs. skipped.
+[32minfo[39m:    No job to load from /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/draft-order/.medusa/server/src/jobs. skipped.
+- Creating server
+✔ Server is ready on port: 9000 – 6ms
+[32minfo[39m:    Admin URL → http://localhost:9000/app
+[32minfo[39m:    Processing cart.created which has 0 subscribers
+[32mhttp[39m:    POST /store/carts ← - (200) - 124.934 ms
+[32minfo[39m:    Processing cart.updated which has 0 subscribers
+[32mhttp[39m:    POST /store/carts/cart_01K86Q55XH9ZNT7VASERE82M3A/line-items ← - (200) - 134.118 ms
+[32minfo[39m:    Processing cart.updated which has 0 subscribers
+[32mhttp[39m:    POST /store/carts/cart_01K86Q55XH9ZNT7VASERE82M3A ← - (200) - 132.294 ms
+[32minfo[39m:    Processing cart.updated which has 0 subscribers
+[32mhttp[39m:    POST /store/carts/cart_01K86Q55XH9ZNT7VASERE82M3A ← - (200) - 137.432 ms
+[32mhttp[39m:    GET /store/shipping-options?cart_id=cart_01K86Q55XH9ZNT7VASERE82M3A ← - (200) - 50.482 ms
+[32minfo[39m:    Processing cart.updated which has 0 subscribers
+[32mhttp[39m:    POST /store/carts/cart_01K86Q55XH9ZNT7VASERE82M3A/shipping-methods ← - (200) - 220.306 ms
+[32mhttp[39m:    POST /store/payment-collections ← - (200) - 28.565 ms
+[32mhttp[39m:    POST /store/payment-collections/pay_col_01K86Q7GDB8KQM6YEMSKPEE96N/payment-sessions ← - (200) - 20.492 ms
+[31merror[39m:   Error was thrown trying to authorize payment session - payses_01K86Q7V8MC295GCYSF60R005V - TypeError: Cannot read properties of undefined (reading 'shipping_methods')
+[32mhttp[39m:    POST /store/carts/cart_01K86Q55XH9ZNT7VASERE82M3A/complete ← - (200) - 458.974 ms
+[32mhttp[39m:    GET /store/carts/cart_01K86Q55XH9ZNT7VASERE82M3A ← - (200) - 25.270 ms
+[32minfo[39m:    Processing cart.created which has 0 subscribers
+[32mhttp[39m:    POST /store/carts ← - (200) - 78.440 ms
+[32minfo[39m:    Processing cart.updated which has 0 subscribers
+[32mhttp[39m:    POST /store/carts/cart_01K86Q9SSY269E1PE8PTC7QPP1/line-items ← - (200) - 93.065 ms
+[32minfo[39m:    Processing cart.updated which has 0 subscribers
+[32mhttp[39m:    POST /store/carts/cart_01K86Q9SSY269E1PE8PTC7QPP1 ← - (200) - 147.645 ms
+[32minfo[39m:    Processing cart.updated which has 0 subscribers
+[32mhttp[39m:    POST /store/carts/cart_01K86Q9SSY269E1PE8PTC7QPP1 ← - (200) - 150.533 ms
+[32mhttp[39m:    GET /store/shipping-options?cart_id=cart_01K86Q9SSY269E1PE8PTC7QPP1 ← - (200) - 51.723 ms
+[32minfo[39m:    Processing cart.updated which has 0 subscribers
+[32mhttp[39m:    POST /store/carts/cart_01K86Q9SSY269E1PE8PTC7QPP1/shipping-methods ← - (200) - 174.114 ms
+[32mhttp[39m:    GET /store/carts/cart_01K86Q9SSY269E1PE8PTC7QPP1 ← - (200) - 17.195 ms
+[32mhttp[39m:    POST /store/payment-collections ← - (200) - 20.709 ms
+[32mhttp[39m:    POST /store/payment-collections/pay_col_01K86QC2KANK1NBAK4318CZPS3/payment-sessions ← - (200) - 11.669 ms
+[32minfo[39m:    Processing cart.created which has 0 subscribers
+[32mhttp[39m:    POST /store/carts ← - (200) - 95.542 ms
+[32minfo[39m:    Processing cart.updated which has 0 subscribers
+[32mhttp[39m:    POST /store/carts/cart_01K86W6HDPZSNW19DMDAHAM58T/line-items ← - (200) - 143.297 ms
+[32minfo[39m:    Processing cart.updated which has 0 subscribers
+[32mhttp[39m:    POST /store/carts/cart_01K86W6HDPZSNW19DMDAHAM58T ← - (200) - 118.218 ms
+[32minfo[39m:    Processing cart.updated which has 0 subscribers
+[32mhttp[39m:    POST /store/carts/cart_01K86W6HDPZSNW19DMDAHAM58T ← - (200) - 128.733 ms
+[32mhttp[39m:    GET /store/shipping-options?cart_id=cart_01K86W6HDPZSNW19DMDAHAM58T ← - (200) - 36.109 ms
+[32minfo[39m:    Processing cart.updated which has 0 subscribers
+[32mhttp[39m:    POST /store/carts/cart_01K86W6HDPZSNW19DMDAHAM58T/shipping-methods ← - (200) - 180.273 ms
+[32mhttp[39m:    POST /store/payment-collections ← - (200) - 15.362 ms
+[32mhttp[39m:    POST /store/payment-collections/pay_col_01K86W88X0DEEN0VJQ4XHCC93X/payment-sessions ← - (200) - 14.775 ms
+[32mhttp[39m:    POST /store/payment-collections ← - (200) - 3.548 ms
+[31merror[39m:   Encountered an error when trying to delete payment session - payses_01K86W94QX3HHN3006R23DEYG8 - [object Object]
+[31merror[39m:   Could not delete all payment sessions
+{
+  message: 'Could not delete all payment sessions',
+  name: 'Error',
+  stack: 'Error: Could not delete all payment sessions\n' +
+    '    at Object.<anonymous> (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/core-flows/src/payment-collection/steps/validate-deleted-payment-sessions.ts:36:13)\n' +
+    '    at Object.invoke (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/workflows-sdk/src/utils/composer/helpers/create-step-handler.ts:84:67)\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+    '    at async DistributedTransaction.handler (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/orchestration/src/workflow/workflow-manager.ts:214:16)\n' +
+    '    at async stepHandler (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/orchestration/src/transaction/transaction-orchestrator.ts:1043:14)\n' +
+    '    at async Promise.allSettled (index 0)\n' +
+    '    at async promiseAll (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/utils/src/common/promise-all.ts:27:18)\n' +
+    '    at async TransactionOrchestrator.executeNext (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/orchestration/src/transaction/transaction-orchestrator.ts:897:7)\n' +
+    '    at async executeNext (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/orchestration/src/transaction/transaction-orchestrator.ts:1281:14)\n' +
+    '    at async TransactionOrchestrator.resume (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/orchestration/src/transaction/transaction-orchestrator.ts:1296:5)\n' +
+    '⮑ sat /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/core-flows/dist/payment-collection/workflows/delete-payment-sessions.js: [delete-payment-sessions -> validate-deleted-payment-sessions (invoke)]\n' +
+    '⮑ sat /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/core-flows/dist/payment-collection/workflows/create-payment-session.js: [create-payment-sessions -> delete-payment-sessions-as-step (invoke)]',
+  __isMedusaError: true,
+  type: 'unexpected_state',
+  code: undefined,
+  date: 2025-10-22T21:21:29.413Z
+}
+[32mhttp[39m:    POST /store/payment-collections/pay_col_01K86W88X0DEEN0VJQ4XHCC93X/payment-sessions ← - (500) - 417.853 ms
+[31merror[39m:   Encountered an error when trying to delete payment session - payses_01K86W94QX3HHN3006R23DEYG8 - [object Object]
+[31merror[39m:   Encountered an error when trying to delete payment session - payses_01K86WRR33EZJ9V8PBFFVDE77Z - [object Object]
+[31merror[39m:   Could not delete all payment sessions
+{
+  message: 'Could not delete all payment sessions',
+  name: 'Error',
+  stack: 'Error: Could not delete all payment sessions\n' +
+    '    at Object.<anonymous> (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/core-flows/src/payment-collection/steps/validate-deleted-payment-sessions.ts:36:13)\n' +
+    '    at Object.invoke (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/workflows-sdk/src/utils/composer/helpers/create-step-handler.ts:84:67)\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+    '    at async DistributedTransaction.handler (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/orchestration/src/workflow/workflow-manager.ts:214:16)\n' +
+    '    at async stepHandler (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/orchestration/src/transaction/transaction-orchestrator.ts:1043:14)\n' +
+    '    at async Promise.allSettled (index 0)\n' +
+    '    at async promiseAll (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/utils/src/common/promise-all.ts:27:18)\n' +
+    '    at async TransactionOrchestrator.executeNext (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/orchestration/src/transaction/transaction-orchestrator.ts:897:7)\n' +
+    '    at async executeNext (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/orchestration/src/transaction/transaction-orchestrator.ts:1281:14)\n' +
+    '    at async TransactionOrchestrator.resume (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/orchestration/src/transaction/transaction-orchestrator.ts:1296:5)\n' +
+    '⮑ sat /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/core-flows/dist/payment-collection/workflows/delete-payment-sessions.js: [delete-payment-sessions -> validate-deleted-payment-sessions (invoke)]\n' +
+    '⮑ sat /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/core-flows/dist/payment-collection/workflows/create-payment-session.js: [create-payment-sessions -> delete-payment-sessions-as-step (invoke)]',
+  __isMedusaError: true,
+  type: 'unexpected_state',
+  code: undefined,
+  date: 2025-10-22T21:25:15.980Z
+}
+[32mhttp[39m:    POST /store/payment-collections/pay_col_01K86W88X0DEEN0VJQ4XHCC93X/payment-sessions ← - (500) - 419.242 ms
+[32minfo[39m:    Processing cart.created which has 0 subscribers
+[32mhttp[39m:    POST /store/carts ← - (200) - 103.400 ms
+[32minfo[39m:    Processing cart.updated which has 0 subscribers
+[32mhttp[39m:    POST /store/carts/cart_01K86X000ZXEBWBHBXAZA12P22/line-items ← - (200) - 114.816 ms
+[32minfo[39m:    Processing cart.updated which has 0 subscribers
+[32mhttp[39m:    POST /store/carts/cart_01K86X000ZXEBWBHBXAZA12P22 ← - (200) - 126.878 ms
+[32minfo[39m:    Processing cart.updated which has 0 subscribers
+[32mhttp[39m:    POST /store/carts/cart_01K86X000ZXEBWBHBXAZA12P22 ← - (200) - 106.084 ms
+[32mhttp[39m:    GET /store/shipping-options?cart_id=cart_01K86X000ZXEBWBHBXAZA12P22 ← - (200) - 37.621 ms
+[32minfo[39m:    Processing cart.updated which has 0 subscribers
+[32mhttp[39m:    POST /store/carts/cart_01K86X000ZXEBWBHBXAZA12P22/shipping-methods ← - (200) - 150.898 ms
+[32mhttp[39m:    GET /store/carts/cart_01K86X000ZXEBWBHBXAZA12P22 ← - (200) - 17.568 ms
+[32mhttp[39m:    POST /store/payment-collections ← - (200) - 23.166 ms
+[32mhttp[39m:    POST /store/payment-collections/pay_col_01K86X2HXC83WHFW2AFV1B1Z60/payment-sessions ← - (200) - 14.637 ms
+[31merror[39m:   Encountered an error when trying to delete payment session - payses_01K86X3313HW2WWHXA690MZHBZ - [object Object]
+[31merror[39m:   Could not delete all payment sessions
+{
+  message: 'Could not delete all payment sessions',
+  name: 'Error',
+  stack: 'Error: Could not delete all payment sessions\n' +
+    '    at Object.<anonymous> (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/core-flows/src/payment-collection/steps/validate-deleted-payment-sessions.ts:36:13)\n' +
+    '    at Object.invoke (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/workflows-sdk/src/utils/composer/helpers/create-step-handler.ts:84:67)\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+    '    at async DistributedTransaction.handler (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/orchestration/src/workflow/workflow-manager.ts:214:16)\n' +
+    '    at async stepHandler (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/orchestration/src/transaction/transaction-orchestrator.ts:1043:14)\n' +
+    '    at async Promise.allSettled (index 0)\n' +
+    '    at async promiseAll (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/utils/src/common/promise-all.ts:27:18)\n' +
+    '    at async TransactionOrchestrator.executeNext (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/orchestration/src/transaction/transaction-orchestrator.ts:897:7)\n' +
+    '    at async executeNext (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/orchestration/src/transaction/transaction-orchestrator.ts:1281:14)\n' +
+    '    at async TransactionOrchestrator.resume (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/orchestration/src/transaction/transaction-orchestrator.ts:1296:5)\n' +
+    '⮑ sat /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/core-flows/dist/payment-collection/workflows/delete-payment-sessions.js: [delete-payment-sessions -> validate-deleted-payment-sessions (invoke)]\n' +
+    '⮑ sat /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/core-flows/dist/payment-collection/workflows/create-payment-session.js: [create-payment-sessions -> delete-payment-sessions-as-step (invoke)]',
+  __isMedusaError: true,
+  type: 'unexpected_state',
+  code: undefined,
+  date: 2025-10-22T21:27:56.645Z
+}
+[32mhttp[39m:    POST /store/payment-collections/pay_col_01K86X2HXC83WHFW2AFV1B1Z60/payment-sessions ← - (500) - 392.927 ms
+[32minfo[39m:    Processing cart.created which has 0 subscribers
+[32mhttp[39m:    POST /store/carts ← - (200) - 65.858 ms
+[32minfo[39m:    Processing cart.updated which has 0 subscribers
+[32mhttp[39m:    POST /store/carts/cart_01K86XGG3FYJQBQVXQKWAPX81A/line-items ← - (200) - 103.892 ms
+[32minfo[39m:    Processing cart.updated which has 0 subscribers
+[32mhttp[39m:    POST /store/carts/cart_01K86XGG3FYJQBQVXQKWAPX81A ← - (200) - 120.669 ms
+[32minfo[39m:    Processing cart.updated which has 0 subscribers
+[32mhttp[39m:    POST /store/carts/cart_01K86XGG3FYJQBQVXQKWAPX81A ← - (200) - 132.843 ms
+[32mhttp[39m:    GET /store/shipping-options?cart_id=cart_01K86XGG3FYJQBQVXQKWAPX81A ← - (200) - 34.096 ms
+[32minfo[39m:    Processing cart.updated which has 0 subscribers
+[32mhttp[39m:    POST /store/carts/cart_01K86XGG3FYJQBQVXQKWAPX81A/shipping-methods ← - (200) - 184.602 ms
+[32mhttp[39m:    POST /store/payment-collections ← - (200) - 19.100 ms
+[32mhttp[39m:    POST /store/payment-collections/pay_col_01K86XJCCH402C31FSXEYR1VVV/payment-sessions ← - (200) - 12.860 ms
+[32mhttp[39m:    GET /store/regions ← - (200) - 7.001 ms
+[32mhttp[39m:    GET /store/regions ← - (200) - 15.411 ms
+[32mhttp[39m:    GET /store/regions ← - (200) - 9.526 ms
+[32mhttp[39m:    POST /store/carts/cart_01K86XGG3FYJQBQVXQKWAPX81A/complete ← - (200) - 49.003 ms
+[32mhttp[39m:    GET /admin/orders/order_01K86XKK??? ← - (401) - 0.969 ms
+[32mhttp[39m:    GET /store/carts/cart_01K86XGG3FYJQBQVXQKWAPX81A ← - (200) - 34.899 ms
+[32mhttp[39m:    POST /admin/auth ← - (401) - 0.514 ms
+[32minfo[39m:    docs/task-002/artifacts/storefront-dev-20251022-154241.log modified: Restarting dev server
+[32minfo[39m:    Gracefully shutting down server
+[32minfo[39m:    Skipping instrumentation registration. No register function found.
+[32minfo[39m:    No link to load from /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/draft-order/.medusa/server/src/links. skipped.
+[32minfo[39m:    Connection to Redis in module 'event-bus-redis' established
+[32minfo[39m:    Connection to Redis in module 'cache-redis' established
+[32minfo[39m:    Connection to Redis in "locking-redis" provider established
+[32minfo[39m:    Locking module: Using "locking-redis" as default.
+[32minfo[39m:    Connection to Redis in module 'workflow-engine-redis' established
+[32minfo[39m:    Connection to Redis PubSub in module 'workflow-engine-redis' established
+[32minfo[39m:    No workflow to load from /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/draft-order/.medusa/server/src/workflows. skipped.
+[32minfo[39m:    No subscriber to load from /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/draft-order/.medusa/server/src/subscribers. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-categories.ts is not a function. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-collections.ts is not a function. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-factory.ts is not a function. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-products.ts is not a function. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-regions.ts is not a function. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-tags.ts is not a function. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-types.ts is not a function. skipped.
+[32minfo[39m:    No job to load from /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/medusa/dist/jobs. skipped.
+[32minfo[39m:    No job to load from /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/draft-order/.medusa/server/src/jobs. skipped.
+- Creating server
+✔ Server is ready on port: 9000 – 6ms
+[32minfo[39m:    Admin URL → http://localhost:9000/app
+[32minfo[39m:    Gracefully shutting down server
+[32minfo[39m:    Gracefully shutting down server
+[32minfo[39m:    Processing cart.created which has 0 subscribers
+[32minfo[39m:    Processing cart.updated which has 0 subscribers
+[32minfo[39m:    Processing cart.updated which has 0 subscribers
+[32minfo[39m:    Processing cart.updated which has 0 subscribers
+[32minfo[39m:    Gracefully shutting down server
+[32minfo[39m:    Processing cart.updated which has 0 subscribers
+[32minfo[39m:    Processing cart.updated which has 0 subscribers
+[32minfo[39m:    Gracefully shutting down server
+[32minfo[39m:    Gracefully shutting down server
+[32minfo[39m:    Processing region.updated which has 0 subscribers
+[32minfo[39m:    Processing sales-channel.updated which has 0 subscribers
+[32minfo[39m:    Processing product-variant.updated which has 0 subscribers
+[32minfo[39m:    Processing cart.updated which has 0 subscribers
+[32minfo[39m:    Processing product-variant.updated which has 0 subscribers
+[32minfo[39m:    Processing cart.updated which has 0 subscribers
+[32minfo[39m:    Processing cart.created which has 0 subscribers
+[32minfo[39m:    Processing cart.created which has 0 subscribers
+[32minfo[39m:    Processing cart.created which has 0 subscribers
+[32minfo[39m:    Processing cart.created which has 0 subscribers
+[32minfo[39m:    Processing cart.created which has 0 subscribers
+[32minfo[39m:    Processing cart.created which has 0 subscribers
+[32minfo[39m:    Processing cart.updated which has 0 subscribers
+[32minfo[39m:    Processing cart.created which has 0 subscribers
+[32minfo[39m:    Processing cart.updated which has 0 subscribers
+[32minfo[39m:    Processing cart.created which has 0 subscribers
+[32minfo[39m:    Processing cart.updated which has 0 subscribers
+[32minfo[39m:    Processing cart.updated which has 0 subscribers
+[32minfo[39m:    Processing cart.created which has 0 subscribers
+[32minfo[39m:    Processing region.updated which has 0 subscribers
+[32minfo[39m:    Processing shipping-option-type.deleted which has 0 subscribers
+[32minfo[39m:    Processing shipping-option-type.deleted which has 0 subscribers
+[32minfo[39m:    Processing cart.created which has 0 subscribers
+[32minfo[39m:    Processing cart.created which has 0 subscribers
+[32minfo[39m:    Processing cart.updated which has 0 subscribers
+[32minfo[39m:    Processing product.updated which has 0 subscribers
+[32minfo[39m:    Processing product-variant.updated which has 0 subscribers
+[32minfo[39m:    Processing product-variant.updated which has 0 subscribers
+[32minfo[39m:    Processing product-variant.updated which has 0 subscribers
+[32minfo[39m:    Processing product-option.updated which has 0 subscribers
+[32minfo[39m:    Processing product-variant.updated which has 0 subscribers
+[32minfo[39m:    Processing product-variant.updated which has 0 subscribers
+[32minfo[39m:    Processing product-variant.updated which has 0 subscribers
+[32minfo[39m:    Processing product-variant.updated which has 0 subscribers
+[32minfo[39m:    Processing product-variant.updated which has 0 subscribers
+[32minfo[39m:    Processing product-variant.updated which has 0 subscribers
+[32minfo[39m:    Processing product-variant.updated which has 0 subscribers
+[32minfo[39m:    Processing product.updated which has 0 subscribers
+[32minfo[39m:    Processing product.updated which has 0 subscribers
+[32minfo[39m:    Processing product-variant.updated which has 0 subscribers
+[32minfo[39m:    Processing product-variant.updated which has 0 subscribers
+[32minfo[39m:    Processing product-variant.updated which has 0 subscribers
+[32minfo[39m:    Processing product-variant.updated which has 0 subscribers
+[32minfo[39m:    Processing product-variant.updated which has 0 subscribers
+[32minfo[39m:    Processing product-variant.updated which has 0 subscribers
+[32minfo[39m:    Processing product-variant.updated which has 0 subscribers
+[32minfo[39m:    Processing product-variant.updated which has 0 subscribers
+[32minfo[39m:    Processing product-variant.updated which has 0 subscribers
+[32minfo[39m:    Processing product-variant.updated which has 0 subscribers
+[32minfo[39m:    Processing product-variant.updated which has 0 subscribers
+[32minfo[39m:    Processing product-variant.updated which has 0 subscribers
+[32minfo[39m:    Processing product-variant.updated which has 0 subscribers
+[32minfo[39m:    Processing product-variant.updated which has 0 subscribers
+[32minfo[39m:    Processing product-variant.updated which has 0 subscribers
+[32minfo[39m:    Processing product-variant.updated which has 0 subscribers
+[32minfo[39m:    Processing product-variant.updated which has 0 subscribers
+[32minfo[39m:    Processing product-variant.updated which has 0 subscribers
+[32minfo[39m:    Processing product-variant.updated which has 0 subscribers
+[32minfo[39m:    Processing product-variant.updated which has 0 subscribers
+[32minfo[39m:    Processing cart.updated which has 0 subscribers
+[32minfo[39m:    Processing cart.updated which has 0 subscribers
+[32minfo[39m:    Processing cart.updated which has 0 subscribers
+[32minfo[39m:    Processing cart.created which has 0 subscribers
+[32minfo[39m:    Processing cart.updated which has 0 subscribers
+[32minfo[39m:    Processing cart.updated which has 0 subscribers
+[32minfo[39m:    Processing product-category.created which has 0 subscribers
+[32minfo[39m:    Processing product-variant.created which has 0 subscribers
+[32minfo[39m:    Processing product-variant.created which has 0 subscribers
+[32minfo[39m:    Processing product-variant.created which has 0 subscribers
+[32minfo[39m:    Processing product-variant.created which has 0 subscribers
+[32minfo[39m:    Processing product.created which has 0 subscribers
+[32minfo[39m:    Processing cart.created which has 0 subscribers
+[32minfo[39m:    Processing cart.created which has 0 subscribers
+[32minfo[39m:    Gracefully shutting down server
+[32minfo[39m:    Gracefully shutting down server
+[32minfo[39m:    Gracefully shutting down server

@@ -1,0 +1,430 @@
+[32minfo[39m:    Watching filesystem to reload dev server on file change
+[32minfo[39m:    Skipping instrumentation registration. No register function found.
+[32minfo[39m:    No link to load from /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/draft-order/.medusa/server/src/links. skipped.
+[32minfo[39m:    Connection to Redis in module 'event-bus-redis' established
+[32minfo[39m:    Connection to Redis in module 'cache-redis' established
+[32minfo[39m:    Connection to Redis in "locking-redis" provider established
+[32minfo[39m:    Locking module: Using "locking-redis" as default.
+[32minfo[39m:    Connection to Redis in module 'workflow-engine-redis' established
+[32minfo[39m:    Connection to Redis PubSub in module 'workflow-engine-redis' established
+[32minfo[39m:    No workflow to load from /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/draft-order/.medusa/server/src/workflows. skipped.
+[32minfo[39m:    No subscriber to load from /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/draft-order/.medusa/server/src/subscribers. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-categories.ts is not a function. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-collections.ts is not a function. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-factory.ts is not a function. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-products.ts is not a function. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-regions.ts is not a function. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-tags.ts is not a function. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-types.ts is not a function. skipped.
+[32minfo[39m:    No job to load from /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/medusa/dist/jobs. skipped.
+[32minfo[39m:    No job to load from /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/draft-order/.medusa/server/src/jobs. skipped.
+- Creating server
+✔ Server is ready on port: 9000 – 6ms
+[32minfo[39m:    Admin URL → http://localhost:9000/app
+[32minfo[39m:    docs/task-002/artifacts/storefront-dev.pid created: Restarting dev server
+[32minfo[39m:    Gracefully shutting down server
+[32minfo[39m:    docs/task-002/artifacts/storefront-dev-20251022-131611.log created: Restarting dev server
+[32minfo[39m:    Skipping instrumentation registration. No register function found.
+[32minfo[39m:    No link to load from /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/draft-order/.medusa/server/src/links. skipped.
+[32minfo[39m:    Connection to Redis in module 'event-bus-redis' established
+[32minfo[39m:    Connection to Redis in module 'cache-redis' established
+[32minfo[39m:    Connection to Redis in "locking-redis" provider established
+[32minfo[39m:    Locking module: Using "locking-redis" as default.
+[32minfo[39m:    Connection to Redis in module 'workflow-engine-redis' established
+[32minfo[39m:    Connection to Redis PubSub in module 'workflow-engine-redis' established
+[32minfo[39m:    No workflow to load from /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/draft-order/.medusa/server/src/workflows. skipped.
+[32minfo[39m:    No subscriber to load from /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/draft-order/.medusa/server/src/subscribers. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-categories.ts is not a function. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-collections.ts is not a function. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-factory.ts is not a function. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-products.ts is not a function. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-regions.ts is not a function. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-tags.ts is not a function. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-types.ts is not a function. skipped.
+[32minfo[39m:    No job to load from /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/medusa/dist/jobs. skipped.
+[32minfo[39m:    No job to load from /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/draft-order/.medusa/server/src/jobs. skipped.
+- Creating server
+✔ Server is ready on port: 9000 – 6ms
+[32minfo[39m:    Admin URL → http://localhost:9000/app
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 23.674 ms
+[32minfo[39m:    Publishable API key required in the request header: x-publishable-api-key. You can manage your keys in settings in the dashboard.
+[32mhttp[39m:    GET /store/products?limit=5 ← - (400) - 7.779 ms
+[32mhttp[39m:    GET /admin/api-keys ← - (401) - 0.996 ms
+[32mhttp[39m:    GET /store/regions ← - (200) - 12.235 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 2.647 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 9.654 ms
+[32mhttp[39m:    GET /store/customers/me?fields=%2Aorders ← - (401) - 4.704 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 8.696 ms
+[32mhttp[39m:    GET /store/customers/me?fields=%2Aorders ← - (401) - 2.786 ms
+[32mhttp[39m:    GET /store/customers/me?fields=%2Aorders ← - (401) - 2.717 ms
+[32mhttp[39m:    GET /store/customers/me?fields=%2Aorders ← - (401) - 3.356 ms
+[32minfo[39m:    Publishable API key required in the request header: x-publishable-api-key. You can manage your keys in settings in the dashboard.
+[32mhttp[39m:    GET /store/products?limit=5 ← - (400) - 1.220 ms
+[32mhttp[39m:    GET /store/products?limit=5 ← - (200) - 41.138 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 9.078 ms
+[32mhttp[39m:    GET /store/regions ← - (200) - 6.330 ms
+[32mhttp[39m:    GET /store/products/prod_01K81BTDWDCQH2J0W3THG7PRFB ← - (200) - 32.686 ms
+[32mhttp[39m:    GET /store/products/prod_01K81BTDWDCQH2J0W3THG7PRFB?fields=*variants,*variants.prices ← - (200) - 27.511 ms
+[32minfo[39m:    Invalid request: Unrecognized fields: 'country_code'
+[32mhttp[39m:    POST /store/carts ← - (400) - 10.766 ms
+[32minfo[39m:    Processing cart.created which has 0 subscribers
+[32mhttp[39m:    POST /store/carts ← - (200) - 121.469 ms
+[31merror[39m:   AwilixResolutionError: Could not resolve 'null'.
+
+Resolution path: null
+[31merror[39m:   Could not resolve 'null'.
+
+Resolution path: null
+AwilixResolutionError: Could not resolve 'null'.
+
+Resolution path: null
+    at resolve (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/awilix/src/container.ts:497:15)
+    at Object.get (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/awilix/src/container.ts:269:52)
+    at TaxProviderService.retrieveProvider (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/tax/src/services/tax-provider.ts:26:32)
+    at TaxModuleService.getTaxLinesFromProvider (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/tax/src/services/tax-module-service.ts:460:47)
+    at TaxModuleService.getTaxLines (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/tax/src/services/tax-module-service.ts:446:33)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async Object.<anonymous> (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/core-flows/src/tax/steps/get-item-tax-lines.ts:195:44)
+    at async Object.invoke (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/workflows-sdk/src/utils/composer/helpers/create-step-handler.ts:84:52)
+    at async DistributedTransaction.handler (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/orchestration/src/workflow/workflow-manager.ts:214:16)
+    at async stepHandler (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/orchestration/src/transaction/transaction-orchestrator.ts:1043:14)
+[31merror[39m:   
+  Unable to retrieve the tax provider with id: null
+  Please make sure that the provider is registered in the container and it is configured correctly in your project configuration file.
+{
+  message: '\n' +
+    '  Unable to retrieve the tax provider with id: null\n' +
+    '  Please make sure that the provider is registered in the container and it is configured correctly in your project configuration file.',
+  name: 'Error',
+  stack: 'Error: \n' +
+    '  Unable to retrieve the tax provider with id: null\n' +
+    '  Please make sure that the provider is registered in the container and it is configured correctly in your project configuration file.\n' +
+    '    at TaxProviderService.retrieveProvider (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/tax/src/services/tax-provider.ts:36:15)\n' +
+    '    at TaxModuleService.getTaxLinesFromProvider (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/tax/src/services/tax-module-service.ts:460:47)\n' +
+    '    at TaxModuleService.getTaxLines (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/tax/src/services/tax-module-service.ts:446:33)\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+    '    at async Object.<anonymous> (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/core-flows/src/tax/steps/get-item-tax-lines.ts:195:44)\n' +
+    '    at async Object.invoke (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/workflows-sdk/src/utils/composer/helpers/create-step-handler.ts:84:52)\n' +
+    '    at async DistributedTransaction.handler (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/orchestration/src/workflow/workflow-manager.ts:214:16)\n' +
+    '    at async stepHandler (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/orchestration/src/transaction/transaction-orchestrator.ts:1043:14)\n' +
+    '    at async Promise.allSettled (index 0)\n' +
+    '    at async promiseAll (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/utils/src/common/promise-all.ts:27:18)\n' +
+    '⮑ sat /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/core-flows/dist/cart/workflows/upsert-tax-lines.js: [upsert-tax-lines -> get-item-tax-lines (invoke)]\n' +
+    '⮑ sat /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/core-flows/dist/cart/workflows/refresh-cart-items.js: [refresh-cart-items -> upsert-tax-lines-as-step (invoke)]\n' +
+    '⮑ sat /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/core-flows/dist/cart/workflows/add-to-cart.js: [add-to-cart -> refresh-cart-items-as-step (invoke)]'
+}
+[32mhttp[39m:    POST /store/carts/cart_01K86F0FXMYT96D66BD5E6YG02/line-items ← - (500) - 108.279 ms
+[31merror[39m:   AwilixResolutionError: Could not resolve 'null'.
+
+Resolution path: null
+[31merror[39m:   Could not resolve 'null'.
+
+Resolution path: null
+AwilixResolutionError: Could not resolve 'null'.
+
+Resolution path: null
+    at resolve (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/awilix/src/container.ts:497:15)
+    at Object.get (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/awilix/src/container.ts:269:52)
+    at TaxProviderService.retrieveProvider (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/tax/src/services/tax-provider.ts:26:32)
+    at TaxModuleService.getTaxLinesFromProvider (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/tax/src/services/tax-module-service.ts:460:47)
+    at TaxModuleService.getTaxLines (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/tax/src/services/tax-module-service.ts:446:33)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async Object.<anonymous> (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/core-flows/src/tax/steps/get-item-tax-lines.ts:195:44)
+    at async Object.invoke (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/workflows-sdk/src/utils/composer/helpers/create-step-handler.ts:84:52)
+    at async DistributedTransaction.handler (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/orchestration/src/workflow/workflow-manager.ts:214:16)
+    at async stepHandler (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/orchestration/src/transaction/transaction-orchestrator.ts:1043:14)
+[31merror[39m:   
+  Unable to retrieve the tax provider with id: null
+  Please make sure that the provider is registered in the container and it is configured correctly in your project configuration file.
+{
+  message: '\n' +
+    '  Unable to retrieve the tax provider with id: null\n' +
+    '  Please make sure that the provider is registered in the container and it is configured correctly in your project configuration file.',
+  name: 'Error',
+  stack: 'Error: \n' +
+    '  Unable to retrieve the tax provider with id: null\n' +
+    '  Please make sure that the provider is registered in the container and it is configured correctly in your project configuration file.\n' +
+    '    at TaxProviderService.retrieveProvider (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/tax/src/services/tax-provider.ts:36:15)\n' +
+    '    at TaxModuleService.getTaxLinesFromProvider (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/tax/src/services/tax-module-service.ts:460:47)\n' +
+    '    at TaxModuleService.getTaxLines (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/tax/src/services/tax-module-service.ts:446:33)\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+    '    at async Object.<anonymous> (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/core-flows/src/tax/steps/get-item-tax-lines.ts:195:44)\n' +
+    '    at async Object.invoke (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/workflows-sdk/src/utils/composer/helpers/create-step-handler.ts:84:52)\n' +
+    '    at async DistributedTransaction.handler (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/orchestration/src/workflow/workflow-manager.ts:214:16)\n' +
+    '    at async stepHandler (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/orchestration/src/transaction/transaction-orchestrator.ts:1043:14)\n' +
+    '    at async Promise.allSettled (index 0)\n' +
+    '    at async promiseAll (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/utils/src/common/promise-all.ts:27:18)\n' +
+    '⮑ sat /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/core-flows/dist/cart/workflows/upsert-tax-lines.js: [upsert-tax-lines -> get-item-tax-lines (invoke)]\n' +
+    '⮑ sat /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/core-flows/dist/cart/workflows/refresh-cart-items.js: [refresh-cart-items -> upsert-tax-lines-as-step (invoke)]\n' +
+    '⮑ sat /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/core-flows/dist/cart/workflows/add-to-cart.js: [add-to-cart -> refresh-cart-items-as-step (invoke)]'
+}
+[32mhttp[39m:    POST /store/carts/cart_01K86F0FXMYT96D66BD5E6YG02/line-items ← - (500) - 75.420 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 8.500 ms
+[32mhttp[39m:    GET /admin/regions ← - (401) - 0.408 ms
+[32mhttp[39m:    GET /admin/regions ← - (401) - 0.423 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 8.066 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 7.111 ms
+[32mhttp[39m:    GET /store/regions/reg_01K81AHC6DVR1ZCWMN0PB4H69T ← - (200) - 5.653 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 8.298 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 8.028 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 8.587 ms
+[32mhttp[39m:    POST /admin/auth ← - (401) - 0.947 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (200) - 5.288 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 5.121 ms
+[32minfo[39m:    Processing cart.updated which has 0 subscribers
+[32mhttp[39m:    POST /store/carts/cart_01K86F0FXMYT96D66BD5E6YG02/line-items ← - (200) - 143.790 ms
+[32mhttp[39m:    GET /store/carts/cart_01K86F0FXMYT96D66BD5E6YG02 ← - (200) - 20.045 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 7.417 ms
+[32minfo[39m:    Processing cart.updated which has 0 subscribers
+[32mhttp[39m:    POST /store/carts/cart_01K86F0FXMYT96D66BD5E6YG02 ← - (200) - 137.405 ms
+[32minfo[39m:    Processing cart.updated which has 0 subscribers
+[32mhttp[39m:    POST /store/carts/cart_01K86F0FXMYT96D66BD5E6YG02 ← - (200) - 124.975 ms
+[32mhttp[39m:    GET /store/shipping-options?cart_id=cart_01K86F0FXMYT96D66BD5E6YG02 ← - (200) - 38.148 ms
+[31merror[39m:   AwilixResolutionError: Could not resolve 'fp_undefined'.
+
+Resolution path: fp_undefined
+[31merror[39m:   Could not resolve 'fp_undefined'.
+
+Resolution path: fp_undefined
+AwilixResolutionError: Could not resolve 'fp_undefined'.
+
+Resolution path: fp_undefined
+    at resolve (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/awilix/src/container.ts:497:15)
+    at Object.get (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/awilix/src/container.ts:269:52)
+    at FulfillmentProviderService.retrieveProviderRegistration (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/fulfillment/src/services/fulfillment-provider.ts:63:32)
+    at FulfillmentProviderService.validateFulfillmentData (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/fulfillment/src/services/fulfillment-provider.ts:111:27)
+    at FulfillmentModuleService.validateFulfillmentData (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/fulfillment/src/services/fulfillment-module-service.ts:2137:51)
+    at Proxy.<anonymous> (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/orchestration/src/workflow/local-workflow.ts:131:27)
+    at /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/core-flows/src/cart/steps/validate-shipping-methods-data.ts:114:51
+    at Array.map (<anonymous>)
+    at Object.<anonymous> (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/core-flows/src/cart/steps/validate-shipping-methods-data.ts:113:25)
+    at Object.invoke (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/workflows-sdk/src/utils/composer/helpers/create-step-handler.ts:84:67)
+[31merror[39m:   
+Unable to retrieve the fulfillment provider with id: undefined
+Please make sure that the provider is registered in the container and it is configured correctly in your project configuration file.
+{
+  message: '\n' +
+    'Unable to retrieve the fulfillment provider with id: undefined\n' +
+    'Please make sure that the provider is registered in the container and it is configured correctly in your project configuration file.',
+  name: 'Error',
+  stack: 'Error: \n' +
+    'Unable to retrieve the fulfillment provider with id: undefined\n' +
+    'Please make sure that the provider is registered in the container and it is configured correctly in your project configuration file.\n' +
+    '    at FulfillmentProviderService.retrieveProviderRegistration (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/fulfillment/src/services/fulfillment-provider.ts:73:15)\n' +
+    '    at FulfillmentProviderService.validateFulfillmentData (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/fulfillment/src/services/fulfillment-provider.ts:111:27)\n' +
+    '    at FulfillmentModuleService.validateFulfillmentData (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/fulfillment/src/services/fulfillment-module-service.ts:2137:51)\n' +
+    '    at Proxy.<anonymous> (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/orchestration/src/workflow/local-workflow.ts:131:27)\n' +
+    '    at /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/core-flows/src/cart/steps/validate-shipping-methods-data.ts:114:51\n' +
+    '    at Array.map (<anonymous>)\n' +
+    '    at Object.<anonymous> (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/core-flows/src/cart/steps/validate-shipping-methods-data.ts:113:25)\n' +
+    '    at Object.invoke (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/workflows-sdk/src/utils/composer/helpers/create-step-handler.ts:84:67)\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+    '    at async DistributedTransaction.handler (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/orchestration/src/workflow/workflow-manager.ts:214:16)\n' +
+    '⮑ sat /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/core-flows/dist/cart/workflows/add-shipping-method-to-cart.js: [add-shipping-method-to-cart -> validate-and-return-shipping-methods-data (invoke)]'
+}
+[32mhttp[39m:    POST /store/carts/cart_01K86F0FXMYT96D66BD5E6YG02/shipping-methods ← - (500) - 70.902 ms
+[31merror[39m:   AwilixResolutionError: Could not resolve 'fp_undefined'.
+
+Resolution path: fp_undefined
+[31merror[39m:   Could not resolve 'fp_undefined'.
+
+Resolution path: fp_undefined
+AwilixResolutionError: Could not resolve 'fp_undefined'.
+
+Resolution path: fp_undefined
+    at resolve (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/awilix/src/container.ts:497:15)
+    at Object.get (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/awilix/src/container.ts:269:52)
+    at FulfillmentProviderService.retrieveProviderRegistration (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/fulfillment/src/services/fulfillment-provider.ts:63:32)
+    at FulfillmentProviderService.validateFulfillmentData (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/fulfillment/src/services/fulfillment-provider.ts:111:27)
+    at FulfillmentModuleService.validateFulfillmentData (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/fulfillment/src/services/fulfillment-module-service.ts:2137:51)
+    at Proxy.<anonymous> (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/orchestration/src/workflow/local-workflow.ts:131:27)
+    at /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/core-flows/src/cart/steps/validate-shipping-methods-data.ts:114:51
+    at Array.map (<anonymous>)
+    at Object.<anonymous> (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/core-flows/src/cart/steps/validate-shipping-methods-data.ts:113:25)
+    at Object.invoke (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/workflows-sdk/src/utils/composer/helpers/create-step-handler.ts:84:67)
+[31merror[39m:   
+Unable to retrieve the fulfillment provider with id: undefined
+Please make sure that the provider is registered in the container and it is configured correctly in your project configuration file.
+{
+  message: '\n' +
+    'Unable to retrieve the fulfillment provider with id: undefined\n' +
+    'Please make sure that the provider is registered in the container and it is configured correctly in your project configuration file.',
+  name: 'Error',
+  stack: 'Error: \n' +
+    'Unable to retrieve the fulfillment provider with id: undefined\n' +
+    'Please make sure that the provider is registered in the container and it is configured correctly in your project configuration file.\n' +
+    '    at FulfillmentProviderService.retrieveProviderRegistration (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/fulfillment/src/services/fulfillment-provider.ts:73:15)\n' +
+    '    at FulfillmentProviderService.validateFulfillmentData (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/fulfillment/src/services/fulfillment-provider.ts:111:27)\n' +
+    '    at FulfillmentModuleService.validateFulfillmentData (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/fulfillment/src/services/fulfillment-module-service.ts:2137:51)\n' +
+    '    at Proxy.<anonymous> (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/orchestration/src/workflow/local-workflow.ts:131:27)\n' +
+    '    at /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/core-flows/src/cart/steps/validate-shipping-methods-data.ts:114:51\n' +
+    '    at Array.map (<anonymous>)\n' +
+    '    at Object.<anonymous> (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/core-flows/src/cart/steps/validate-shipping-methods-data.ts:113:25)\n' +
+    '    at Object.invoke (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/workflows-sdk/src/utils/composer/helpers/create-step-handler.ts:84:67)\n' +
+    '    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n' +
+    '    at async DistributedTransaction.handler (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/orchestration/src/workflow/workflow-manager.ts:214:16)\n' +
+    '⮑ sat /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/core-flows/dist/cart/workflows/add-shipping-method-to-cart.js: [add-shipping-method-to-cart -> validate-and-return-shipping-methods-data (invoke)]'
+}
+[32mhttp[39m:    POST /store/carts/cart_01K86F0FXMYT96D66BD5E6YG02/shipping-methods ← - (500) - 62.823 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 5.544 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 4.308 ms
+[32mhttp[39m:    GET /store/carts/cart_01K86F0FXMYT96D66BD5E6YG02 ← - (200) - 19.746 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 7.600 ms
+[32minfo[39m:    src/scripts/link-dtc-channel.ts created: Restarting dev server
+[32minfo[39m:    Gracefully shutting down server
+[32minfo[39m:    Skipping instrumentation registration. No register function found.
+[32minfo[39m:    No link to load from /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/draft-order/.medusa/server/src/links. skipped.
+[32minfo[39m:    Connection to Redis in module 'event-bus-redis' established
+[32minfo[39m:    Connection to Redis in module 'cache-redis' established
+[32minfo[39m:    Connection to Redis in "locking-redis" provider established
+[32minfo[39m:    Locking module: Using "locking-redis" as default.
+[32minfo[39m:    Connection to Redis in module 'workflow-engine-redis' established
+[32minfo[39m:    Connection to Redis PubSub in module 'workflow-engine-redis' established
+[32minfo[39m:    No workflow to load from /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/draft-order/.medusa/server/src/workflows. skipped.
+[32minfo[39m:    No subscriber to load from /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/draft-order/.medusa/server/src/subscribers. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-categories.ts is not a function. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-collections.ts is not a function. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-factory.ts is not a function. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-products.ts is not a function. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-regions.ts is not a function. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-tags.ts is not a function. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-types.ts is not a function. skipped.
+[32minfo[39m:    No job to load from /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/medusa/dist/jobs. skipped.
+[32minfo[39m:    No job to load from /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/draft-order/.medusa/server/src/jobs. skipped.
+- Creating server
+✔ Server is ready on port: 9000 – 6ms
+[32minfo[39m:    Admin URL → http://localhost:9000/app
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (200) - 10.979 ms
+[32minfo[39m:    src/scripts/link-dtc-channel.ts removed: Restarting dev server
+[32minfo[39m:    Gracefully shutting down server
+[32minfo[39m:    Skipping instrumentation registration. No register function found.
+[32minfo[39m:    No link to load from /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/draft-order/.medusa/server/src/links. skipped.
+[32minfo[39m:    Connection to Redis in module 'event-bus-redis' established
+[32minfo[39m:    Connection to Redis in module 'cache-redis' established
+[32minfo[39m:    Connection to Redis in "locking-redis" provider established
+[32minfo[39m:    Locking module: Using "locking-redis" as default.
+[32minfo[39m:    Connection to Redis in module 'workflow-engine-redis' established
+[32minfo[39m:    Connection to Redis PubSub in module 'workflow-engine-redis' established
+[32minfo[39m:    No workflow to load from /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/draft-order/.medusa/server/src/workflows. skipped.
+[32minfo[39m:    No subscriber to load from /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/draft-order/.medusa/server/src/subscribers. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-categories.ts is not a function. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-collections.ts is not a function. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-factory.ts is not a function. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-products.ts is not a function. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-regions.ts is not a function. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-tags.ts is not a function. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-types.ts is not a function. skipped.
+[32minfo[39m:    No job to load from /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/medusa/dist/jobs. skipped.
+[32minfo[39m:    No job to load from /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/draft-order/.medusa/server/src/jobs. skipped.
+- Creating server
+✔ Server is ready on port: 9000 – 7ms
+[32minfo[39m:    Admin URL → http://localhost:9000/app
+[32mhttp[39m:    GET /store/shipping-options?cart_id=cart_01K86F0FXMYT96D66BD5E6YG02 ← - (200) - 107.947 ms
+[32minfo[39m:    Processing cart.updated which has 0 subscribers
+[32mhttp[39m:    POST /store/carts/cart_01K86F0FXMYT96D66BD5E6YG02/shipping-methods ← - (200) - 272.001 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 11.363 ms
+[32mhttp[39m:    GET /store/products?limit=5 ← - (200) - 30.642 ms
+[32mhttp[39m:    GET /store/carts/cart_01K86F0FXMYT96D66BD5E6YG02 ← - (200) - 23.329 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 7.025 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 6.637 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 5.486 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (200) - 6.193 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 5.257 ms
+[32mhttp[39m:    POST /store/payment-collections ← - (200) - 36.668 ms
+[32mhttp[39m:    POST /store/payment-collections/pay_col_01K86GATX8EDVZG88ZMY0JBYQY/payment-sessions ← - (200) - 21.646 ms
+[32minfo[39m:    The cart items require shipping profiles that are not satisfied by the current shipping methods
+[32mhttp[39m:    POST /store/carts/cart_01K86F0FXMYT96D66BD5E6YG02/complete ← - (400) - 276.492 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 7.273 ms
+[32mhttp[39m:    GET /store/carts/cart_01K86F0FXMYT96D66BD5E6YG02 ← - (200) - 20.823 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 5.458 ms
+[31merror[39m:   Error was thrown trying to authorize payment session - payses_01K86GB3FAWAXYSQT1XA0CB2Q7 - TypeError: Cannot read properties of undefined (reading 'shipping_methods')
+[32mhttp[39m:    POST /store/carts/cart_01K86F0FXMYT96D66BD5E6YG02/complete ← - (200) - 463.455 ms
+[32minfo[39m:    docs/task-002/artifacts/checkout-session-20251022.md created: Restarting dev server
+[32minfo[39m:    Gracefully shutting down server
+[32minfo[39m:    Skipping instrumentation registration. No register function found.
+[32minfo[39m:    No link to load from /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/draft-order/.medusa/server/src/links. skipped.
+[32minfo[39m:    Connection to Redis in module 'event-bus-redis' established
+[32minfo[39m:    Connection to Redis in module 'cache-redis' established
+[32minfo[39m:    Connection to Redis in "locking-redis" provider established
+[32minfo[39m:    Locking module: Using "locking-redis" as default.
+[32minfo[39m:    Connection to Redis in module 'workflow-engine-redis' established
+[32minfo[39m:    Connection to Redis PubSub in module 'workflow-engine-redis' established
+[32minfo[39m:    No workflow to load from /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/draft-order/.medusa/server/src/workflows. skipped.
+[32minfo[39m:    No subscriber to load from /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/draft-order/.medusa/server/src/subscribers. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-categories.ts is not a function. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-collections.ts is not a function. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-factory.ts is not a function. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-products.ts is not a function. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-regions.ts is not a function. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-tags.ts is not a function. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-types.ts is not a function. skipped.
+[32minfo[39m:    No job to load from /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/medusa/dist/jobs. skipped.
+[32minfo[39m:    No job to load from /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/draft-order/.medusa/server/src/jobs. skipped.
+- Creating server
+✔ Server is ready on port: 9000 – 5ms
+[32minfo[39m:    Admin URL → http://localhost:9000/app
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 18.946 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 9.463 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 7.221 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 7.628 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 3.800 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 6.439 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 8.917 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 6.069 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 9.284 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 7.009 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 5.885 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 7.732 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 4.678 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 6.161 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 6.370 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 3.682 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (200) - 8.029 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 4.576 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 8.020 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 5.658 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 5.899 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 4.068 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 3.301 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 7.065 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 5.441 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 4.285 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 4.319 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 4.507 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 6.049 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 6.770 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 6.431 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 5.364 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 6.798 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 5.220 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 7.660 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 7.310 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 7.175 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 2.971 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 4.640 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 7.244 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (200) - 3.958 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (200) - 6.723 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 7.707 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (200) - 6.288 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 4.861 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 5.426 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 6.769 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 6.712 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 5.298 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 6.237 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 5.311 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 7.316 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 7.172 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 5.289 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 7.203 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 6.693 ms
+[32mhttp[39m:    GET /admin/notifications?limit=1&offset=0&fields=created_at ← http://localhost:9000/app/products/prod_01K81BTE3N4F6W6HZD9CP95EYS (304) - 3.737 ms
+[32minfo[39m:    Gracefully shutting down server
+[32minfo[39m:    Gracefully shutting down server
+[32minfo[39m:    Gracefully shutting down server
+[32minfo[39m:    Gracefully shutting down server
+[32minfo[39m:    Gracefully shutting down server
+[32minfo[39m:    Gracefully shutting down server
+[32minfo[39m:    Gracefully shutting down server
+[32minfo[39m:    Gracefully shutting down server

@@ -12,7 +12,7 @@ import {
   OrderLineItemDTO,
   StockLocationAddressDTO,
 } from "@medusajs/framework/types"
-import { 
+import {
   ShipStationClient 
 } from './client'
 import {
@@ -23,6 +23,7 @@ import {
 
 export type ShipStationOptions = {
   api_key: string
+  api_secret?: string
 }
 
 class ShipStationProviderService extends AbstractFulfillmentProviderService {
@@ -35,6 +36,33 @@ class ShipStationProviderService extends AbstractFulfillmentProviderService {
 
     this.options_ = options
     this.client = new ShipStationClient(options)
+  }
+
+  private pickLowestRate(rates?: Rate[]) {
+    if (!Array.isArray(rates) || rates.length === 0) {
+      return undefined
+    }
+
+    return rates.reduce<Rate | undefined>((best, current) => {
+      if (!current) {
+        return best
+      }
+
+      if (!best) {
+        return current
+      }
+
+      const bestAmount =
+        typeof best.shipping_amount?.amount === "number"
+          ? best.shipping_amount.amount
+          : Number.POSITIVE_INFINITY
+      const currentAmount =
+        typeof current.shipping_amount?.amount === "number"
+          ? current.shipping_amount.amount
+          : Number.POSITIVE_INFINITY
+
+      return currentAmount < bestAmount ? current : best
+    }, undefined)
   }
 
   async getFulfillmentOptions(): Promise<FulfillmentOption[]> {
@@ -119,13 +147,13 @@ class ShipStationProviderService extends AbstractFulfillmentProviderService {
     }
     
     // Sum the package's weight (Medusa variant.weight is grams)
-    // Convert to kilograms for ShipStation when specifying unit: "kilogram"
     const totalGrams = items.reduce((sum, item) => {
       // @ts-ignore
       const w = Number(item?.variant?.weight) || 0
       return sum + w
     }, 0)
-    const packageWeightKg = totalGrams / 1000
+    // Convert to kilograms (ShipStation accepts metric weights) and ensure a small floor
+    const packageWeightKg = Math.max(Number((totalGrams / 1000).toFixed(4)), 0.001)
 
     return await this.client.getShippingRates({
       shipment: {
@@ -161,11 +189,11 @@ class ShipStationProviderService extends AbstractFulfillmentProviderService {
   // calculatePrice
 
   async calculatePrice(
-    optionData: CalculateShippingOptionPriceDTO["optionData"], 
-    data: CalculateShippingOptionPriceDTO["data"], 
+    optionData: CalculateShippingOptionPriceDTO["optionData"],
+    data: CalculateShippingOptionPriceDTO["data"],
     context: CalculateShippingOptionPriceDTO["context"]
   ): Promise<CalculatedShippingOptionPrice> {
-    const { shipment_id } = data as {
+    const { shipment_id } = (data || {}) as {
       shipment_id?: string
     }
     const { carrier_id, carrier_service_code } = optionData as {
@@ -185,15 +213,44 @@ class ShipStationProviderService extends AbstractFulfillmentProviderService {
         items: context.items || [],
         currency_code: context.currency_code as string,
       })
-      rate = shipment.rate_response.rates[0]
+      rate = this.pickLowestRate(shipment.rate_response?.rates)
     } else {
-      const rateResponse = await this.client.getShipmentRates(shipment_id)
-      rate = rateResponse[0].rates[0]
+      const rateResponses = await this.client.getShipmentRates(shipment_id)
+      const flattened = rateResponses.flatMap((resp) => resp.rates || [])
+      rate = this.pickLowestRate(flattened)
     }
 
-    const calculatedPrice = !rate ? 0 : rate.shipping_amount.amount + rate.insurance_amount.amount + 
-      rate.confirmation_amount.amount + rate.other_amount.amount + 
-      (rate.tax_amount?.amount || 0)
+    if (process.env.NODE_ENV === "development" && rate) {
+      console.log(
+        "[shipstation-debug] rate response",
+        JSON.stringify(
+          {
+            carrier_id,
+            carrier_service_code,
+            shipping_amount: rate.shipping_amount,
+            insurance_amount: rate.insurance_amount,
+            confirmation_amount: rate.confirmation_amount,
+            other_amount: rate.other_amount,
+            tax_amount: rate.tax_amount,
+          },
+          null,
+          2
+        )
+      )
+    }
+
+    const toMajorUnits = (amount?: number) =>
+      typeof amount === "number" && !Number.isNaN(amount)
+        ? amount
+        : 0
+
+    const calculatedPrice = !rate
+      ? 0
+      : toMajorUnits(rate.shipping_amount?.amount) +
+        toMajorUnits(rate.insurance_amount?.amount) +
+        toMajorUnits(rate.confirmation_amount?.amount) +
+        toMajorUnits(rate.other_amount?.amount) +
+        toMajorUnits(rate.tax_amount?.amount)
 
     return {
       calculated_amount: calculatedPrice,
@@ -208,7 +265,7 @@ class ShipStationProviderService extends AbstractFulfillmentProviderService {
     data: Record<string, unknown>, 
     context: Record<string, unknown>
   ): Promise<any> {
-    let { shipment_id } = data as {
+    let { shipment_id } = (data || {}) as {
       shipment_id?: string
     }
 

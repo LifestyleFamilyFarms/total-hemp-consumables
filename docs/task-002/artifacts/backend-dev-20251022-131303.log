@@ -1,0 +1,34 @@
+[32minfo[39m:    Watching filesystem to reload dev server on file change
+[32minfo[39m:    Skipping instrumentation registration. No register function found.
+[32minfo[39m:    No link to load from /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/draft-order/.medusa/server/src/links. skipped.
+[32minfo[39m:    Connection to Redis in module 'event-bus-redis' established
+[32minfo[39m:    Connection to Redis in module 'cache-redis' established
+[32minfo[39m:    Connection to Redis in "locking-redis" provider established
+[32minfo[39m:    Locking module: Using "locking-redis" as default.
+[32minfo[39m:    Connection to Redis in module 'workflow-engine-redis' established
+[32minfo[39m:    Connection to Redis PubSub in module 'workflow-engine-redis' established
+[32minfo[39m:    No workflow to load from /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/draft-order/.medusa/server/src/workflows. skipped.
+[32minfo[39m:    No subscriber to load from /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/draft-order/.medusa/server/src/subscribers. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-categories.ts is not a function. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-collections.ts is not a function. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-factory.ts is not a function. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-products.ts is not a function. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-regions.ts is not a function. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-tags.ts is not a function. skipped.
+[33mwarn[39m:    The subscriber in /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/src/subscribers/revalidate-types.ts is not a function. skipped.
+[32minfo[39m:    No job to load from /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/medusa/dist/jobs. skipped.
+[32minfo[39m:    No job to load from /Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/draft-order/.medusa/server/src/jobs. skipped.
+- Creating server
+Error: listen EADDRINUSE: address already in use :::9000
+    at Server.setupListenHandle [as _listen2] (node:net:1937:16)
+    at listenInCluster (node:net:1994:12)
+    at Server.listen (node:net:2099:7)
+    at internalStart (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/medusa/src/commands/start.ts:221:15)
+    at async start (/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/node_modules/@medusajs/medusa/src/commands/start.ts:303:5) {
+  code: 'EADDRINUSE',
+  errno: -48,
+  syscall: 'listen',
+  address: '::',
+  port: 9000
+}
+[32minfo[39m:    Gracefully shutting down server

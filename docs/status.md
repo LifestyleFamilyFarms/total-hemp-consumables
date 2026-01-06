@@ -29,9 +29,12 @@ This document is intended for both humans and LLM tools. It summarizes the stack
   - PDP disables option values that can’t form a valid in‑stock variant given current selections
 - Backend seeds & parity
   - Remote seed (`src/scripts/seed-remote.ts`) for Admin API; idempotent upserts; supports delineated envs
-    - `yarn seed:prod` (prod), `yarn seed:dev` (dev with non‑blocking inventory)
+    - `yarn seed:prod` (prod), `yarn seed:dev` (dev with non-blocking inventory)
   - Mirror Prod → Dev (`src/scripts/mirror-prod-to-dev.ts`) via Admin API (types/categories/products/variants/prices/metadata/images)
     - `yarn mirror:dev`
+  - Inventory mirror hardened (`src/scripts/mirror-inventory.ts`)
+    - `INVENTORY_DRY_RUN=1 yarn mirror:inventory` compares PROD vs DEV without writes and prints per-SKU diffs
+    - Script fails fast if stock locations, SKUs, or pagination metadata are missing/misconfigured
   - Dev DB reset script (drop/recreate + migrate): `yarn db:reset:dev`
 - Infra correctness
   - ShipStation: package weight converts grams → kilograms for rate calc
@@ -107,3 +110,7 @@ Tip: After `db:reset:dev`, regenerate a local Admin API token and update `MEDUSA
 ## Maintenance Mode
 - Set `MAINTENANCE_MODE=1` in `total-hemp-consumables-storefront/.env` to route all traffic to `/maintenance`.
 - Optional allowlist via `ALLOWED_PATHS="/maintenance,/health"`; default ensures the maintenance page remains accessible.
+
+## Latest Review
+- See `docs/code-review-2025-10-03.md` for the current backend readiness report, critical findings, and priority actions leading to this week’s MVP launch.
+- See `docs/roadmap-2025-10-mvp.md` for the prioritized roadmap and critical path to hit the MVP deadline.

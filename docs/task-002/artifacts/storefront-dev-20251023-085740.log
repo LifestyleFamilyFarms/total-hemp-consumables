@@ -1,0 +1,9 @@
+   ▲ Next.js 15.3.1 (Turbopack)
+   - Local:        http://localhost:8000
+   - Network:      http://192.168.1.161:8000
+   - Environments: .env
+
+ ✓ Starting...
+ ✓ Compiled middleware in 77ms
+ ✓ Ready in 922ms
+[?25h

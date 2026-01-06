@@ -1,0 +1,174 @@
+   ▲ Next.js 15.3.1 (Turbopack)
+   - Local:        http://localhost:8000
+   - Network:      http://192.168.1.161:8000
+   - Environments: .env
+
+ ✓ Starting...
+ ✓ Compiled middleware in 60ms
+ ✓ Ready in 735ms
+ ○ Compiling /[countryCode] ...
+
+warn - The class `data-[state=closed]:slide-out-to-top-[48%]` is ambiguous and matches multiple utilities.
+warn - If this is content and not a class, replace it with `data-&lsqb;state=closed&rsqb;:slide-out-to-top-[48%]` to silence this warning.
+
+warn - The class `data-[state=open]:slide-in-from-top-[48%]` is ambiguous and matches multiple utilities.
+warn - If this is content and not a class, replace it with `data-&lsqb;state=open&rsqb;:slide-in-from-top-[48%]` to silence this warning.
+ ✓ Compiled /[countryCode] in 1654ms
+Initiating Medusa client with default headers:
+ {
+  "accept": "application/json",
+  "content-type": "application/json",
+  "x-publishable-api-key": "pk_432a763cd9e2d474d9f1abb24ca7689abb613f1dff22065003ce3ef51d60bb26",
+  "authorization": "<REDACTED>"
+}
+
+Initiating Medusa client with default headers:
+ {
+  "accept": "application/json",
+  "content-type": "application/json",
+  "x-publishable-api-key": "pk_432a763cd9e2d474d9f1abb24ca7689abb613f1dff22065003ce3ef51d60bb26",
+  "authorization": "<REDACTED>"
+}
+
+Performing request to:
+ URL: http://localhost:9000/store/regions
+ Headers: {
+  "accept": "application/json",
+  "content-type": "application/json",
+  "x-publishable-api-key": "pk_432a763cd9e2d474d9f1abb24ca7689abb613f1dff22065003ce3ef51d60bb26",
+  "authorization": "<REDACTED>"
+}
+
+Performing request to:
+ URL: http://localhost:9000/store/customers/me?fields=%2Aorders
+ Headers: {
+  "accept": "application/json",
+  "content-type": "application/json",
+  "x-publishable-api-key": "pk_432a763cd9e2d474d9f1abb24ca7689abb613f1dff22065003ce3ef51d60bb26",
+  "authorization": "<REDACTED>"
+}
+
+Received response with status 401
+
+Received response with status 200
+
+Performing request to:
+ URL: http://localhost:9000/store/collections?fields=id%2C%20handle%2C%20title&limit=100&offset=0
+ Headers: {
+  "accept": "application/json",
+  "content-type": "application/json",
+  "x-publishable-api-key": "pk_432a763cd9e2d474d9f1abb24ca7689abb613f1dff22065003ce3ef51d60bb26",
+  "authorization": "<REDACTED>"
+}
+
+Received response with status 200
+
+ GET /us 200 in 2108ms
+ │ GET http://localhost:9000/store/customers/me?fields=%2Aorders 401 in 29ms (cache skip)
+ │ │ Cache skipped reason: (cache-control: no-cache (hard refresh))
+ │ GET http://localhost:9000/store/regions 200 in 38ms (cache hit)
+ │ GET http://localhost:9000/store/collections?fields=id%2C%20handle%2C%20title&limit=100&offset=0 200 in 97ms (cache hit)
+ ✓ Compiled /[countryCode]/store in 459ms
+Initiating Medusa client with default headers:
+ {
+  "accept": "application/json",
+  "content-type": "application/json",
+  "x-publishable-api-key": "pk_432a763cd9e2d474d9f1abb24ca7689abb613f1dff22065003ce3ef51d60bb26",
+  "authorization": "<REDACTED>"
+}
+
+Performing request to:
+ URL: http://localhost:9000/store/customers/me?fields=%2Aorders
+ Headers: {
+  "accept": "application/json",
+  "content-type": "application/json",
+  "x-publishable-api-key": "pk_432a763cd9e2d474d9f1abb24ca7689abb613f1dff22065003ce3ef51d60bb26",
+  "authorization": "<REDACTED>"
+}
+
+Performing request to:
+ URL: http://localhost:9000/store/products?limit=100&offset=0&region_id=reg_01K81AHC6DVR1ZCWMN0PB4H69T&fields=%2Avariants.calculated_price%2C%2Bvariants.inventory_quantity%2C%2Bvariants.options%2C%2Bvariants.metadata%2C%2Bmetadata%2C%2Btags%2C%2Btype&order=created_at
+ Headers: {
+  "accept": "application/json",
+  "content-type": "application/json",
+  "x-publishable-api-key": "pk_432a763cd9e2d474d9f1abb24ca7689abb613f1dff22065003ce3ef51d60bb26",
+  "authorization": "<REDACTED>"
+}
+
+Received response with status 200
+
+Received response with status 401
+
+ GET /us/store 200 in 761ms
+ │ GET http://localhost:9000/store/products?limit=100&offset=0&region_id=reg_01K81AHC6DVR1ZCWMN0PB4H69T&fields=%2Avariants.calculated_price%2C%2Bvariants.inventory_quantity%2C%2Bvariants.options%2C%2Bvariants.metadata%2C%2Bmetadata%2C%2Btags%2C%2Btype&order=created_at 200 in 7ms (cache hit)
+ │ GET http://localhost:9000/store/customers/me?fields=%2Aorders 401 in 19ms (cache skip)
+ │ │ Cache skipped reason: (cache-control: no-cache (hard refresh))
+Performing request to:
+ URL: http://localhost:9000/store/customers/me?fields=%2Aorders
+ Headers: {
+  "accept": "application/json",
+  "content-type": "application/json",
+  "x-publishable-api-key": "pk_432a763cd9e2d474d9f1abb24ca7689abb613f1dff22065003ce3ef51d60bb26",
+  "authorization": "<REDACTED>"
+}
+
+Performing request to:
+ URL: http://localhost:9000/store/products?limit=100&offset=0&region_id=reg_01K81AHC6DVR1ZCWMN0PB4H69T&fields=%2Avariants.calculated_price%2C%2Bvariants.inventory_quantity%2C%2Bvariants.options%2C%2Bvariants.metadata%2C%2Bmetadata%2C%2Btags%2C%2Btype&order=created_at
+ Headers: {
+  "accept": "application/json",
+  "content-type": "application/json",
+  "x-publishable-api-key": "pk_432a763cd9e2d474d9f1abb24ca7689abb613f1dff22065003ce3ef51d60bb26",
+  "authorization": "<REDACTED>"
+}
+
+Received response with status 200
+
+Received response with status 401
+
+ GET /us/store 200 in 127ms
+ │ GET http://localhost:9000/store/products?limit=100&offset=0&region_id=reg_01K81AHC6DVR1ZCWMN0PB4H69T&fields=%2Avariants.calculated_price%2C%2Bvariants.inventory_quantity%2C%2Bvariants.options%2C%2Bvariants.metadata%2C%2Bmetadata%2C%2Btags%2C%2Btype&order=created_at 200 in 0ms (cache hit)
+ │ GET http://localhost:9000/store/customers/me?fields=%2Aorders 401 in 9ms (cache skip)
+ │ │ Cache skipped reason: (cache-control: no-cache (hard refresh))
+Initiating Medusa client with default headers:
+ {
+  "accept": "application/json",
+  "content-type": "application/json",
+  "x-publishable-api-key": "pk_432a763cd9e2d474d9f1abb24ca7689abb613f1dff22065003ce3ef51d60bb26",
+  "authorization": "<REDACTED>"
+}
+
+Performing request to:
+ URL: http://localhost:9000/store/customers/me?fields=%2Aorders
+ Headers: {
+  "accept": "application/json",
+  "content-type": "application/json",
+  "x-publishable-api-key": "pk_432a763cd9e2d474d9f1abb24ca7689abb613f1dff22065003ce3ef51d60bb26",
+  "authorization": "<REDACTED>"
+}
+
+Performing request to:
+ URL: http://localhost:9000/store/products?limit=100&offset=0&region_id=reg_01K81AHC6DVR1ZCWMN0PB4H69T&fields=%2Avariants.calculated_price%2C%2Bvariants.inventory_quantity%2C%2Bvariants.options%2C%2Bvariants.metadata%2C%2Bmetadata%2C%2Btags%2C%2Btype&order=created_at
+ Headers: {
+  "accept": "application/json",
+  "content-type": "application/json",
+  "x-publishable-api-key": "pk_432a763cd9e2d474d9f1abb24ca7689abb613f1dff22065003ce3ef51d60bb26",
+  "authorization": "<REDACTED>"
+}
+
+Received response with status 200
+
+Received response with status 401
+
+ GET /us/store 200 in 101ms
+ │ GET http://localhost:9000/store/products?limit=100&offset=0&region_id=reg_01K81AHC6DVR1ZCWMN0PB4H69T&fields=%2Avariants.calculated_price%2C%2Bvariants.inventory_quantity%2C%2Bvariants.options%2C%2Bvariants.metadata%2C%2Bmetadata%2C%2Btags%2C%2Btype&order=created_at 200 in 0ms (cache hit)
+ │ GET http://localhost:9000/store/customers/me?fields=%2Aorders 401 in 11ms (cache skip)
+ │ │ Cache skipped reason: (cache-control: no-cache (hard refresh))
+Initiating Medusa client with default headers:
+ {
+  "accept": "application/json",
+  "content-type": "application/json",
+  "x-publishable-api-key": "pk_432a763cd9e2d474d9f1abb24ca7689abb613f1dff22065003ce3ef51d60bb26",
+  "authorization": "<REDACTED>"
+}
+
+[?25h
