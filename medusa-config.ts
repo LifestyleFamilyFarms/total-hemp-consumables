@@ -3,6 +3,31 @@ import { loadEnv, defineConfig } from '@medusajs/framework/utils';
 loadEnv(process.env.NODE_ENV || 'development', process.cwd());
 
 const isProd = process.env.NODE_ENV === 'production';
+const dbSslRejectUnauthorized = process.env.DB_SSL_REJECT_UNAUTHORIZED;
+
+const databaseDriverOptions = (() => {
+  if (isProd) {
+    const sslConfig = dbSslRejectUnauthorized
+      ? { rejectUnauthorized: dbSslRejectUnauthorized !== "false" }
+      : true
+
+    return {
+      connection: {
+        ssl: sslConfig,
+      },
+    }
+  }
+
+  if (dbSslRejectUnauthorized) {
+    return {
+      connection: {
+        ssl: { rejectUnauthorized: dbSslRejectUnauthorized !== "false" },
+      },
+    }
+  }
+
+  return {}
+})();
 
 module.exports = defineConfig({
   admin: {
@@ -24,9 +49,7 @@ module.exports = defineConfig({
       cookieSecret: process.env.COOKIE_SECRET,
     },
     // Enable SSL options for production if needed
-    databaseDriverOptions: isProd
-      ? { connection: { ssl: { rejectUnauthorized: false } } }
-      : {},
+    databaseDriverOptions,
   },
   modules: [
     //Authorize.net Payment Module
@@ -128,14 +151,11 @@ module.exports = defineConfig({
       options: {
         providers: [
           {
-            resolve: "@medusajs/medusa/fulfillment-manual",
-            id: "manual",
-          },
-          {
             resolve: "./src/modules/shipstation",
             id: "shipstation",
             options: {
-              api_key: process.env.SHIPSTATION_API_KEY
+              api_key: process.env.SHIPSTATION_API_KEY,
+              api_secret: process.env.SHIPSTATION_API_SECRET
             }
           }
         ]
@@ -143,4 +163,3 @@ module.exports = defineConfig({
     },
   ],
 }); 
-

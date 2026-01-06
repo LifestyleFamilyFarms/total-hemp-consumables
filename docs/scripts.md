@@ -13,9 +13,11 @@ cd total-hemp-consumables
 - `predeploy` — Run DB migrations
 
 ## Seeds & Mirror
-- `seed` — Template demo seed that comes with Medusa starter (local only). Not used for prod.
-- `seed:fresh` — Bootstrap a fresh US store via Medusa core flows (USD region, stock location, shipping options). Idempotent.
-  - `medusa exec ./src/scripts/seed-fresh.ts`
+- `seed` — Medusa starter demo seed. **Do not use** for this project; it will overwrite real configuration.
+- `seed-config` — Manual-only bootstrap for new environments (sales channel, region, stock location, ShipStation options).
+  - Guarded by `ALLOW_CONFIG_SEED=true medusa exec ./src/scripts/seed-config.ts`
+  - Prefer the Admin UI checklist instead; only run when you intentionally want an automated reset.
+- _Catalog seeding_ — Temporarily manual. Follow `docs/admin-store-setup.md` and create/update products through the Admin UI until a replacement seed is defined.
 - `seed:prod` — Seed catalog to PROD via Admin API (types/categories/products/variants/prices/metadata). Idempotent upsert.
   - `ts-node ./src/scripts/seed-remote.ts`
   - Requires `MEDUSA_PROD_BACKEND_URL` and `MEDUSA_PROD_ADMIN_TOKEN`
@@ -38,8 +40,8 @@ cd total-hemp-consumables
   - DANGER: destructive. Use only for local development.
 
 ## One‑shot Dev Rebuild
-- `rebuild:dev` — Reset DB → seed fresh US store (no mirror step; run mirrors separately to avoid invalid tokens after reset).
-  - `yarn db:reset:dev && yarn seed:fresh`
+- `rebuild:dev` — Drops/recreates the DB, then reminds you to follow the manual admin checklist.
+  - `yarn db:reset:dev && echo 'Run the manual admin checklist (docs/admin-store-setup.md) before seeding catalog data.'`
   - Run from backend: `cd total-hemp-consumables && yarn rebuild:dev`
 
 ## Tests
@@ -62,10 +64,11 @@ cd total-hemp-consumables
 
 ## Typical dev flow
 1) Reset DB: `yarn db:reset:dev`
-2) Bootstrap US store: `yarn seed:fresh`
-3) Start backend: `yarn dev`
-4) Generate a new Admin API token in local Admin → Settings → API Keys, set `MEDUSA_DEV_ADMIN_TOKEN` in `.env`
-5) Mirror prod catalog: `yarn mirror:dev` (and inventory: `yarn mirror:inventory` or `yarn mirror:dev:all`)
-6) Start storefront: `cd ../total-hemp-consumables-storefront && yarn dev`
+2) Complete Admin UI checklist in `docs/admin-store-setup.md` (sales channel, region, ShipStation, Authorize.Net, stock location).
+3) Manually add/verify catalog data via Medusa Admin (temporary until the new seed strategy ships).
+4) Start backend: `yarn dev`
+5) Generate a new Admin API token in local Admin → Settings → API Keys, set `MEDUSA_DEV_ADMIN_TOKEN` in `.env`
+6) Mirror prod catalog: `yarn mirror:dev` (and inventory: `yarn mirror:inventory` or `yarn mirror:dev:all`)
+7) Start storefront: `cd ../total-hemp-consumables-storefront && yarn dev`
 
 Note: After `db:reset:dev`, previously issued Admin API tokens are invalidated. Ensure `MEDUSA_DEV_ADMIN_TOKEN` is refreshed before running any Admin API mirror/seed targeting DEV.

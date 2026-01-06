@@ -32,10 +32,44 @@ const DEV_TOKEN = req("MEDUSA_DEV_ADMIN_TOKEN")
 const prod = new Medusa({ baseUrl: PROD_URL, apiKey: PROD_TOKEN })
 const dev = new Medusa({ baseUrl: DEV_URL, apiKey: DEV_TOKEN })
 
+// Channel controls (DEV-only):
+// - CHANNEL_ALLOWLIST: comma-separated channel names to mirror; if unset, mirror all.
+// - CHANNEL_CREATE_MISSING: default "1". Set to "0" to skip creating missing channels in DEV.
+// - CHANNEL_ENFORCE_MIRROR: default "1". Set to "0" to avoid detaching extra DEV channel links.
+const CHANNEL_ALLOWLIST = (process.env.CHANNEL_ALLOWLIST || "")
+  .split(",")
+  .map((s) => s.trim())
+  .filter(Boolean)
+  .map((s) => s.toLowerCase())
+const CHANNEL_CREATE_MISSING = (process.env.CHANNEL_CREATE_MISSING || "1") !== "0"
+const CHANNEL_ENFORCE_MIRROR = (process.env.CHANNEL_ENFORCE_MIRROR || "1") !== "0"
+
 async function listAll<T>(path: string, key: string, limit = 100) {
-  return prod.client
-    .fetch<{ [k: string]: T[] }>(path, { method: "GET", query: { limit } })
-    .then((r) => (r[key] as T[]) || [])
+  const results: T[] = []
+  let offset = 0
+  const maxPages = 100
+
+  for (let page = 0; page < maxPages; page++) {
+    const response = await prod.client.fetch<{ [k: string]: T[] }>(path, {
+      method: "GET",
+      query: { limit, offset },
+    })
+    const batch = (response[key] as T[]) || []
+    results.push(...batch)
+
+    if (batch.length < limit) {
+      break
+    }
+
+    offset += limit
+    if (page === maxPages - 1) {
+      throw new Error(
+        `Pagination overflow fetching ${path}. Retrieved at least ${results.length} records (limit=${limit}).`
+      )
+    }
+  }
+
+  return results
 }
 
 async function upsertTypeDev(value: string) {
@@ -53,6 +87,27 @@ async function upsertTypeDev(value: string) {
       body: { value },
     })
     .then((r) => r.product_type)
+}
+
+async function getOrCreateDevChannelByName(
+  name: string,
+  devChannelIdByName: Map<string, string>
+) {
+  const key = name.toLowerCase()
+  if (devChannelIdByName.has(key)) return devChannelIdByName.get(key)!
+
+  if (!CHANNEL_CREATE_MISSING) {
+    throw new Error(
+      `DEV channel "${name}" not found and CHANNEL_CREATE_MISSING=0 (cannot create).`
+    )
+  }
+
+  const created = await dev.client.fetch<{ sales_channel: { id: string; name: string } }>(
+    `/admin/sales-channels`,
+    { method: "POST", body: { name } }
+  )
+  devChannelIdByName.set(key, created.sales_channel.id)
+  return created.sales_channel.id
 }
 
 async function upsertCategoryDev(name: string, handle: string, parent_id?: string) {
@@ -105,156 +160,16 @@ async function mirror() {
   await ping(prod, PROD_URL, "PROD")
   await ping(dev, DEV_URL, "DEV")
 
-  // Mirror store currencies + default sales channel (parity)
-  try {
-    const prodStore = await prod.client.fetch<{ store: { supported_currencies?: any[]; default_sales_channel_id?: string } }>(
-      `/admin/store`,
-      { method: "GET" }
-    )
-    const supported_currencies = prodStore.store.supported_currencies || []
-    if (Array.isArray(supported_currencies) && supported_currencies.length) {
-      await dev.client.fetch(`/admin/store`, {
-        method: "POST",
-        body: { supported_currencies },
-      })
-      console.log(`Store currencies mirrored to DEV`)
-    }
-  } catch (e) {
-    console.warn(`Store currency mirror skipped:`, (e as any)?.message || e)
-  }
-
-  // Regions: mirror basic shape (name, currency_code, countries)
-  try {
-    const prodRegions = await prod.client
-      .fetch<{ regions: { id: string; name: string; currency_code: string; countries: { iso_2: string }[] }[] }>(
-        `/admin/regions`,
-        { method: "GET", query: { limit: 100 } }
-      )
-      .then((r) => r.regions || [])
-
-    const devRegions = await dev.client
-      .fetch<{ regions: { id: string; name: string }[] }>(`/admin/regions`, { method: "GET", query: { limit: 100 } })
-      .then((r) => r.regions || [])
-
-    for (const r of prodRegions) {
-      const exists = devRegions.find((dr) => (dr.name || "").toLowerCase() === (r.name || "").toLowerCase())
-      if (exists) continue
-      try {
-        await dev.client.fetch(`/admin/regions`, {
-          method: "POST",
-          body: {
-            name: r.name,
-            currency_code: r.currency_code,
-            countries: (r.countries || []).map((c) => c.iso_2).filter(Boolean),
-          },
-        })
-        console.log(`Region created in DEV: ${r.name}`)
-      } catch (e) {
-        console.warn(`Region mirror skipped for ${r.name}:`, (e as any)?.message || e)
-      }
-    }
-  } catch (e) {
-    console.warn(`Region mirror skipped:`, (e as any)?.message || e)
-  }
-
-  // Stock locations: mirror by name + basic address
-  const devLocationIdByName = new Map<string, string>()
-  try {
-    const prodLocs = await prod.client
-      .fetch<{ stock_locations: { id: string; name: string; address?: any }[] }>(
-        `/admin/stock-locations`,
-        { method: "GET", query: { limit: 100 } }
-      )
-      .then((r) => r.stock_locations || [])
-
-    const devLocs = await dev.client
-      .fetch<{ stock_locations: { id: string; name: string }[] }>(`/admin/stock-locations`, {
-        method: "GET",
-        query: { limit: 100 },
-      })
-      .then((r) => r.stock_locations || [])
-
-    for (const l of prodLocs) {
-      const name = l.name || ""
-      if (!name) continue
-      let devId = devLocs.find((dl) => (dl.name || "").toLowerCase() === name.toLowerCase())?.id
-      if (!devId) {
-        try {
-          const created = await dev.client.fetch<{ stock_location: { id: string } }>(
-            `/admin/stock-locations`,
-            {
-              method: "POST",
-              body: {
-                name: l.name,
-                address: l.address || {},
-              },
-            }
-          )
-          devId = created.stock_location.id
-          console.log(`Stock location created in DEV: ${l.name}`)
-        } catch (e) {
-          console.warn(`Stock location mirror skipped for ${l.name}:`, (e as any)?.message || e)
-        }
-      }
-      if (devId) devLocationIdByName.set(name.toLowerCase(), devId)
-    }
-  } catch (e) {
-    console.warn(`Stock location mirror skipped:`, (e as any)?.message || e)
-  }
-  // 0) sales channels: mirror by name and set default store channel
-  const prodChannels: { id: string; name: string }[] = await prod.client
-    .fetch<{ sales_channels: { id: string; name: string }[] }>(`/admin/sales-channels`, {
-      method: "GET",
-      query: { limit: 100 },
-    })
-    .then((r) => r.sales_channels ?? [])
-    .catch(() => [] as { id: string; name: string }[])
-
-  // Upsert DEV channels and build name→id map
   const devChannelIdByName = new Map<string, string>()
-  const devExisting: { id: string; name: string }[] = await dev.client
-    .fetch<{ sales_channels: { id: string; name: string }[] }>(`/admin/sales-channels`, {
-      method: "GET",
-      query: { limit: 100 },
-    })
-    .then((r) => r.sales_channels ?? [])
-    .catch(() => [] as { id: string; name: string }[])
-
-  for (const sc of prodChannels) {
-    const name = sc.name || ""
-    if (!name) continue
-    let devId = devExisting.find((d) => (d.name || "").toLowerCase() === name.toLowerCase())?.id
-    if (!devId) {
-      devId = await dev.client
-        .fetch<{ sales_channel: { id: string } }>(`/admin/sales-channels`, {
-          method: "POST",
-          body: { name },
-        })
-        .then((r) => r.sales_channel.id)
-        .catch(() => undefined as unknown as string)
-    }
-    if (devId) devChannelIdByName.set(name.toLowerCase(), devId)
-  }
-
-  // Mirror default sales channel on the Store
-  try {
-    const prodStore = await prod.client.fetch<{ store: { default_sales_channel_id?: string } }>(
-      `/admin/store`,
-      { method: "GET" }
+  {
+    const devChannels = await dev.client.fetch<{ sales_channels: { id: string; name: string }[] }>(
+      `/admin/sales-channels`,
+      { method: "GET", query: { limit: 100 } }
     )
-    const defaultProdChannelId = prodStore.store.default_sales_channel_id
-    if (defaultProdChannelId) {
-      const defaultName = prodChannels.find((c) => c.id === defaultProdChannelId)?.name
-      const devDefaultId = defaultName ? devChannelIdByName.get(defaultName.toLowerCase()) : undefined
-      if (devDefaultId) {
-        await dev.client.fetch(`/admin/store`, {
-          method: "POST",
-          body: { default_sales_channel_id: devDefaultId },
-        })
-        console.log(`Default sales channel set to '${defaultName}' in DEV`)
-      }
-    }
-  } catch {}
+    ;(devChannels.sales_channels || []).forEach((sc) =>
+      devChannelIdByName.set((sc.name || "").toLowerCase(), sc.id)
+    )
+  }
 
   // 1) types (build value→id maps for both sides)
   const prodTypes = await listAll<{ id: string; value: string }>(`/admin/product-types`, "product_types")
@@ -286,6 +201,25 @@ async function mirror() {
   const products = await listAll<any>(`/admin/products`, "products")
   console.log(`Syncing ${products.length} products...`)
   for (const p of products) {
+    const prodChannelNames = Array.isArray(p.sales_channels)
+      ? (p.sales_channels as any[])
+          .map((sc) => (sc?.name || "").toLowerCase())
+          .filter((n) => n)
+      : []
+    const scopedChannelNames =
+      CHANNEL_ALLOWLIST.length > 0
+        ? prodChannelNames.filter((n) => CHANNEL_ALLOWLIST.includes(n))
+        : prodChannelNames
+    const devChannelIds: { id: string }[] = []
+    for (const name of scopedChannelNames) {
+      try {
+        const devId = await getOrCreateDevChannelByName(name, devChannelIdByName)
+        if (devId) devChannelIds.push({ id: devId })
+      } catch (e: any) {
+        console.warn(`Channel mirror skipped for ${name}:`, e?.message || e)
+      }
+    }
+
     // Resolve type id for DEV by value (avoid reusing PROD ids)
     const prodTypeValue = (p.type?.value as string) || prodTypeById.get(p.type_id) || ""
     const devTypeId = prodTypeValue ? devTypeIdByValue.get(prodTypeValue.toLowerCase()) : undefined
@@ -296,15 +230,7 @@ async function mirror() {
       description: p.description,
       type_id: devTypeId,
       categories: Array.isArray(p.categories) ? p.categories.map((c: any) => ({ id: catMap.get(c.id) || undefined })).filter((x: any) => x?.id) : [],
-      sales_channels: Array.isArray(p.sales_channels)
-        ? p.sales_channels
-            .map((sc: any) => {
-              const name = (sc.name || "").toLowerCase()
-              const id = devChannelIdByName.get(name)
-              return id ? { id } : null
-            })
-            .filter(Boolean)
-        : [],
+      sales_channels: devChannelIds,
       options: (p.options || []).map((o: any) => ({ title: o.title, values: (o.values || []).map((v: any) => v.value) })),
       variants: (p.variants || []).map((v: any) => ({
         title: v.title || v.sku,
@@ -320,7 +246,32 @@ async function mirror() {
       images: (p.images || []).map((im: any) => ({ url: im.url })),
       thumbnail: p.thumbnail,
     }
-    await upsertProductDev(payload)
+    const devProduct = await upsertProductDev(payload)
+
+    // Optional channel pruning to mirror exactly (only for scoped channels)
+    if (CHANNEL_ENFORCE_MIRROR && Array.isArray(devProduct?.sales_channels)) {
+      const desired = new Set(devChannelIds.map((c) => c.id))
+      const allowset =
+        CHANNEL_ALLOWLIST.length > 0 ? new Set(CHANNEL_ALLOWLIST) : null
+      for (const sc of devProduct.sales_channels as any[]) {
+        const name = (sc?.name || "").toLowerCase()
+        if (allowset && !allowset.has(name)) continue
+        const id = sc?.id
+        if (!id) continue
+        if (!desired.has(id)) {
+          try {
+            await dev.client.fetch(`/admin/products/${devProduct.id}/sales-channels/${id}`, {
+              method: "DELETE",
+            })
+          } catch (e: any) {
+            console.warn(
+              `Failed to detach channel ${name} from product ${devProduct?.handle || devProduct?.id}:`,
+              e?.message || e
+            )
+          }
+        }
+      }
+    }
   }
   console.log(`Done.`)
 }

@@ -1,4 +1,5 @@
-import { ShipStationOptions } from "./service"
+import { Buffer } from "node:buffer"
+import type { ShipStationOptions } from "./service"
 import { MedusaError } from "@medusajs/framework/utils"
 import {
   CarriersResponse,
@@ -13,17 +14,54 @@ import {
 export class ShipStationClient {
   options: ShipStationOptions
 
-  constructor(options) {
+  constructor(options: ShipStationOptions) {
     this.options = options
   }
 
-  private async sendRequest(url: string, data?: RequestInit): Promise<any> {
-    return fetch(`https://api.shipstation.com/v2${url}`, {
+  private buildAuthHeaders(): Record<string, string> {
+    const { api_key, api_secret } = this.options
+
+    if (!api_key) {
+      throw new Error("ShipStation API key is required")
+    }
+
+    if (api_secret) {
+      const token = Buffer.from(`${api_key}:${api_secret}`).toString("base64")
+      return {
+        Authorization: `Basic ${token}`,
+      }
+    }
+
+    if (api_key.includes(":")) {
+      const token = Buffer.from(api_key).toString("base64")
+      return {
+        Authorization: `Basic ${token}`,
+      }
+    }
+
+    return {
+      "api-key": api_key,
+    }
+  }
+
+  private async sendRequest(
+    url: string,
+    data?: {
+      method?: string
+      headers?: Record<string, string>
+      body?: string
+    }
+  ): Promise<any> {
+    const authHeaders = this.buildAuthHeaders()
+    const fetchFn = (globalThis as typeof globalThis & { fetch: (...args: any[]) => Promise<any> }).fetch
+
+    return fetchFn(`https://api.shipstation.com/v2${url}`, {
       ...data,
       headers: {
         ...data?.headers,
-        "api-key": this.options.api_key,
+        Accept: "application/json",
         "Content-Type": "application/json",
+        ...authHeaders,
       },
     }).then((resp) => {
       const contentType = resp.headers.get("content-type")
@@ -58,14 +96,24 @@ export class ShipStationClient {
       method: "POST",
       body: JSON.stringify(data),
     }).then((resp) => {
-      if (resp.rate_response.errors?.length) {
+      const errors = resp?.rate_response?.errors || resp?.errors
+      if (Array.isArray(errors) && errors.length) {
         throw new MedusaError(
           MedusaError.Types.INVALID_DATA,
-          `An error occured while retrieving rates from ShipStation: ${
-            resp.rate_response.errors.map((error) => error.message)
-          }`
+          `An error occured while retrieving rates from ShipStation: ${errors
+            .map((error: any) => error?.message || error)
+            .join(", ")}`
         )
       }
+
+      const rates = resp?.rate_response?.rates
+      if (!Array.isArray(rates) || rates.length === 0) {
+        throw new MedusaError(
+          MedusaError.Types.INVALID_DATA,
+          "ShipStation did not return any shipping rates for this service."
+        )
+      }
+
       return resp
     })
   }
