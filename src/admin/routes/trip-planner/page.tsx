@@ -63,6 +63,7 @@ const TripPlannerPage = () => {
   const [endTime, setEndTime] = useState("17:00")
   const [maxOptionalStops, setMaxOptionalStops] = useState("2")
   const [optionalServiceMinutes, setOptionalServiceMinutes] = useState("15")
+  const [exportWaypointLimit, setExportWaypointLimit] = useState("25")
   const [mustStops, setMustStops] = useState<
     Array<{ address: string; serviceMinutes: string }>
   >([{ address: "", serviceMinutes: "30" }])
@@ -152,7 +153,7 @@ const TripPlannerPage = () => {
           maxOptionalStops: Number(maxOptionalStops),
           optionalServiceMinutes: Number(optionalServiceMinutes),
           keywords,
-          exportWaypointLimit: 25,
+          exportWaypointLimit: Number(exportWaypointLimit),
         }
       )
       setResult(response)
@@ -253,7 +254,7 @@ const TripPlannerPage = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           <div className="flex flex-col gap-2">
             <Label>Max optional stops</Label>
             <Select
@@ -289,6 +290,27 @@ const TripPlannerPage = () => {
                 ))}
               </Select.Content>
             </Select>
+          </div>
+          <div className="flex flex-col gap-2">
+            <Label>Maps link waypoint limit</Label>
+            <Select
+              value={exportWaypointLimit}
+              onValueChange={(value) => setExportWaypointLimit(value)}
+            >
+              <Select.Trigger>
+                <Select.Value placeholder="Select limit" />
+              </Select.Trigger>
+              <Select.Content>
+                {[3, 5, 9, 12, 15, 20, 25].map((limit) => (
+                  <Select.Item key={limit} value={`${limit}`}>
+                    {limit}
+                  </Select.Item>
+                ))}
+              </Select.Content>
+            </Select>
+            <Text size="small" className="text-ui-fg-subtle">
+              Higher limits may split links if the URL gets too long.
+            </Text>
           </div>
         </div>
       </Container>
@@ -429,6 +451,11 @@ const TripPlannerPage = () => {
 
           <div className="flex flex-col gap-2">
             <Heading level="h2">Google Maps Links</Heading>
+            {result.googleMapsSegments.length > 1 && (
+              <Text size="small" className="text-ui-fg-subtle">
+                Multiple links were generated to stay under Google Maps URL limits.
+              </Text>
+            )}
             <div className="flex flex-col gap-1">
               {result.googleMapsSegments.map((segment) => (
                 <a
