@@ -9,12 +9,16 @@ type RouteResult = {
   encodedPolyline: string | null
   legDurationsMinutes: number[]
   totalDriveMinutes: number
+  legLocations: Array<{
+    start: { lat: number; lng: number } | null
+    end: { lat: number; lng: number } | null
+  }>
 }
 
 const ROUTES_URL = "https://routes.googleapis.com/directions/v2:computeRoutes"
 
 const ROUTES_FIELD_MASK =
-  "routes.duration,routes.legs.duration,routes.polyline.encodedPolyline"
+  "routes.duration,routes.legs.duration,routes.legs.startLocation,routes.legs.endLocation,routes.polyline.encodedPolyline"
 
 const toMinutes = (duration: unknown) => {
   if (!duration) {
@@ -81,7 +85,11 @@ export async function computeRoute(
   const data = (await response.json()) as {
     routes?: Array<{
       duration?: string | { seconds?: string | number }
-      legs?: Array<{ duration?: string | { seconds?: string | number } }>
+      legs?: Array<{
+        duration?: string | { seconds?: string | number }
+        startLocation?: { latLng?: { latitude?: number; longitude?: number } }
+        endLocation?: { latLng?: { latitude?: number; longitude?: number } }
+      }>
       polyline?: { encodedPolyline?: string }
     }>
   }
@@ -96,6 +104,25 @@ export async function computeRoute(
     toMinutes(leg.duration)
   )
 
+  const legLocations =
+    route.legs?.map((leg) => {
+      const startLat = leg.startLocation?.latLng?.latitude
+      const startLng = leg.startLocation?.latLng?.longitude
+      const endLat = leg.endLocation?.latLng?.latitude
+      const endLng = leg.endLocation?.latLng?.longitude
+
+      return {
+        start:
+          typeof startLat === "number" && typeof startLng === "number"
+            ? { lat: startLat, lng: startLng }
+            : null,
+        end:
+          typeof endLat === "number" && typeof endLng === "number"
+            ? { lat: endLat, lng: endLng }
+            : null,
+      }
+    }) || []
+
   const totalDriveMinutes =
     legDurationsMinutes.reduce((sum, minutes) => sum + minutes, 0) ||
     toMinutes(route.duration)
@@ -104,5 +131,6 @@ export async function computeRoute(
     encodedPolyline: route.polyline?.encodedPolyline || null,
     legDurationsMinutes,
     totalDriveMinutes,
+    legLocations,
   }
 }

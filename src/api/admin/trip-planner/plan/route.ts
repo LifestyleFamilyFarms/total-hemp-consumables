@@ -22,7 +22,7 @@ const TripPlanSchema = z.object({
   maxOptionalStops: z.number().int().min(0).max(10),
   optionalServiceMinutes: z.number().int().min(5).max(60),
   keywords: z.array(z.string().trim().min(1)).default([]),
-  exportWaypointLimit: z.number().int().min(1).max(9).default(3),
+  exportWaypointLimit: z.number().int().min(1).max(25).default(25),
 })
 
 export async function POST(req: MedusaRequest, res: MedusaResponse) {

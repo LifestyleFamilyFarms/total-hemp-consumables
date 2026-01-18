@@ -152,7 +152,7 @@ const TripPlannerPage = () => {
           maxOptionalStops: Number(maxOptionalStops),
           optionalServiceMinutes: Number(optionalServiceMinutes),
           keywords,
-          exportWaypointLimit: 3,
+          exportWaypointLimit: 25,
         }
       )
       setResult(response)
