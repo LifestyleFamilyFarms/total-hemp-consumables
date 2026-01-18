@@ -42,6 +42,26 @@ Visit the [Quickstart Guide](https://docs.medusajs.com/learn/installation) to se
 
 Visit the [Docs](https://docs.medusajs.com/learn/installation#get-started) to learn more about our system requirements.
 
+## Trip Planner (Admin)
+
+This project includes a Medusa Admin page for planning sales trips with required and optional stops.
+
+### Setup
+
+1. Enable Google Maps Platform APIs:
+   - Routes API
+   - Places API (Text Search)
+2. Add the API key to your environment:
+   - `GOOGLE_MAPS_API_KEY=your_key_here`
+3. Start the backend and admin:
+   - `yarn dev`
+
+### Known limitations (v1)
+
+- Optional stop selection uses a simple rank-based heuristic (no full route optimization).
+- Optional stops are appended after must stops to keep routing deterministic.
+- Google Maps export links are segmented by waypoint limit and URL length, so long routes may create multiple segments.
+
 ## What is Medusa
 
 Medusa is a set of commerce modules and tools that allow you to build rich, reliable, and performant commerce applications without reinventing core commerce logic. The modules can be customized and used to build advanced ecommerce stores, marketplaces, or any product that needs foundational commerce primitives. All modules are open-source and freely available on npm.
