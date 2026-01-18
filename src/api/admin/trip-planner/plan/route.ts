@@ -14,6 +14,7 @@ const TripPlanSchema = z.object({
   mustStops: z
     .array(
       z.object({
+        name: z.string().trim().min(1).optional(),
         address: z.string().trim().min(1),
         serviceMinutes: z.number().int().min(0),
       })

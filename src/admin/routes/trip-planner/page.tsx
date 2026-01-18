@@ -65,8 +65,8 @@ const TripPlannerPage = () => {
   const [optionalServiceMinutes, setOptionalServiceMinutes] = useState("15")
   const [exportWaypointLimit, setExportWaypointLimit] = useState("25")
   const [mustStops, setMustStops] = useState<
-    Array<{ address: string; serviceMinutes: string }>
-  >([{ address: "", serviceMinutes: "30" }])
+    Array<{ name: string; address: string; serviceMinutes: string }>
+  >([{ name: "", address: "", serviceMinutes: "30" }])
   const [keywordsText, setKeywordsText] = useState(DEFAULT_KEYWORDS)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -97,7 +97,7 @@ const TripPlannerPage = () => {
 
   const updateMustStop = (
     index: number,
-    changes: Partial<{ address: string; serviceMinutes: string }>
+    changes: Partial<{ name: string; address: string; serviceMinutes: string }>
   ) => {
     setMustStops((prev) =>
       prev.map((stop, idx) =>
@@ -107,7 +107,10 @@ const TripPlannerPage = () => {
   }
 
   const addMustStop = () => {
-    setMustStops((prev) => [...prev, { address: "", serviceMinutes: "30" }])
+    setMustStops((prev) => [
+      ...prev,
+      { name: "", address: "", serviceMinutes: "30" },
+    ])
   }
 
   const removeMustStop = (index: number) => {
@@ -146,6 +149,7 @@ const TripPlannerPage = () => {
           endTime,
           mustStops: mustStops
             .map((stop) => ({
+              name: stop.name.trim() || undefined,
               address: stop.address.trim(),
               serviceMinutes: Number(stop.serviceMinutes),
             }))
@@ -321,8 +325,18 @@ const TripPlannerPage = () => {
           {mustStops.map((stop, index) => (
             <div
               key={`must-stop-${index}`}
-              className="grid grid-cols-1 gap-3 md:grid-cols-[1fr_160px_100px]"
+              className="grid grid-cols-1 gap-3 md:grid-cols-[1fr_1.5fr_160px_100px]"
             >
+              <div className="flex flex-col gap-2">
+                <Label>Stop name</Label>
+                <Input
+                  value={stop.name}
+                  onChange={(event) =>
+                    updateMustStop(index, { name: event.target.value })
+                  }
+                  placeholder="Account or store name"
+                />
+              </div>
               <div className="flex flex-col gap-2">
                 <Label>Address</Label>
                 <Input

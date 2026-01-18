@@ -11,7 +11,7 @@ export type TripPlanRequest = {
   dateISO: string
   startTime: string
   endTime: string
-  mustStops: Array<{ address: string; serviceMinutes: number }>
+  mustStops: Array<{ name?: string; address: string; serviceMinutes: number }>
   maxOptionalStops: number
   optionalServiceMinutes: number
   keywords: string[]
@@ -186,6 +186,7 @@ export const planTrip = async (
 
   const mustStops = request.mustStops
     .map((stop) => ({
+      name: stop.name?.trim() || undefined,
       address: stop.address.trim(),
       serviceMinutes: stop.serviceMinutes,
     }))
@@ -262,6 +263,7 @@ export const planTrip = async (
     },
     ...mustStops.map((stop) => ({
       type: "MUST" as const,
+      name: stop.name,
       address: stop.address,
       serviceMinutes: stop.serviceMinutes,
     })),
