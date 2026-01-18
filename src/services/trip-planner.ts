@@ -52,6 +52,11 @@ type PlannedStop = {
   serviceMinutes: number
 }
 
+type Coordinate = {
+  lat: number
+  lng: number
+}
+
 const MAX_OPTIONAL_CANDIDATES = 40
 
 const haversineMeters = (
@@ -71,6 +76,38 @@ const haversineMeters = (
       Math.sin(dLng / 2) ** 2
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
   return earthRadius * c
+}
+
+const toMeters = (value: number) => value * (Math.PI / 180) * 6371000
+
+const distancePointToSegmentMeters = (
+  point: Coordinate,
+  segmentStart: Coordinate,
+  segmentEnd: Coordinate
+) => {
+  const latFactor = Math.cos(((segmentStart.lat + segmentEnd.lat) / 2) * (Math.PI / 180))
+  const ax = toMeters(segmentStart.lng) * latFactor
+  const ay = toMeters(segmentStart.lat)
+  const bx = toMeters(segmentEnd.lng) * latFactor
+  const by = toMeters(segmentEnd.lat)
+  const px = toMeters(point.lng) * latFactor
+  const py = toMeters(point.lat)
+
+  const abx = bx - ax
+  const aby = by - ay
+  const apx = px - ax
+  const apy = py - ay
+  const abLenSq = abx * abx + aby * aby
+
+  if (abLenSq === 0) {
+    return Math.hypot(apx, apy)
+  }
+
+  const t = Math.max(0, Math.min(1, (apx * abx + apy * aby) / abLenSq))
+  const closestX = ax + abx * t
+  const closestY = ay + aby * t
+
+  return Math.hypot(px - closestX, py - closestY)
 }
 
 const dedupeCandidates = (candidates: PlaceCandidate[]) => {
@@ -217,7 +254,7 @@ export const planTrip = async (
       serviceMinutes: request.optionalServiceMinutes,
     }))
 
-  let finalStops: PlannedStop[] = [
+  const baseStops: PlannedStop[] = [
     {
       type: "START",
       address: startAddress,
@@ -228,13 +265,96 @@ export const planTrip = async (
       address: stop.address,
       serviceMinutes: stop.serviceMinutes,
     })),
-    ...selectedOptional,
     {
       type: "END",
       address: endAddress,
       serviceMinutes: 0,
     },
   ]
+
+  const baseCoordinates: Coordinate[] = []
+  if (baseRoute.legLocations.length === baseStops.length - 1) {
+    for (let i = 0; i < baseRoute.legLocations.length; i += 1) {
+      const leg = baseRoute.legLocations[i]
+      if (!leg.start || !leg.end) {
+        baseCoordinates.length = 0
+        break
+      }
+      if (i === 0) {
+        baseCoordinates.push(leg.start)
+      }
+      baseCoordinates.push(leg.end)
+    }
+  }
+
+  const buildFinalStops = (optionalCount: number) => {
+    const optionalSlice = selectedOptional.slice(0, optionalCount)
+    let orderedStops: PlannedStop[] = [
+      baseStops[0],
+      ...optionalSlice,
+      ...baseStops.slice(1),
+    ]
+
+    if (baseCoordinates.length === baseStops.length) {
+      const segmentBuckets: Array<
+        Array<{ stop: PlannedStop; position: number }>
+      > = Array.from({ length: baseStops.length - 1 }, () => [])
+
+      optionalSlice.forEach((stop) => {
+        if (typeof stop.lat !== "number" || typeof stop.lng !== "number") {
+          return
+        }
+
+        let bestIndex = 0
+        let bestDistance = Number.POSITIVE_INFINITY
+        let bestPosition = 0
+
+        baseCoordinates.forEach((coord, index) => {
+          if (index === baseCoordinates.length - 1) {
+            return
+          }
+          const next = baseCoordinates[index + 1]
+          const distance = distancePointToSegmentMeters(
+            { lat: stop.lat!, lng: stop.lng! },
+            coord,
+            next
+          )
+
+          if (distance < bestDistance) {
+            bestDistance = distance
+            bestIndex = index
+            const segmentLength = haversineMeters(
+              coord.lat,
+              coord.lng,
+              next.lat,
+              next.lng
+            )
+            const fromStart = haversineMeters(
+              coord.lat,
+              coord.lng,
+              stop.lat!,
+              stop.lng!
+            )
+            bestPosition = segmentLength > 0 ? fromStart / segmentLength : 0
+          }
+        })
+
+        segmentBuckets[bestIndex].push({ stop, position: bestPosition })
+      })
+
+      orderedStops = [baseStops[0]]
+      segmentBuckets.forEach((bucket, index) => {
+        const sortedOptional = bucket
+          .sort((a, b) => a.position - b.position)
+          .map((entry) => entry.stop)
+        orderedStops.push(...sortedOptional, baseStops[index + 1])
+      })
+    }
+
+    return orderedStops
+  }
+
+  let finalStops = buildFinalStops(selectedOptional.length)
 
   let legDurationsMinutes: number[] = []
   let totalDriveMinutes = 0
@@ -262,12 +382,7 @@ export const planTrip = async (
         notes.push(
           "Dropped an optional stop to satisfy routing limits. Reduce optional stops if you want to keep all candidates."
         )
-        finalStops = [
-          finalStops[0],
-          ...finalStops.slice(1, 1 + mustStops.length),
-          ...selectedOptional.slice(0, optionalToTry),
-          finalStops[finalStops.length - 1],
-        ]
+        finalStops = buildFinalStops(optionalToTry)
         continue
       }
       throw error
@@ -302,7 +417,7 @@ export const planTrip = async (
 
   const googleMapsSegments = buildMapsSegments(
     finalStops.map((stop) => ({ address: stop.address })),
-    request.exportWaypointLimit || 3
+    request.exportWaypointLimit || 25
   )
 
   const csv = buildCsv(

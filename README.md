@@ -60,7 +60,7 @@ This project includes a Medusa Admin page for planning sales trips with required
 
 - Optional stop selection uses a simple rank-based heuristic (no full route optimization).
 - Optional stops are appended after must stops to keep routing deterministic.
-- Google Maps export links are segmented by waypoint limit and URL length, so long routes may create multiple segments.
+- Google Maps export links are segmented by waypoint limit and URL length, so long routes may create multiple segments even with a higher limit.
 
 ## What is Medusa
 
