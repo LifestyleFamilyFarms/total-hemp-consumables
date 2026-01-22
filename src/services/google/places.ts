@@ -14,9 +14,13 @@ export type PlaceCandidate = {
 }
 
 const PLACES_URL = "https://places.googleapis.com/v1/places:searchText"
+const PLACES_AUTOCOMPLETE_URL =
+  "https://places.googleapis.com/v1/places:autocomplete"
 
 const PLACES_FIELD_MASK =
   "places.id,places.displayName,places.formattedAddress,places.location"
+const PLACES_AUTOCOMPLETE_FIELD_MASK =
+  "suggestions.placePrediction.placeId,suggestions.placePrediction.text"
 
 export async function searchPlacesAlongRoute({
   query,
@@ -83,4 +87,55 @@ export async function searchPlacesAlongRoute({
       }
     })
     .filter((place): place is PlaceCandidate => Boolean(place))
+}
+
+export type PlaceSuggestion = {
+  placeId: string
+  text: string
+}
+
+export async function autocompletePlaces(
+  input: string,
+  apiKey: string
+): Promise<PlaceSuggestion[]> {
+  const body = {
+    input,
+  }
+
+  const response = await fetch(PLACES_AUTOCOMPLETE_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Goog-Api-Key": apiKey,
+      "X-Goog-FieldMask": PLACES_AUTOCOMPLETE_FIELD_MASK,
+    },
+    body: JSON.stringify(body),
+  })
+
+  if (!response.ok) {
+    const errorText = await response.text()
+    throw new Error(
+      `Places API error (${response.status}): ${errorText || response.statusText}`
+    )
+  }
+
+  const data = (await response.json()) as {
+    suggestions?: Array<{
+      placePrediction?: {
+        placeId?: string
+        text?: { text?: string }
+      }
+    }>
+  }
+
+  return (data.suggestions || [])
+    .map((suggestion) => {
+      const placeId = suggestion.placePrediction?.placeId || ""
+      const text = suggestion.placePrediction?.text?.text || ""
+      if (!placeId || !text) {
+        return null
+      }
+      return { placeId, text }
+    })
+    .filter((suggestion): suggestion is PlaceSuggestion => Boolean(suggestion))
 }
