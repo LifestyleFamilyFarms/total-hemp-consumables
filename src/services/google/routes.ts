@@ -3,6 +3,7 @@ type ComputeRouteInput = {
   destinationAddress: string
   intermediateAddresses?: string[]
   departureTimeISO?: string
+  optimizeWaypoints?: boolean
 }
 
 type RouteResult = {
@@ -13,12 +14,13 @@ type RouteResult = {
     start: { lat: number; lng: number } | null
     end: { lat: number; lng: number } | null
   }>
+  optimizedWaypointOrder?: number[]
 }
 
 const ROUTES_URL = "https://routes.googleapis.com/directions/v2:computeRoutes"
 
 const ROUTES_FIELD_MASK =
-  "routes.duration,routes.legs.duration,routes.legs.startLocation,routes.legs.endLocation,routes.polyline.encodedPolyline"
+  "routes.duration,routes.legs.duration,routes.legs.startLocation,routes.legs.endLocation,routes.polyline.encodedPolyline,routes.optimizedIntermediateWaypointIndex"
 
 const toMinutes = (duration: unknown) => {
   if (!duration) {
@@ -49,8 +51,13 @@ export async function computeRoute(
   input: ComputeRouteInput,
   apiKey: string
 ): Promise<RouteResult> {
-  const { originAddress, destinationAddress, intermediateAddresses, departureTimeISO } =
-    input
+  const {
+    originAddress,
+    destinationAddress,
+    intermediateAddresses,
+    departureTimeISO,
+    optimizeWaypoints,
+  } = input
 
   const body = {
     origin: { address: originAddress },
@@ -62,6 +69,7 @@ export async function computeRoute(
     routingPreference: "TRAFFIC_AWARE",
     polylineQuality: "OVERVIEW",
     polylineEncoding: "ENCODED_POLYLINE",
+    ...(optimizeWaypoints ? { optimizeWaypointOrder: true } : {}),
     ...(departureTimeISO ? { departureTime: departureTimeISO } : {}),
   }
 
@@ -91,6 +99,7 @@ export async function computeRoute(
         endLocation?: { latLng?: { latitude?: number; longitude?: number } }
       }>
       polyline?: { encodedPolyline?: string }
+      optimizedIntermediateWaypointIndex?: number[]
     }>
   }
 
@@ -132,5 +141,6 @@ export async function computeRoute(
     legDurationsMinutes,
     totalDriveMinutes,
     legLocations,
+    optimizedWaypointOrder: route.optimizedIntermediateWaypointIndex,
   }
 }

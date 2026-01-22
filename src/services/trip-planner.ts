@@ -3,6 +3,7 @@ import { PlaceCandidate, searchPlacesAlongRoute } from "./google/places"
 import { addMinutes, diffMinutes, formatLocalISOString, parseLocalDateTime } from "../utils/time"
 import { buildMapsSegments, MapsSegment } from "../utils/maps-url"
 import { buildCsv } from "../utils/csv"
+import { Coordinate, decodePolyline } from "../utils/polyline"
 
 export type TripPlanRequest = {
   startAddress: string
@@ -16,6 +17,7 @@ export type TripPlanRequest = {
   optionalServiceMinutes: number
   keywords: string[]
   exportWaypointLimit: number
+  allowOptimizeMustStops: boolean
 }
 
 export type TripPlanResponse = {
@@ -52,12 +54,8 @@ type PlannedStop = {
   serviceMinutes: number
 }
 
-type Coordinate = {
-  lat: number
-  lng: number
-}
-
 const MAX_OPTIONAL_CANDIDATES = 40
+const POLYLINE_SAMPLE_RATE = 5
 
 const haversineMeters = (
   lat1: number,
@@ -110,6 +108,27 @@ const distancePointToSegmentMeters = (
   return Math.hypot(px - closestX, py - closestY)
 }
 
+const minDistanceToPolylineMeters = (
+  point: Coordinate,
+  polyline: Coordinate[]
+) => {
+  if (polyline.length < 2) {
+    return Number.POSITIVE_INFINITY
+  }
+
+  let best = Number.POSITIVE_INFINITY
+
+  for (let i = 0; i < polyline.length - 1; i += 1) {
+    const start = polyline[i]
+    const end = polyline[i + 1]
+    const distance = distancePointToSegmentMeters(point, start, end)
+    if (distance < best) {
+      best = distance
+    }
+  }
+
+  return best
+}
 const dedupeCandidates = (candidates: PlaceCandidate[]) => {
   const byId = new Map<string, PlaceCandidate>()
   const deduped: PlaceCandidate[] = []
@@ -202,9 +221,20 @@ export const planTrip = async (
       destinationAddress: endAddress,
       intermediateAddresses: mustStops.map((stop) => stop.address),
       departureTimeISO,
+      optimizeWaypoints: request.allowOptimizeMustStops,
     },
     apiKey
   )
+
+  if (
+    request.allowOptimizeMustStops &&
+    baseRoute.optimizedWaypointOrder &&
+    baseRoute.optimizedWaypointOrder.length === mustStops.length
+  ) {
+    const reordered = baseRoute.optimizedWaypointOrder.map((index) => mustStops[index])
+    mustStops.splice(0, mustStops.length, ...reordered)
+    notes.push("Must-stop order was optimized for a smoother route.")
+  }
 
   let optionalCandidates: PlaceCandidate[] = []
 
@@ -244,7 +274,42 @@ export const planTrip = async (
     )
   })
 
-  const selectedOptional = optionalCandidates
+  let scoredCandidates = optionalCandidates
+
+  if (baseRoute.encodedPolyline) {
+    try {
+      const decoded = decodePolyline(baseRoute.encodedPolyline)
+      const sampled = decoded.filter(
+        (_, index) => index % POLYLINE_SAMPLE_RATE === 0
+      )
+      if (sampled.length >= 2) {
+        scoredCandidates = optionalCandidates
+          .map((candidate) => ({
+            candidate,
+            score: minDistanceToPolylineMeters(
+              { lat: candidate.lat, lng: candidate.lng },
+              sampled
+            ),
+          }))
+          .sort((a, b) => a.score - b.score)
+          .map((entry) => entry.candidate)
+      } else {
+        notes.push(
+          "Optional stop scoring used Google ranking because the route shape was unavailable."
+        )
+      }
+    } catch (error) {
+      notes.push(
+        "Optional stop scoring used Google ranking because the route shape was unavailable."
+      )
+    }
+  } else {
+    notes.push(
+      "Optional stop scoring used Google ranking because the route shape was unavailable."
+    )
+  }
+
+  const selectedOptional = scoredCandidates
     .slice(0, request.maxOptionalStops)
     .map((candidate) => ({
       type: "OPTIONAL" as const,
@@ -372,6 +437,7 @@ export const planTrip = async (
           destinationAddress: endAddress,
           intermediateAddresses: intermediates,
           departureTimeISO,
+          optimizeWaypoints: false,
         },
         apiKey
       )
