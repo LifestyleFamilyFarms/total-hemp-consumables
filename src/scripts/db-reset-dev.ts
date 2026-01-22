@@ -12,7 +12,7 @@
 */
 
 import { loadEnv } from "@medusajs/framework/utils"
-import { Client } from "pg"
+import { Client } from "@medusajs/framework/pg"
 
 loadEnv(process.env.NODE_ENV || "development", process.cwd())
 
