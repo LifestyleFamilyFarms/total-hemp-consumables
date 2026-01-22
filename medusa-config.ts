@@ -88,7 +88,11 @@ module.exports = defineConfig({
     {
       resolve: '@medusajs/medusa/workflow-engine-redis',
       options: {
+        // Keep both keys for compatibility across loader versions.
         redisUrl: process.env.WORKFLOW_REDIS_URL,
+        redis: {
+          url: process.env.WORKFLOW_REDIS_URL,
+        },
       },
     },
     // S3 File Module Provider (for production)
