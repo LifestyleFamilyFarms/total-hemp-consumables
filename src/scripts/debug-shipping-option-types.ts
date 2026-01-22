@@ -1,4 +1,4 @@
-import { Client } from "pg"
+import { Client } from "@medusajs/framework/pg"
 import { readFileSync } from "fs"
 import type { ExecArgs } from "@medusajs/framework/types"
 
