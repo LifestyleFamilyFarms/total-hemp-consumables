@@ -15,8 +15,9 @@ import {
   Toaster,
   toast,
 } from "@medusajs/ui"
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { getAdmin, postAdmin } from "../../lib/sdk"
+import { normalizeAddress } from "../../../utils/sales-stores"
 
 type SalesStore = {
   id: string
@@ -34,6 +35,11 @@ type SalesStoreStage = {
   occurred_at: string
   notes?: string
   source?: string
+}
+
+type AddressSuggestion = {
+  placeId: string
+  text: string
 }
 
 const STAGES = [
@@ -80,18 +86,50 @@ const SalesStoresPage = () => {
   const [savedFilters, setSavedFilters] = useState<
     Array<{ id: string; label: string; term: string; stage: string }>
   >([])
+  const [newStoreName, setNewStoreName] = useState("")
+  const [newStoreAddress, setNewStoreAddress] = useState("")
+  const [newStoreStage, setNewStoreStage] = useState<string>("discovered")
+  const [newStoreNotes, setNewStoreNotes] = useState("")
+  const [suggestions, setSuggestions] = useState<AddressSuggestion[]>([])
+  const [isSuggesting, setIsSuggesting] = useState(false)
+  const suggestTimer = useRef<number | null>(null)
+  const suggestCache = useRef<Map<string, AddressSuggestion[]>>(new Map())
   const [viewMode, setViewMode] = useState<"list" | "board">("list")
+  const [totalCount, setTotalCount] = useState(0)
+  const [isLoadingMore, setIsLoadingMore] = useState(false)
+  const pageSize = 50
 
   const savedFiltersKey = "sales-stores-saved-filters"
 
-  const loadStores = async () => {
-    setIsLoading(true)
-    setError(null)
+  const loadStores = async (options?: {
+    q?: string
+    stage?: string
+    reset?: boolean
+  }) => {
+    if (options?.reset) {
+      setIsLoading(true)
+      setError(null)
+    } else {
+      setIsLoadingMore(true)
+    }
     try {
-      const response = await getAdmin<{ stores: SalesStore[] }>(
-        "/admin/sales-stores"
+      const response = await getAdmin<{
+        stores: SalesStore[]
+        total?: number
+        skip?: number
+        take?: number
+      }>("/admin/sales-stores", {
+        q: options?.q,
+        stage: options?.stage,
+        take: pageSize,
+        skip: options?.reset ? 0 : stores.length,
+      })
+      setStores((prev) =>
+        options?.reset
+          ? response.stores || []
+          : [...prev, ...(response.stores || [])]
       )
-      setStores(response.stores || [])
+      setTotalCount(response.total || 0)
     } catch (loadError) {
       setError(
         loadError instanceof Error
@@ -100,12 +138,9 @@ const SalesStoresPage = () => {
       )
     } finally {
       setIsLoading(false)
+      setIsLoadingMore(false)
     }
   }
-
-  useEffect(() => {
-    void loadStores()
-  }, [])
 
   useEffect(() => {
     try {
@@ -126,6 +161,57 @@ const SalesStoresPage = () => {
     }
   }, [])
 
+  useEffect(() => {
+    if (!searchTerm || searchTerm.trim().length < 3) {
+      setSuggestions([])
+      setIsSuggesting(false)
+      return
+    }
+
+    if (suggestTimer.current) {
+      window.clearTimeout(suggestTimer.current)
+    }
+
+    suggestTimer.current = window.setTimeout(async () => {
+      const cacheKey = searchTerm.trim().toLowerCase()
+      if (suggestCache.current.has(cacheKey)) {
+        setSuggestions(suggestCache.current.get(cacheKey) || [])
+        return
+      }
+
+      setIsSuggesting(true)
+      try {
+        const response = await getAdmin<{ suggestions?: AddressSuggestion[] }>(
+          "/admin/sales-stores/suggest",
+          { q: searchTerm.trim() }
+        )
+        const next = (response.suggestions || []).filter(
+          (suggestion) =>
+            !normalizedStoreAddresses.has(normalizeAddress(suggestion.text))
+        )
+        suggestCache.current.set(cacheKey, next)
+        setSuggestions(next)
+      } catch (error) {
+        setSuggestions([])
+      } finally {
+        setIsSuggesting(false)
+      }
+    }, 350)
+
+    return () => {
+      if (suggestTimer.current) {
+        window.clearTimeout(suggestTimer.current)
+      }
+    }
+  }, [searchTerm, normalizedStoreAddresses])
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      void loadStores({ q: searchTerm.trim(), stage: stageFilter, reset: true })
+    }, 300)
+    return () => window.clearTimeout(timer)
+  }, [searchTerm, stageFilter])
+
   const updateStageSelection = (storeId: string, stage: string) => {
     setStageSelections((prev) => ({ ...prev, [storeId]: stage }))
   }
@@ -145,7 +231,7 @@ const SalesStoresPage = () => {
       })
       toast.success("Stage updated.")
       setNoteSelections((prev) => ({ ...prev, [storeId]: "" }))
-      await loadStores()
+      await loadStores({ q: searchTerm.trim(), stage: stageFilter, reset: true })
       if (selectedStoreId === storeId) {
         await loadStages(storeId)
       }
@@ -171,17 +257,11 @@ const SalesStoresPage = () => {
     [stores, selectedStoreId]
   )
 
-  const filteredStores = useMemo(() => {
-    const term = searchTerm.trim().toLowerCase()
-    return stores.filter((store) => {
-      const matchesStage =
-        stageFilter === "all" ? true : store.stage === stageFilter
-      const matchesTerm = term
-        ? `${store.name || ""} ${store.address}`.toLowerCase().includes(term)
-        : true
-      return matchesStage && matchesTerm
-    })
-  }, [stores, searchTerm, stageFilter])
+  const filteredStores = stores
+
+  const normalizedStoreAddresses = useMemo(() => {
+    return new Set(stores.map((store) => normalizeAddress(store.address)))
+  }, [stores])
 
   const stageCounts = useMemo(() => {
     const counts = STAGES.reduce<Record<string, number>>(
@@ -272,7 +352,7 @@ const SalesStoresPage = () => {
       )
       toast.success("Updated stages for selected stores.")
       setBulkNotes("")
-      await loadStores()
+      await loadStores({ q: searchTerm.trim(), stage: stageFilter, reset: true })
       if (selectedStoreId) {
         await loadStages(selectedStoreId)
       }
@@ -307,7 +387,7 @@ const SalesStoresPage = () => {
     try {
       await postAdmin(`/admin/sales-stores/${storeId}/stages`, { stage })
       toast.success("Stage updated.")
-      await loadStores()
+      await loadStores({ q: searchTerm.trim(), stage: stageFilter, reset: true })
       if (selectedStoreId === storeId) {
         await loadStages(storeId)
       }
@@ -322,7 +402,7 @@ const SalesStoresPage = () => {
         stage,
       })
       toast.success("Stage updated.")
-      await loadStores()
+      await loadStores({ q: searchTerm.trim(), stage: stageFilter, reset: true })
       if (selectedStoreId === storeId) {
         await loadStages(storeId)
       }
@@ -343,7 +423,7 @@ const SalesStoresPage = () => {
       })
       toast.success("Stage updated.")
       setNoteSelections((prev) => ({ ...prev, [storeId]: "" }))
-      await loadStores()
+      await loadStores({ q: searchTerm.trim(), stage: stageFilter, reset: true })
       if (selectedStoreId === storeId) {
         await loadStages(storeId)
       }
@@ -397,6 +477,54 @@ const SalesStoresPage = () => {
     URL.revokeObjectURL(url)
   }
 
+  const addStore = async () => {
+    if (!newStoreAddress.trim()) {
+      toast.error("Please enter an address for the store.")
+      return
+    }
+
+    try {
+      await postAdmin("/admin/sales-stores/bulk", {
+        stores: [
+          {
+            name: newStoreName.trim() || undefined,
+            address: newStoreAddress.trim(),
+            stage: newStoreStage,
+            notes: newStoreNotes.trim() || undefined,
+            source: "manual",
+          },
+        ],
+      })
+      toast.success("Store added.")
+      setNewStoreName("")
+      setNewStoreAddress("")
+      setNewStoreNotes("")
+      setNewStoreStage("discovered")
+      await loadStores({ q: searchTerm.trim(), stage: stageFilter, reset: true })
+    } catch (error) {
+      toast.error("Could not add store. Please try again.")
+    }
+  }
+
+  const addStoreFromSuggestion = async (address: string) => {
+    try {
+      await postAdmin("/admin/sales-stores/bulk", {
+        stores: [
+          {
+            name: address.split(",")[0]?.trim() || undefined,
+            address,
+            stage: "discovered",
+            source: "google_places",
+          },
+        ],
+      })
+      toast.success("Store added from Google search.")
+      await loadStores({ q: searchTerm.trim(), stage: stageFilter, reset: true })
+    } catch (error) {
+      toast.error("Could not add store. Please try again.")
+    }
+  }
+
   return (
     <Container className="flex flex-col gap-6">
       <Toaster />
@@ -407,7 +535,13 @@ const SalesStoresPage = () => {
             Track account status and sales activity for retail partners.
           </Text>
         </div>
-        <Button variant="secondary" onClick={loadStores} isLoading={isLoading}>
+        <Button
+          variant="secondary"
+          onClick={() =>
+            loadStores({ q: searchTerm.trim(), stage: stageFilter, reset: true })
+          }
+          isLoading={isLoading}
+        >
           Refresh
         </Button>
       </div>
@@ -464,8 +598,44 @@ const SalesStoresPage = () => {
           </div>
         </div>
         <Text size="small" className="text-ui-fg-subtle">
-          Showing {filteredStores.length} of {stores.length} stores
+          Showing {filteredStores.length} of {totalCount || stores.length} stores
         </Text>
+        {searchTerm.trim().length >= 3 && (
+          <div className="rounded-md border border-ui-border-base p-3">
+            <div className="flex items-center justify-between">
+              <Text size="small" className="text-ui-fg-subtle">
+                Google address suggestions
+              </Text>
+              {isSuggesting && (
+                <Text size="xsmall" className="text-ui-fg-subtle">
+                  Searching...
+                </Text>
+              )}
+            </div>
+            {suggestions.length === 0 && !isSuggesting ? (
+              <Text size="small" className="text-ui-fg-subtle">
+                No Google suggestions found. Try a different search.
+              </Text>
+            ) : (
+              <div className="mt-2 flex flex-col gap-2">
+                {suggestions.map((suggestion) => (
+                  <div
+                    key={suggestion.placeId}
+                    className="flex items-center justify-between gap-3 rounded-md border border-ui-border-base px-2 py-2"
+                  >
+                    <Text size="small">{suggestion.text}</Text>
+                    <Button
+                      variant="secondary"
+                      onClick={() => addStoreFromSuggestion(suggestion.text)}
+                    >
+                      Add store
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
         <div className="flex flex-wrap items-center gap-2">
           <Button variant="secondary" onClick={saveFilter}>
             Save current filter
@@ -507,6 +677,79 @@ const SalesStoresPage = () => {
           ))}
         </div>
       </Container>
+
+      <Container className="flex flex-col gap-4">
+        <Heading level="h2">Add Sales Store</Heading>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="flex flex-col gap-2">
+            <Text size="small" className="text-ui-fg-subtle">
+              Store name
+            </Text>
+            <Input
+              value={newStoreName}
+              onChange={(event) => setNewStoreName(event.target.value)}
+              placeholder="Store or account name"
+            />
+          </div>
+          <div className="flex flex-col gap-2">
+            <Text size="small" className="text-ui-fg-subtle">
+              Address
+            </Text>
+            <Input
+              value={newStoreAddress}
+              onChange={(event) => setNewStoreAddress(event.target.value)}
+              placeholder="Full address"
+            />
+          </div>
+          <div className="flex flex-col gap-2">
+            <Text size="small" className="text-ui-fg-subtle">
+              Stage
+            </Text>
+            <Select value={newStoreStage} onValueChange={setNewStoreStage}>
+              <Select.Trigger>
+                <Select.Value placeholder="Select stage" />
+              </Select.Trigger>
+              <Select.Content>
+                {STAGES.map((stage) => (
+                  <Select.Item key={stage} value={stage}>
+                    {formatStage(stage)}
+                  </Select.Item>
+                ))}
+              </Select.Content>
+            </Select>
+          </div>
+          <div className="flex flex-col gap-2">
+            <Text size="small" className="text-ui-fg-subtle">
+              Notes
+            </Text>
+            <Textarea
+              rows={2}
+              value={newStoreNotes}
+              onChange={(event) => setNewStoreNotes(event.target.value)}
+              placeholder="Optional notes"
+            />
+          </div>
+        </div>
+        <div>
+          <Button variant="secondary" onClick={addStore}>
+            Add store
+          </Button>
+        </div>
+      </Container>
+
+      {stores.length < totalCount && (
+        <div className="flex justify-center">
+          <Button
+            variant="secondary"
+            isLoading={isLoadingMore}
+            onClick={() =>
+              loadStores({ q: searchTerm.trim(), stage: stageFilter })
+            }
+          >
+            Load more
+          </Button>
+        </div>
+      )}
 
       <Container className="flex flex-col gap-4">
         <div className="flex flex-wrap items-center gap-3">
