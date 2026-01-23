@@ -65,10 +65,16 @@ class SalesPeopleModuleService extends MedusaService({
   }
 
   async resolveByRepCode(repCode: string) {
-    const [person] = await this.listSalesPeople(
-      { rep_code: repCode },
-      { take: 1 }
-    )
+    const listSalesPeople = (
+      this as unknown as {
+        listSalesPeople: (
+          selector?: Record<string, unknown>,
+          config?: Record<string, unknown>
+        ) => Promise<unknown[]>
+      }
+    ).listSalesPeople
+
+    const [person] = await listSalesPeople({ rep_code: repCode }, { take: 1 })
     return person || null
   }
 }

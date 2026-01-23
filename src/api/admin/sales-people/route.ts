@@ -12,7 +12,7 @@ const SalesPersonSchema = z.object({
 
 export async function GET(req: MedusaRequest, res: MedusaResponse) {
   try {
-    const service = req.scope.resolve("salesPeople") as {
+    const service = req.scope.resolve("salesPeople") as unknown as {
       listSalesPeople: (
         selector?: Record<string, unknown>,
         config?: Record<string, unknown>
@@ -46,7 +46,7 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
   }
 
   try {
-    const service = req.scope.resolve("salesPeople") as {
+    const service = req.scope.resolve("salesPeople") as unknown as {
       createSalesPeople: (input: Record<string, unknown>) => Promise<unknown>
     }
 
