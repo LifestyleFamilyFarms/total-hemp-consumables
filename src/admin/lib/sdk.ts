@@ -4,12 +4,20 @@ export type ApiError = {
   message: string
 }
 
-const baseUrl =
-  typeof window !== "undefined" ? window.location.origin : "http://localhost:9000"
+const resolveBackendUrl = () => {
+  if (typeof window !== "undefined") {
+    const globalBackend =
+      (window as { __BACKEND_URL__?: string }).__BACKEND_URL__ ||
+      (globalThis as { __BACKEND_URL__?: string }).__BACKEND_URL__
+    return globalBackend || window.location.origin
+  }
+
+  return process.env.MEDUSA_BACKEND_URL || "http://localhost:9000"
+}
 
 // Medusa docs recommend the JS SDK for admin customizations.
 export const sdk = new Medusa({
-  baseUrl,
+  baseUrl: resolveBackendUrl(),
   debug: process.env.NODE_ENV === "development",
   auth: {
     type: "session",

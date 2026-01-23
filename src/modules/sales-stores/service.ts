@@ -1,6 +1,7 @@
 import { MedusaService } from "@medusajs/framework/utils"
 import SalesStore from "./models/sales-store"
 import SalesStoreStage from "./models/sales-store-stage"
+import { normalizeAddress } from "../../utils/sales-stores"
 
 export type SalesStoreInput = {
   name?: string
@@ -11,9 +12,6 @@ export type SalesStoreInput = {
   stage?: string
   notes?: string
 }
-
-const normalizeAddress = (address: string) =>
-  address.trim().toLowerCase().replace(/\s+/g, " ")
 
 class SalesStoresModuleService extends MedusaService({
   SalesStore,
