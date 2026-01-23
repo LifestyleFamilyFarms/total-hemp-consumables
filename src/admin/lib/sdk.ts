@@ -54,3 +54,38 @@ export const getAdmin = async <TResponse>(
     throw new Error(message)
   }
 }
+
+export const getAdminUser = async <TResponse>(): Promise<TResponse> => {
+  try {
+    return await sdk.admin.user.me()
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Request failed."
+    throw new Error(message)
+  }
+}
+
+export const listAdminUsers = async <TResponse>(
+  query?: Record<string, unknown>
+): Promise<TResponse> => {
+  try {
+    return await sdk.admin.user.list(query)
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Request failed."
+    throw new Error(message)
+  }
+}
+
+export const updateAdminUser = async <TResponse>(
+  id: string,
+  body: Record<string, unknown>
+): Promise<TResponse> => {
+  try {
+    return await sdk.admin.user.update(id, body)
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Request failed."
+    throw new Error(message)
+  }
+}

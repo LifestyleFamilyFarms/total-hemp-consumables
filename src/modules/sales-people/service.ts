@@ -48,6 +48,22 @@ class SalesPeopleModuleService extends MedusaService({
     return assignment
   }
 
+  async unassignStore(salesStoreId: string) {
+    const existing = (
+      await this.listSalesPersonAssignments(
+        { sales_store_id: salesStoreId },
+        { take: 1 }
+      )
+    )[0]
+
+    if (!existing) {
+      return null
+    }
+
+    await this.deleteSalesPersonAssignments({ id: existing.id })
+    return existing
+  }
+
   async resolveByRepCode(repCode: string) {
     const [person] = await this.listSalesPeople(
       { rep_code: repCode },
