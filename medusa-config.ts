@@ -166,5 +166,8 @@ module.exports = defineConfig({
     {
       resolve: "./src/modules/sales-stores",
     },
+    {
+      resolve: "./src/modules/sales-people",
+    },
   ],
 }); 

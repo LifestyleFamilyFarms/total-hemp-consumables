@@ -96,6 +96,22 @@ class SalesStoresModuleService extends MedusaService({
 
     return storeRecord
   }
+
+  async assignSalesPerson(storeId: string, salesPersonId?: string) {
+    const [storeRecord] = await this.listSalesStores(
+      { id: storeId },
+      { take: 1 }
+    )
+
+    if (!storeRecord) {
+      return null
+    }
+
+    return this.updateSalesStores(
+      { id: storeId },
+      { assigned_sales_person_id: salesPersonId || null }
+    )
+  }
 }
 
 export default SalesStoresModuleService

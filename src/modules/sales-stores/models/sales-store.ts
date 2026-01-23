@@ -11,6 +11,7 @@ const SalesStore = model.define("sales_store", {
   stage: model.text().nullable(),
   stage_updated_at: model.dateTime().nullable(),
   notes: model.text().nullable(),
+  assigned_sales_person_id: model.text().nullable(),
 })
 
 export default SalesStore

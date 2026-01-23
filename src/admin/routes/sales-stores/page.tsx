@@ -27,6 +27,7 @@ type SalesStore = {
   stage_updated_at?: string
   source?: string
   notes?: string
+  assigned_sales_person_id?: string
 }
 
 type SalesStoreStage = {
@@ -40,6 +41,13 @@ type SalesStoreStage = {
 type AddressSuggestion = {
   placeId: string
   text: string
+}
+
+type SalesPerson = {
+  id: string
+  name: string
+  rep_code: string
+  active?: boolean
 }
 
 const STAGES = [
@@ -98,6 +106,10 @@ const SalesStoresPage = () => {
   const [totalCount, setTotalCount] = useState(0)
   const [isLoadingMore, setIsLoadingMore] = useState(false)
   const pageSize = 50
+  const [salesPeople, setSalesPeople] = useState<SalesPerson[]>([])
+  const [assignmentMap, setAssignmentMap] = useState<
+    Record<string, SalesPerson | undefined>
+  >({})
 
   const savedFiltersKey = "sales-stores-saved-filters"
 
@@ -163,6 +175,36 @@ const SalesStoresPage = () => {
     } catch (error) {
       setSavedFilters([])
     }
+  }, [])
+
+  useEffect(() => {
+    if (salesPeople.length === 0) {
+      return
+    }
+    const map: Record<string, SalesPerson | undefined> = {}
+    stores.forEach((store) => {
+      if (store.assigned_sales_person_id) {
+        map[store.id] = salesPeople.find(
+          (rep) => rep.id === store.assigned_sales_person_id
+        )
+      }
+    })
+    setAssignmentMap(map)
+  }, [stores, salesPeople])
+
+  useEffect(() => {
+    const loadSalesPeople = async () => {
+      try {
+        const response = await getAdmin<{ people: SalesPerson[] }>(
+          "/admin/sales-people"
+        )
+        setSalesPeople(response.people || [])
+      } catch (error) {
+        setSalesPeople([])
+      }
+    }
+
+    void loadSalesPeople()
   }, [])
 
   useEffect(() => {
@@ -525,6 +567,25 @@ const SalesStoresPage = () => {
     }
   }
 
+  const assignSalesPerson = async (storeId: string, salesPersonId: string) => {
+    if (!salesPersonId) {
+      setAssignmentMap((prev) => ({ ...prev, [storeId]: undefined }))
+      return
+    }
+
+    try {
+      await postAdmin("/admin/sales-people/assignments", {
+        sales_person_id: salesPersonId,
+        sales_store_id: storeId,
+      })
+      const person = salesPeople.find((rep) => rep.id === salesPersonId)
+      setAssignmentMap((prev) => ({ ...prev, [storeId]: person }))
+      toast.success("Sales person assigned.")
+    } catch (error) {
+      toast.error("Could not assign sales person.")
+    }
+  }
+
   return (
     <Container className="flex flex-col gap-6">
       <Toaster />
@@ -800,6 +861,7 @@ const SalesStoresPage = () => {
               <Table.HeaderCell>Name</Table.HeaderCell>
               <Table.HeaderCell>Address</Table.HeaderCell>
               <Table.HeaderCell>Stage</Table.HeaderCell>
+              <Table.HeaderCell>Sales Rep</Table.HeaderCell>
               <Table.HeaderCell>Last Updated</Table.HeaderCell>
               <Table.HeaderCell>Time in Stage</Table.HeaderCell>
               <Table.HeaderCell>Actions</Table.HeaderCell>
@@ -820,6 +882,24 @@ const SalesStoresPage = () => {
                 <Table.Cell>{store.address}</Table.Cell>
                 <Table.Cell>
                   <Badge color="blue">{formatStage(store.stage)}</Badge>
+                </Table.Cell>
+                <Table.Cell>
+                  <Select
+                    value={assignmentMap[store.id]?.id || ""}
+                    onValueChange={(value) => assignSalesPerson(store.id, value)}
+                  >
+                    <Select.Trigger>
+                      <Select.Value placeholder="Assign rep" />
+                    </Select.Trigger>
+                    <Select.Content>
+                      <Select.Item value="">Unassigned</Select.Item>
+                      {salesPeople.map((rep) => (
+                        <Select.Item key={rep.id} value={rep.id}>
+                          {rep.name} ({rep.rep_code})
+                        </Select.Item>
+                      ))}
+                    </Select.Content>
+                  </Select>
                 </Table.Cell>
                 <Table.Cell>
                   {store.stage_updated_at
@@ -927,6 +1007,12 @@ const SalesStoresPage = () => {
                         <Text size="xsmall" className="text-ui-fg-subtle">
                           {store.address}
                         </Text>
+                        {assignmentMap[store.id] && (
+                          <Text size="xsmall" className="text-ui-fg-subtle">
+                            Rep: {assignmentMap[store.id]?.name} (
+                            {assignmentMap[store.id]?.rep_code})
+                          </Text>
+                        )}
                         <Text size="xsmall" className="text-ui-fg-subtle">
                           In stage: {daysSince(store.stage_updated_at)}
                         </Text>
