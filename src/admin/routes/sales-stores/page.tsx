@@ -142,6 +142,10 @@ const SalesStoresPage = () => {
     }
   }
 
+  const normalizedStoreAddresses = useMemo(() => {
+    return new Set(stores.map((store) => normalizeAddress(store.address)))
+  }, [stores])
+
   useEffect(() => {
     try {
       const stored = window.localStorage.getItem(savedFiltersKey)
@@ -258,10 +262,6 @@ const SalesStoresPage = () => {
   )
 
   const filteredStores = stores
-
-  const normalizedStoreAddresses = useMemo(() => {
-    return new Set(stores.map((store) => normalizeAddress(store.address)))
-  }, [stores])
 
   const stageCounts = useMemo(() => {
     const counts = STAGES.reduce<Record<string, number>>(
