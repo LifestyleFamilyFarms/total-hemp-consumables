@@ -1,36 +1,48 @@
+import Medusa from "@medusajs/js-sdk"
+
 export type ApiError = {
   message: string
 }
+
+const baseUrl =
+  typeof window !== "undefined" ? window.location.origin : "http://localhost:9000"
+
+// Medusa docs recommend the JS SDK for admin customizations.
+export const sdk = new Medusa({
+  baseUrl,
+  debug: process.env.NODE_ENV === "development",
+  auth: {
+    type: "session",
+  },
+})
 
 export const postAdmin = async <TResponse>(
   path: string,
   body: unknown
 ): Promise<TResponse> => {
-  const response = await fetch(path, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
-    body: JSON.stringify(body),
-  })
-
-  if (!response.ok) {
-    let message = `Request failed (${response.status})`
-    try {
-      const errorBody = (await response.json()) as ApiError
-      if (errorBody?.message) {
-        message = errorBody.message
-      }
-    } catch (error) {
-      const text = await response.text()
-      if (text) {
-        message = text
-      }
-    }
-
+  try {
+    return await sdk.client.fetch<TResponse>(path, {
+      method: "POST",
+      body,
+    })
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Request failed."
     throw new Error(message)
   }
+}
 
-  return (await response.json()) as TResponse
+export const getAdmin = async <TResponse>(
+  path: string,
+  query?: Record<string, unknown>
+): Promise<TResponse> => {
+  try {
+    return await sdk.client.fetch<TResponse>(path, {
+      query,
+    })
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Request failed."
+    throw new Error(message)
+  }
 }
