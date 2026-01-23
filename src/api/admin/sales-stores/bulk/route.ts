@@ -9,6 +9,7 @@ const SalesStoreSchema = z.object({
   source: z.string().optional(),
   stage: z.string().optional(),
   notes: z.string().optional(),
+  assigned_sales_person_id: z.string().trim().optional(),
 })
 
 const BulkSchema = z.object({

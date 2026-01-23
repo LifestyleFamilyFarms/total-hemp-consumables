@@ -11,6 +11,10 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
 
   const q = typeof req.query?.q === "string" ? req.query.q.trim() : ""
   const stage = typeof req.query?.stage === "string" ? req.query.stage.trim() : ""
+  const salesPersonId =
+    typeof req.query?.sales_person_id === "string"
+      ? req.query.sales_person_id.trim()
+      : ""
   const take = Math.min(
     Number(req.query?.take || 100) || 100,
     200
@@ -20,6 +24,10 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
   const selector: Record<string, unknown> = {}
   if (stage && stage !== "all") {
     selector.stage = stage
+  }
+
+  if (salesPersonId && salesPersonId !== "all") {
+    selector.assigned_sales_person_id = salesPersonId
   }
 
   // Server-side search for name or address when available.

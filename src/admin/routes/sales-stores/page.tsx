@@ -16,7 +16,7 @@ import {
   toast,
 } from "@medusajs/ui"
 import { useEffect, useMemo, useRef, useState } from "react"
-import { getAdmin, postAdmin } from "../../lib/sdk"
+import { getAdmin, getAdminUser, postAdmin } from "../../lib/sdk"
 import { normalizeAddress } from "../../../utils/sales-stores"
 
 type SalesStore = {
@@ -48,6 +48,12 @@ type SalesPerson = {
   name: string
   rep_code: string
   active?: boolean
+}
+
+type AdminUser = {
+  id: string
+  email: string
+  metadata?: Record<string, unknown> | null
 }
 
 const STAGES = [
@@ -110,12 +116,56 @@ const SalesStoresPage = () => {
   const [assignmentMap, setAssignmentMap] = useState<
     Record<string, SalesPerson | undefined>
   >({})
+  const [currentUser, setCurrentUser] = useState<AdminUser | null>(null)
+  const [salesPersonFilter, setSalesPersonFilter] = useState<string>("all")
+
+  const { isRep, repSalesPersonId } = useMemo(() => {
+    const metadata = currentUser?.metadata || {}
+    const role =
+      typeof metadata.sales_role === "string"
+        ? metadata.sales_role
+        : typeof metadata.role === "string"
+        ? metadata.role
+        : ""
+    const salesPersonId =
+      typeof metadata.sales_person_id === "string"
+        ? metadata.sales_person_id
+        : typeof metadata.sales_rep_id === "string"
+        ? metadata.sales_rep_id
+        : ""
+    return {
+      isRep: role === "rep" || role === "sales_rep",
+      repSalesPersonId: salesPersonId || "",
+    }
+  }, [currentUser])
+
+  const effectiveSalesPersonFilter =
+    isRep && repSalesPersonId ? repSalesPersonId : salesPersonFilter
 
   const savedFiltersKey = "sales-stores-saved-filters"
+
+  useEffect(() => {
+    const loadUser = async () => {
+      try {
+        const response = await getAdminUser<{ user: AdminUser }>()
+        setCurrentUser(response.user || null)
+      } catch (error) {
+        setCurrentUser(null)
+      }
+    }
+    void loadUser()
+  }, [])
+
+  useEffect(() => {
+    if (isRep && repSalesPersonId && salesPersonFilter !== repSalesPersonId) {
+      setSalesPersonFilter(repSalesPersonId)
+    }
+  }, [isRep, repSalesPersonId, salesPersonFilter])
 
   const loadStores = async (options?: {
     q?: string
     stage?: string
+    salesPersonId?: string
     reset?: boolean
   }) => {
     if (options?.reset) {
@@ -133,6 +183,10 @@ const SalesStoresPage = () => {
       }>("/admin/sales-stores", {
         q: options?.q,
         stage: options?.stage,
+        sales_person_id:
+          options?.salesPersonId && options.salesPersonId !== "all"
+            ? options.salesPersonId
+            : undefined,
         take: pageSize,
         skip: options?.reset ? 0 : stores.length,
       })
@@ -253,10 +307,15 @@ const SalesStoresPage = () => {
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
-      void loadStores({ q: searchTerm.trim(), stage: stageFilter, reset: true })
+      void loadStores({
+        q: searchTerm.trim(),
+        stage: stageFilter,
+        salesPersonId: effectiveSalesPersonFilter,
+        reset: true,
+      })
     }, 300)
     return () => window.clearTimeout(timer)
-  }, [searchTerm, stageFilter])
+  }, [searchTerm, stageFilter, effectiveSalesPersonFilter])
 
   const updateStageSelection = (storeId: string, stage: string) => {
     setStageSelections((prev) => ({ ...prev, [storeId]: stage }))
@@ -277,7 +336,12 @@ const SalesStoresPage = () => {
       })
       toast.success("Stage updated.")
       setNoteSelections((prev) => ({ ...prev, [storeId]: "" }))
-      await loadStores({ q: searchTerm.trim(), stage: stageFilter, reset: true })
+      await loadStores({
+        q: searchTerm.trim(),
+        stage: stageFilter,
+        salesPersonId: effectiveSalesPersonFilter,
+        reset: true,
+      })
       if (selectedStoreId === storeId) {
         await loadStages(storeId)
       }
@@ -394,7 +458,12 @@ const SalesStoresPage = () => {
       )
       toast.success("Updated stages for selected stores.")
       setBulkNotes("")
-      await loadStores({ q: searchTerm.trim(), stage: stageFilter, reset: true })
+      await loadStores({
+        q: searchTerm.trim(),
+        stage: stageFilter,
+        salesPersonId: effectiveSalesPersonFilter,
+        reset: true,
+      })
       if (selectedStoreId) {
         await loadStages(selectedStoreId)
       }
@@ -429,7 +498,12 @@ const SalesStoresPage = () => {
     try {
       await postAdmin(`/admin/sales-stores/${storeId}/stages`, { stage })
       toast.success("Stage updated.")
-      await loadStores({ q: searchTerm.trim(), stage: stageFilter, reset: true })
+      await loadStores({
+        q: searchTerm.trim(),
+        stage: stageFilter,
+        salesPersonId: effectiveSalesPersonFilter,
+        reset: true,
+      })
       if (selectedStoreId === storeId) {
         await loadStages(storeId)
       }
@@ -444,7 +518,12 @@ const SalesStoresPage = () => {
         stage,
       })
       toast.success("Stage updated.")
-      await loadStores({ q: searchTerm.trim(), stage: stageFilter, reset: true })
+      await loadStores({
+        q: searchTerm.trim(),
+        stage: stageFilter,
+        salesPersonId: effectiveSalesPersonFilter,
+        reset: true,
+      })
       if (selectedStoreId === storeId) {
         await loadStages(storeId)
       }
@@ -465,7 +544,12 @@ const SalesStoresPage = () => {
       })
       toast.success("Stage updated.")
       setNoteSelections((prev) => ({ ...prev, [storeId]: "" }))
-      await loadStores({ q: searchTerm.trim(), stage: stageFilter, reset: true })
+      await loadStores({
+        q: searchTerm.trim(),
+        stage: stageFilter,
+        salesPersonId: effectiveSalesPersonFilter,
+        reset: true,
+      })
       if (selectedStoreId === storeId) {
         await loadStages(storeId)
       }
@@ -542,7 +626,12 @@ const SalesStoresPage = () => {
       setNewStoreAddress("")
       setNewStoreNotes("")
       setNewStoreStage("discovered")
-      await loadStores({ q: searchTerm.trim(), stage: stageFilter, reset: true })
+      await loadStores({
+        q: searchTerm.trim(),
+        stage: stageFilter,
+        salesPersonId: effectiveSalesPersonFilter,
+        reset: true,
+      })
     } catch (error) {
       toast.error("Could not add store. Please try again.")
     }
@@ -561,7 +650,12 @@ const SalesStoresPage = () => {
         ],
       })
       toast.success("Store added from Google search.")
-      await loadStores({ q: searchTerm.trim(), stage: stageFilter, reset: true })
+      await loadStores({
+        q: searchTerm.trim(),
+        stage: stageFilter,
+        salesPersonId: effectiveSalesPersonFilter,
+        reset: true,
+      })
     } catch (error) {
       toast.error("Could not add store. Please try again.")
     }
@@ -569,7 +663,22 @@ const SalesStoresPage = () => {
 
   const assignSalesPerson = async (storeId: string, salesPersonId: string) => {
     if (!salesPersonId) {
-      setAssignmentMap((prev) => ({ ...prev, [storeId]: undefined }))
+      try {
+        await postAdmin("/admin/sales-people/assignments/unassign", {
+          sales_store_id: storeId,
+        })
+        setAssignmentMap((prev) => ({ ...prev, [storeId]: undefined }))
+        setStores((prev) =>
+          prev.map((store) =>
+            store.id === storeId
+              ? { ...store, assigned_sales_person_id: undefined }
+              : store
+          )
+        )
+        toast.success("Sales person unassigned.")
+      } catch (error) {
+        toast.error("Could not unassign sales person.")
+      }
       return
     }
 
@@ -580,6 +689,13 @@ const SalesStoresPage = () => {
       })
       const person = salesPeople.find((rep) => rep.id === salesPersonId)
       setAssignmentMap((prev) => ({ ...prev, [storeId]: person }))
+      setStores((prev) =>
+        prev.map((store) =>
+          store.id === storeId
+            ? { ...store, assigned_sales_person_id: salesPersonId }
+            : store
+        )
+      )
       toast.success("Sales person assigned.")
     } catch (error) {
       toast.error("Could not assign sales person.")
@@ -599,7 +715,12 @@ const SalesStoresPage = () => {
         <Button
           variant="secondary"
           onClick={() =>
-            loadStores({ q: searchTerm.trim(), stage: stageFilter, reset: true })
+            loadStores({
+              q: searchTerm.trim(),
+              stage: stageFilter,
+              salesPersonId: effectiveSalesPersonFilter,
+              reset: true,
+            })
           }
           isLoading={isLoading}
         >
@@ -625,7 +746,7 @@ const SalesStoresPage = () => {
             </button>
           ))}
         </div>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-[1fr_220px]">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-[1fr_220px_220px]">
           <div className="flex flex-col gap-2">
             <Text size="small" className="text-ui-fg-subtle">
               Search by store name or address
@@ -656,6 +777,33 @@ const SalesStoresPage = () => {
                 ))}
               </Select.Content>
             </Select>
+          </div>
+          <div className="flex flex-col gap-2">
+            <Text size="small" className="text-ui-fg-subtle">
+              Filter by sales rep
+            </Text>
+            <Select
+              value={effectiveSalesPersonFilter || "all"}
+              onValueChange={(value) => setSalesPersonFilter(value)}
+              disabled={isRep && Boolean(repSalesPersonId)}
+            >
+              <Select.Trigger>
+                <Select.Value placeholder="All reps" />
+              </Select.Trigger>
+              <Select.Content>
+                <Select.Item value="all">All reps</Select.Item>
+                {salesPeople.map((rep) => (
+                  <Select.Item key={rep.id} value={rep.id}>
+                    {rep.name} ({rep.rep_code})
+                  </Select.Item>
+                ))}
+              </Select.Content>
+            </Select>
+            {isRep && repSalesPersonId && (
+              <Text size="xsmall" className="text-ui-fg-subtle">
+                Showing only your assigned stores.
+              </Text>
+            )}
           </div>
         </div>
         <Text size="small" className="text-ui-fg-subtle">
@@ -804,7 +952,11 @@ const SalesStoresPage = () => {
             variant="secondary"
             isLoading={isLoadingMore}
             onClick={() =>
-              loadStores({ q: searchTerm.trim(), stage: stageFilter })
+              loadStores({
+                q: searchTerm.trim(),
+                stage: stageFilter,
+                salesPersonId: effectiveSalesPersonFilter,
+              })
             }
           >
             Load more
@@ -884,22 +1036,35 @@ const SalesStoresPage = () => {
                   <Badge color="blue">{formatStage(store.stage)}</Badge>
                 </Table.Cell>
                 <Table.Cell>
-                  <Select
-                    value={assignmentMap[store.id]?.id || ""}
-                    onValueChange={(value) => assignSalesPerson(store.id, value)}
-                  >
-                    <Select.Trigger>
-                      <Select.Value placeholder="Assign rep" />
-                    </Select.Trigger>
-                    <Select.Content>
-                      <Select.Item value="">Unassigned</Select.Item>
-                      {salesPeople.map((rep) => (
-                        <Select.Item key={rep.id} value={rep.id}>
-                          {rep.name} ({rep.rep_code})
-                        </Select.Item>
-                      ))}
-                    </Select.Content>
-                  </Select>
+                  {isRep ? (
+                    <Text size="small">
+                      {assignmentMap[store.id]
+                        ? `${assignmentMap[store.id]?.name} (${assignmentMap[store.id]?.rep_code})`
+                        : "Unassigned"}
+                    </Text>
+                  ) : (
+                    <Select
+                      value={assignmentMap[store.id]?.id || "unassigned"}
+                      onValueChange={(value) =>
+                        assignSalesPerson(
+                          store.id,
+                          value === "unassigned" ? "" : value
+                        )
+                      }
+                    >
+                      <Select.Trigger>
+                        <Select.Value placeholder="Assign rep" />
+                      </Select.Trigger>
+                      <Select.Content>
+                        <Select.Item value="unassigned">Unassigned</Select.Item>
+                        {salesPeople.map((rep) => (
+                          <Select.Item key={rep.id} value={rep.id}>
+                            {rep.name} ({rep.rep_code})
+                          </Select.Item>
+                        ))}
+                      </Select.Content>
+                    </Select>
+                  )}
                 </Table.Cell>
                 <Table.Cell>
                   {store.stage_updated_at

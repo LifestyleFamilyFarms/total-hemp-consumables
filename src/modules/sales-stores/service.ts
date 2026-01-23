@@ -11,6 +11,7 @@ export type SalesStoreInput = {
   source?: string
   stage?: string
   notes?: string
+  assigned_sales_person_id?: string | null
 }
 
 class SalesStoresModuleService extends MedusaService({
@@ -34,6 +35,10 @@ class SalesStoresModuleService extends MedusaService({
         lng: typeof input.lng === "number" ? input.lng : existing?.lng,
         source: input.source || existing?.source || "trip_planner",
         notes: input.notes || existing?.notes,
+        assigned_sales_person_id:
+          typeof input.assigned_sales_person_id === "string"
+            ? input.assigned_sales_person_id
+            : existing?.assigned_sales_person_id,
       }
 
       const stage = input.stage || existing?.stage || "discovered"
