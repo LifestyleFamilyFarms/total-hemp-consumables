@@ -21,7 +21,7 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
   }
 
   try {
-    const service = req.scope.resolve("salesPeople") as {
+    const service = req.scope.resolve("salesPeople") as unknown as {
       updateSalesPeople: (
         selector: Record<string, unknown>,
         input: Record<string, unknown>

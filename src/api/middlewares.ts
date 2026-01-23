@@ -298,7 +298,7 @@ const repGuard = async (
           ...(typeof query.metadata === "object" && query.metadata ? query.metadata : {}),
           sales_person_id: salesPersonId,
         }
-        req.query = query
+        ;(req as unknown as { query: Record<string, unknown> }).query = query
         return next()
       }
       if (req.method === "POST") {
