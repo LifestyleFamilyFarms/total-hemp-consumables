@@ -118,6 +118,11 @@ const RepCustomersPage = () => {
     window.open(`/app/customers/${customerId}`, "_blank")
   }
 
+  const createDraftOrder = (customerId: string) => {
+    const params = new URLSearchParams({ customer_id: customerId })
+    window.open(`/app/draft-orders/create?${params.toString()}`, "_blank")
+  }
+
   return (
     <Container className="flex flex-col gap-6">
       <Toaster />
@@ -172,9 +177,20 @@ const RepCustomersPage = () => {
               <Table.Cell>{customer.phone || "-"}</Table.Cell>
               <Table.Cell>{formatDate(customer.created_at)}</Table.Cell>
               <Table.Cell>
-                <Button variant="secondary" onClick={() => openCustomer(customer.id)}>
-                  Open
-                </Button>
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    variant="secondary"
+                    onClick={() => openCustomer(customer.id)}
+                  >
+                    Open
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    onClick={() => createDraftOrder(customer.id)}
+                  >
+                    Create draft order
+                  </Button>
+                </div>
               </Table.Cell>
             </Table.Row>
           ))}
