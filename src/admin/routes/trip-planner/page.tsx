@@ -17,7 +17,7 @@ import {
   toast,
 } from "@medusajs/ui"
 import { useEffect, useMemo, useRef, useState } from "react"
-import { postAdmin } from "../../lib/sdk"
+import { getAdmin, postAdmin } from "../../lib/sdk"
 
 type TripStop = {
   order: number
@@ -53,6 +53,11 @@ type AddressSuggestion = {
   text: string
 }
 
+type SalesStoreResponse = {
+  created: number
+  updated: number
+}
+
 const buildTodayISO = () => {
   const now = new Date()
   const year = now.getFullYear()
@@ -66,19 +71,15 @@ const DEFAULT_KEYWORDS = ["THCa", "CBD store", "hemp store"].join("\n")
 const fetchAddressSuggestions = async (
   query: string
 ): Promise<AddressSuggestion[]> => {
-  const response = await fetch(
-    `/admin/trip-planner/suggest?q=${encodeURIComponent(query)}`,
-    {
-      credentials: "include",
-    }
-  )
-
-  if (!response.ok) {
+  try {
+    const data = await getAdmin<{ suggestions?: AddressSuggestion[] }>(
+      "/admin/trip-planner/suggest",
+      { q: query }
+    )
+    return data.suggestions || []
+  } catch (error) {
     return []
   }
-
-  const data = (await response.json()) as { suggestions?: AddressSuggestion[] }
-  return data.suggestions || []
 }
 
 type AddressInputProps = {
@@ -86,18 +87,64 @@ type AddressInputProps = {
   placeholder?: string
   value: string
   onChange: (value: string) => void
+  onSelect?: (value: string) => void
 }
 
-const AddressInput = ({ label, placeholder, value, onChange }: AddressInputProps) => {
+const RECENT_ADDRESSES_KEY = "trip-planner-recent-addresses"
+const FAVORITE_ADDRESSES_KEY = "trip-planner-favorite-addresses"
+const MAX_RECENT_ADDRESSES = 8
+const MAX_FAVORITE_ADDRESSES = 6
+
+const AddressInput = ({
+  label,
+  placeholder,
+  value,
+  onChange,
+  onSelect,
+}: AddressInputProps) => {
   const [suggestions, setSuggestions] = useState<AddressSuggestion[]>([])
+  const [recentAddresses, setRecentAddresses] = useState<string[]>([])
+  const [favoriteAddresses, setFavoriteAddresses] = useState<string[]>([])
   const [isOpen, setIsOpen] = useState(false)
+  const [showRecent, setShowRecent] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const debounceRef = useRef<number | null>(null)
+  const cacheRef = useRef<Map<string, AddressSuggestion[]>>(new Map())
+
+  useEffect(() => {
+    try {
+      const stored = window.localStorage.getItem(RECENT_ADDRESSES_KEY)
+      if (stored) {
+        const parsed = JSON.parse(stored) as string[]
+        if (Array.isArray(parsed)) {
+          setRecentAddresses(parsed.slice(0, MAX_RECENT_ADDRESSES))
+        }
+      }
+      const storedFavorites = window.localStorage.getItem(FAVORITE_ADDRESSES_KEY)
+      if (storedFavorites) {
+        const parsedFavorites = JSON.parse(storedFavorites) as string[]
+        if (Array.isArray(parsedFavorites)) {
+          setFavoriteAddresses(parsedFavorites.slice(0, MAX_FAVORITE_ADDRESSES))
+        }
+      }
+    } catch (error) {
+      setRecentAddresses([])
+      setFavoriteAddresses([])
+    }
+  }, [])
 
   useEffect(() => {
     if (!value || value.trim().length < 3) {
       setSuggestions([])
       setIsOpen(false)
+      if (
+        value.trim().length === 0 &&
+        (recentAddresses.length > 0 || favoriteAddresses.length > 0)
+      ) {
+        setShowRecent(true)
+      } else {
+        setShowRecent(false)
+      }
       return
     }
 
@@ -106,10 +153,20 @@ const AddressInput = ({ label, placeholder, value, onChange }: AddressInputProps
     }
 
     debounceRef.current = window.setTimeout(async () => {
+      if (cacheRef.current.has(value.trim().toLowerCase())) {
+        const cached = cacheRef.current.get(value.trim().toLowerCase()) || []
+        setSuggestions(cached)
+        setIsOpen(cached.length > 0)
+        setShowRecent(false)
+        return
+      }
+
       setIsLoading(true)
       const results = await fetchAddressSuggestions(value.trim())
+      cacheRef.current.set(value.trim().toLowerCase(), results)
       setSuggestions(results)
       setIsOpen(results.length > 0)
+      setShowRecent(false)
       setIsLoading(false)
     }, 300)
 
@@ -120,9 +177,72 @@ const AddressInput = ({ label, placeholder, value, onChange }: AddressInputProps
     }
   }, [value])
 
+  const storeRecentAddress = (text: string) => {
+    if (!text.trim()) {
+      return
+    }
+
+    const next = [
+      text.trim(),
+      ...recentAddresses.filter(
+        (existing) => existing.toLowerCase() !== text.trim().toLowerCase()
+      ),
+    ].slice(0, MAX_RECENT_ADDRESSES)
+
+    setRecentAddresses(next)
+
+    try {
+      window.localStorage.setItem(RECENT_ADDRESSES_KEY, JSON.stringify(next))
+    } catch (error) {
+      // Ignore storage errors for safety.
+    }
+  }
+
+  const storeFavoriteAddress = (text: string) => {
+    if (!text.trim()) {
+      return
+    }
+
+    const next = [
+      text.trim(),
+      ...favoriteAddresses.filter(
+        (existing) => existing.toLowerCase() !== text.trim().toLowerCase()
+      ),
+    ].slice(0, MAX_FAVORITE_ADDRESSES)
+
+    setFavoriteAddresses(next)
+
+    try {
+      window.localStorage.setItem(FAVORITE_ADDRESSES_KEY, JSON.stringify(next))
+    } catch (error) {
+      // Ignore storage errors for safety.
+    }
+  }
+
+  const clearRecentAddresses = () => {
+    setRecentAddresses([])
+    try {
+      window.localStorage.removeItem(RECENT_ADDRESSES_KEY)
+    } catch (error) {
+      // Ignore storage errors for safety.
+    }
+  }
+
+  const clearFavoriteAddresses = () => {
+    setFavoriteAddresses([])
+    try {
+      window.localStorage.removeItem(FAVORITE_ADDRESSES_KEY)
+    } catch (error) {
+      // Ignore storage errors for safety.
+    }
+  }
+
   const handleSelect = (text: string) => {
     onChange(text)
+    onSelect?.(text)
+    storeRecentAddress(text)
     setIsOpen(false)
+    setShowRecent(false)
   }
 
   return (
@@ -135,10 +255,19 @@ const AddressInput = ({ label, placeholder, value, onChange }: AddressInputProps
         onFocus={() => {
           if (suggestions.length > 0) {
             setIsOpen(true)
+          } else if (
+            value.trim().length === 0 &&
+            (recentAddresses.length > 0 || favoriteAddresses.length > 0)
+          ) {
+            setShowRecent(true)
           }
         }}
         onBlur={() => {
           window.setTimeout(() => setIsOpen(false), 150)
+          window.setTimeout(() => setShowRecent(false), 150)
+          if (value.trim().length > 0) {
+            storeRecentAddress(value.trim())
+          }
         }}
       />
       {isLoading && (
@@ -146,23 +275,104 @@ const AddressInput = ({ label, placeholder, value, onChange }: AddressInputProps
           Searching addresses...
         </Text>
       )}
-      {isOpen && suggestions.length > 0 && (
+      {(isOpen && suggestions.length > 0) ||
+      (showRecent &&
+        (recentAddresses.length > 0 || favoriteAddresses.length > 0)) ? (
         <div className="absolute top-full z-10 w-full rounded-md border border-ui-border-base bg-ui-bg-base p-1 shadow-elevation-card">
-          {suggestions.map((suggestion) => (
-            <button
-              key={suggestion.placeId}
-              type="button"
-              className="w-full rounded px-2 py-1 text-left text-sm text-ui-fg-base hover:bg-ui-bg-subtle"
-              onMouseDown={(event) => {
-                event.preventDefault()
-                handleSelect(suggestion.text)
-              }}
-            >
-              {suggestion.text}
-            </button>
-          ))}
+          {showRecent && recentAddresses.length > 0 && (
+            <>
+              <div className="flex items-center justify-between px-2 py-1">
+                <Text size="xsmall" className="text-ui-fg-subtle">
+                  Favorites
+                </Text>
+                {favoriteAddresses.length > 0 && (
+                  <button
+                    type="button"
+                    className="text-xs text-ui-fg-subtle hover:text-ui-fg-base"
+                    onMouseDown={(event) => {
+                      event.preventDefault()
+                      clearFavoriteAddresses()
+                    }}
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
+              {favoriteAddresses.map((address) => (
+                <button
+                  key={address}
+                  type="button"
+                  className="w-full rounded px-2 py-1 text-left text-sm text-ui-fg-base hover:bg-ui-bg-subtle"
+                  onMouseDown={(event) => {
+                    event.preventDefault()
+                    handleSelect(address)
+                  }}
+                >
+                  {address}
+                </button>
+              ))}
+              <div className="flex items-center justify-between px-2 py-1">
+                <Text size="xsmall" className="text-ui-fg-subtle">
+                  Recent addresses
+                </Text>
+                {recentAddresses.length > 0 && (
+                  <button
+                    type="button"
+                    className="text-xs text-ui-fg-subtle hover:text-ui-fg-base"
+                    onMouseDown={(event) => {
+                      event.preventDefault()
+                      clearRecentAddresses()
+                    }}
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
+              {recentAddresses.map((address) => (
+                <div
+                  key={address}
+                  className="flex items-center justify-between gap-2 rounded px-2 py-1 hover:bg-ui-bg-subtle"
+                >
+                  <button
+                    type="button"
+                    className="flex-1 text-left text-sm text-ui-fg-base"
+                    onMouseDown={(event) => {
+                      event.preventDefault()
+                      handleSelect(address)
+                    }}
+                  >
+                    {address}
+                  </button>
+                  <button
+                    type="button"
+                    className="text-xs text-ui-fg-subtle hover:text-ui-fg-base"
+                    onMouseDown={(event) => {
+                      event.preventDefault()
+                      storeFavoriteAddress(address)
+                    }}
+                  >
+                    Pin
+                  </button>
+                </div>
+              ))}
+            </>
+          )}
+          {isOpen &&
+            suggestions.map((suggestion) => (
+              <button
+                key={suggestion.placeId}
+                type="button"
+                className="w-full rounded px-2 py-1 text-left text-sm text-ui-fg-base hover:bg-ui-bg-subtle"
+                onMouseDown={(event) => {
+                  event.preventDefault()
+                  handleSelect(suggestion.text)
+                }}
+              >
+                {suggestion.text}
+              </button>
+            ))}
         </div>
-      )}
+      ) : null}
     </div>
   )
 }
@@ -344,6 +554,46 @@ const TripPlannerPage = () => {
     window.prompt("Copy the links below:", text)
   }
 
+  const saveStopsToSalesStores = async () => {
+    if (!result) {
+      return
+    }
+
+    const stores = result.stops
+      .filter((stop) => stop.type === "MUST" || stop.type === "OPTIONAL")
+      .map((stop) => ({
+        name: stop.name,
+        address: stop.address,
+        lat: stop.lat,
+        lng: stop.lng,
+        source: "trip_planner",
+        stage: "discovered",
+        notes:
+          stop.type === "MUST"
+            ? "Required stop imported from Trip Planner."
+            : "Optional stop imported from Trip Planner.",
+      }))
+
+    if (stores.length === 0) {
+      toast.error("No must or optional stops to save.")
+      return
+    }
+
+    try {
+      const response = await postAdmin<SalesStoreResponse>(
+        "/admin/sales-stores/bulk",
+        { stores }
+      )
+      toast.success(
+        `Saved ${response.created + response.updated} stores to your sales list.`
+      )
+    } catch (saveError) {
+      toast.error(
+        "We couldn't save these stops. Please try again or contact an admin."
+      )
+    }
+  }
+
   return (
     <Container className="flex flex-col gap-6">
       <Toaster />
@@ -510,6 +760,14 @@ const TripPlannerPage = () => {
                 value={stop.address}
                 onChange={(value) => updateMustStop(index, { address: value })}
                 placeholder="Enter must-visit address"
+                onSelect={(value) => {
+                  if (!stop.name.trim()) {
+                    const inferred = value.split(",")[0]?.trim() || ""
+                    if (inferred) {
+                      updateMustStop(index, { name: inferred })
+                    }
+                  }
+                }}
               />
               <div className="flex flex-col gap-2">
                 <Label>Service minutes</Label>
@@ -676,6 +934,11 @@ const TripPlannerPage = () => {
           <div>
             <Button variant="secondary" onClick={downloadCsv}>
               Download CSV
+            </Button>
+          </div>
+          <div>
+            <Button variant="secondary" onClick={saveStopsToSalesStores}>
+              Save stops to Sales Stores
             </Button>
           </div>
         </Container>
