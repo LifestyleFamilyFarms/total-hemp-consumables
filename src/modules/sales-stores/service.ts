@@ -43,7 +43,7 @@ class SalesStoresModuleService extends MedusaService({
       let created = false
 
       if (existing) {
-        ;[storeRecord] = await this.updateSalesStores(
+        storeRecord = await this.updateSalesStores(
           { id: existing.id },
           {
             ...payload,
@@ -53,7 +53,7 @@ class SalesStoresModuleService extends MedusaService({
         )
       } else {
         created = true
-        ;[storeRecord] = await this.createSalesStores({
+        storeRecord = await this.createSalesStores({
           ...payload,
           stage,
           stage_updated_at: stageUpdatedAt,
@@ -79,7 +79,7 @@ class SalesStoresModuleService extends MedusaService({
   async addStage(storeId: string, stage: string, notes?: string) {
     const stageUpdatedAt = new Date()
 
-    const [storeRecord] = await this.updateSalesStores(
+    const storeRecord = await this.updateSalesStores(
       { id: storeId },
       {
         stage,
