@@ -26,7 +26,7 @@ export const sdk = new Medusa({
 
 export const postAdmin = async <TResponse>(
   path: string,
-  body: unknown
+  body?: BodyInit | Record<string, unknown> | null
 ): Promise<TResponse> => {
   try {
     return await sdk.client.fetch<TResponse>(path, {
@@ -57,7 +57,7 @@ export const getAdmin = async <TResponse>(
 
 export const getAdminUser = async <TResponse>(): Promise<TResponse> => {
   try {
-    return await sdk.admin.user.me()
+    return (await sdk.admin.user.me()) as TResponse
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Request failed."
@@ -69,7 +69,7 @@ export const listAdminUsers = async <TResponse>(
   query?: Record<string, unknown>
 ): Promise<TResponse> => {
   try {
-    return await sdk.admin.user.list(query)
+    return (await sdk.admin.user.list(query)) as TResponse
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Request failed."
@@ -82,7 +82,7 @@ export const updateAdminUser = async <TResponse>(
   body: Record<string, unknown>
 ): Promise<TResponse> => {
   try {
-    return await sdk.admin.user.update(id, body)
+    return (await sdk.admin.user.update(id, body)) as TResponse
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Request failed."

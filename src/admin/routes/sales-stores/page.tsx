@@ -512,26 +512,6 @@ const SalesStoresPage = () => {
     }
   }
 
-  const moveStageWithNote = async (storeId: string, stage: string) => {
-    try {
-      await postAdmin(`/admin/sales-stores/${storeId}/stages`, {
-        stage,
-      })
-      toast.success("Stage updated.")
-      await loadStores({
-        q: searchTerm.trim(),
-        stage: stageFilter,
-        salesPersonId: effectiveSalesPersonFilter,
-        reset: true,
-      })
-      if (selectedStoreId === storeId) {
-        await loadStages(storeId)
-      }
-    } catch (error) {
-      toast.error("Could not update stage.")
-    }
-  }
-
   const moveStageWithInlineNote = async (
     storeId: string,
     stage: string,

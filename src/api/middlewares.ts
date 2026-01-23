@@ -82,6 +82,7 @@ const isAllowedForRep = (path: string) => {
   if (path.startsWith("/admin/rep-dashboard")) return true
   if (path.startsWith("/admin/rep-orders")) return true
   if (path.startsWith("/admin/rep-customers")) return true
+  if (path.startsWith("/admin/rep-commissions")) return true
   if (path.startsWith("/admin/draft-orders")) return true
   if (path.startsWith("/admin/sales-stores")) return true
   if (path.startsWith("/admin/trip-planner")) return true
@@ -95,11 +96,29 @@ const isWriteMethod = (method: string) =>
   ["POST", "PUT", "PATCH", "DELETE"].includes(method.toUpperCase())
 
 const resolveOrderService = (req: MedusaRequest) => {
-  return req.scope.resolve("order") as {
+  return req.scope.resolve("order") as unknown as {
     retrieveOrder: (
       id: string,
       config?: Record<string, unknown>
     ) => Promise<{ id: string; metadata?: Record<string, unknown> | null }>
+    listOrders?: (
+      selector?: Record<string, unknown>,
+      config?: Record<string, unknown>
+    ) => Promise<
+      Array<{
+        id: string
+        display_id?: number
+        status?: string
+        payment_status?: string
+        fulfillment_status?: string
+        total?: number
+        currency_code?: string
+        email?: string
+        created_at?: string
+        metadata?: Record<string, unknown> | null
+      }>
+    >
+    countOrders?: (sel: Record<string, unknown>) => Promise<number>
   }
 }
 
@@ -236,9 +255,68 @@ const repGuard = async (
     const orderId = segments[2]
     if (!orderId) {
       if (req.method === "GET") {
-        return res.status(403).json({
-          message:
-            "Sales reps should use the Rep Orders view to list orders.",
+        const orderService = resolveOrderService(req)
+        const limit = Math.min(
+          Number((req.query as Record<string, unknown>)?.limit || 50) || 50,
+          200
+        )
+        const offset = Math.max(
+          Number((req.query as Record<string, unknown>)?.offset || 0) || 0,
+          0
+        )
+        const q = typeof req.query?.q === "string" ? req.query.q.trim() : ""
+
+        const selector: Record<string, unknown> = {
+          metadata: {
+            sales_person_id: salesPersonId,
+          },
+        }
+        if (q) {
+          selector.$or = [
+            { id: { $ilike: `%${q}%` } },
+            { email: { $ilike: `%${q}%` } },
+          ]
+        }
+
+        const listOrders = orderService.listOrders
+        if (!listOrders) {
+          return res.status(500).json({ message: "Orders list unavailable." })
+        }
+        const orders = await listOrders(selector, {
+          take: limit,
+          skip: offset,
+          order: { created_at: "DESC" },
+          select: [
+            "id",
+            "display_id",
+            "status",
+            "payment_status",
+            "fulfillment_status",
+            "total",
+            "currency_code",
+            "email",
+            "created_at",
+            "metadata",
+          ],
+        })
+        const filtered = orders.filter(
+          (order) => order.metadata?.sales_person_id === salesPersonId
+        )
+        const countOrders = (
+          orderService as unknown as {
+            countOrders?: (sel: Record<string, unknown>) => Promise<number>
+          }
+        ).countOrders
+        const count =
+          typeof countOrders === "function"
+            ? await countOrders(selector)
+            : filtered.length
+
+        return res.status(200).json({
+          orders: filtered,
+          count,
+          offset,
+          limit,
         })
       }
       if (req.method === "POST") {

@@ -24,6 +24,8 @@ type TripStop = {
   type: "START" | "MUST" | "OPTIONAL" | "END"
   name?: string
   address: string
+  lat?: number
+  lng?: number
   etaISO?: string
   departISO?: string
   serviceMinutes: number
