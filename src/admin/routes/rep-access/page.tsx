@@ -109,12 +109,24 @@ const RepAccessPage = () => {
     )
   }
 
+  const handleRoleChange = (id: string, role: string) => {
+    if (role === "rep") {
+      updateRow(id, { role })
+      return
+    }
+    updateRow(id, { role, sales_person_id: "" })
+  }
+
   const saveUser = async (user: UserRow) => {
     try {
+      if (user.role === "rep" && !user.sales_person_id) {
+        toast.error("Assign a Sales Person before saving a rep.")
+        return
+      }
       const metadata = {
         ...(user.metadata || {}),
-        sales_role: user.role || null,
-        sales_person_id: user.sales_person_id || null,
+        sales_role: user.role === "rep" ? "rep" : null,
+        sales_person_id: user.role === "rep" ? user.sales_person_id : null,
       }
       const response = await updateAdminUser<{ user: AdminUser }>(user.id, {
         metadata,
@@ -169,7 +181,7 @@ const RepAccessPage = () => {
               <Table.Cell>
                 <Select
                   value={user.role || "admin"}
-                  onValueChange={(value) => updateRow(user.id, { role: value })}
+                  onValueChange={(value) => handleRoleChange(user.id, value)}
                 >
                   <Select.Trigger>
                     <Select.Value placeholder="Select role" />
@@ -188,6 +200,7 @@ const RepAccessPage = () => {
                       sales_person_id: value === "unassigned" ? "" : value,
                     })
                   }
+                  disabled={user.role !== "rep"}
                 >
                   <Select.Trigger>
                     <Select.Value placeholder="Assign rep" />
