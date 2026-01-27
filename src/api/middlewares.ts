@@ -77,6 +77,32 @@ const getPath = (req: MedusaRequest) => {
 
 const toSegments = (path: string) => path.split("/").filter(Boolean)
 
+const getRequestId = (req: MedusaRequest) => {
+  const header =
+    (req.headers?.["x-request-id"] as string | undefined) ||
+    (req.headers?.["x-correlation-id"] as string | undefined)
+  return header || ""
+}
+
+const logRepAction = (input: {
+  userId?: string
+  salesPersonId: string
+  method: string
+  path: string
+  requestId?: string
+}) => {
+  const payload = {
+    event: "rep_action",
+    user_id: input.userId || "",
+    sales_person_id: input.salesPersonId,
+    method: input.method,
+    path: input.path,
+    request_id: input.requestId || "",
+    at: new Date().toISOString(),
+  }
+  console.info(JSON.stringify(payload))
+}
+
 const isAllowedForRep = (path: string) => {
   if (path.startsWith("/admin/orders")) return true
   if (path.startsWith("/admin/rep-dashboard")) return true
@@ -365,6 +391,12 @@ const repGuard = async (
     }
   }
 
+  if (path.startsWith("/admin/rep-commissions")) {
+    return res.status(403).json({
+      message: "Rep commissions are only available to admins.",
+    })
+  }
+
   if (path.startsWith("/admin/draft-orders")) {
     const segments = toSegments(path)
     const draftId = segments[2]
@@ -407,6 +439,13 @@ const repGuard = async (
         message: "Sales reps can only access their own draft orders.",
       })
     }
+  }
+
+  if (path === "/admin/sales-stores" && req.method === "GET") {
+    const query = (req.query || {}) as Record<string, unknown>
+    query.sales_person_id = salesPersonId
+    ;(req as unknown as { query: Record<string, unknown> }).query = query
+    return next()
   }
 
   if (path.startsWith("/admin/sales-stores") && isWriteMethod(req.method)) {
@@ -499,6 +538,24 @@ const repGuard = async (
         return res.status(404).json({ message: "Customer not found." })
       }
     }
+  }
+
+  const shouldLog =
+    isWriteMethod(req.method) ||
+    path.startsWith("/admin/rep-") ||
+    path.startsWith("/admin/orders") ||
+    path.startsWith("/admin/draft-orders") ||
+    path.startsWith("/admin/sales-stores") ||
+    path.startsWith("/admin/customers")
+
+  if (shouldLog) {
+    logRepAction({
+      userId: user?.id,
+      salesPersonId,
+      method: req.method,
+      path,
+      requestId: getRequestId(req),
+    })
   }
 
   return next()

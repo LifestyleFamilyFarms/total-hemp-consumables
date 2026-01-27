@@ -147,6 +147,15 @@ const RepAccessPage = () => {
           Assign sales-rep roles and link admin users to sales people.
         </Text>
       </div>
+      <div className="rounded-md border border-ui-border-base p-4">
+        <Heading level="h2">Rep setup checklist</Heading>
+        <div className="mt-2 flex flex-col gap-1">
+          <Text size="small">1) Create Sales Person record.</Text>
+          <Text size="small">2) Create Admin User (email provided by rep).</Text>
+          <Text size="small">3) Set Role = Rep and assign Sales Person.</Text>
+          <Text size="small">4) Save and verify Rep Dashboard access.</Text>
+        </div>
+      </div>
 
       <div className="flex flex-col gap-2">
         <Text size="small" className="text-ui-fg-subtle">
