@@ -6,12 +6,77 @@ type OrderSummary = {
   metadata?: Record<string, unknown>
 }
 
+type AdminUser = {
+  id: string
+  metadata?: Record<string, unknown> | null
+}
+
+const resolveAdminUser = async (req: MedusaRequest): Promise<AdminUser | null> => {
+  const directUser = (req as { user?: AdminUser }).user
+  if (directUser?.metadata) {
+    return directUser
+  }
+
+  const authUser = (req as { auth?: { user?: AdminUser } }).auth?.user
+  if (authUser?.metadata) {
+    return authUser
+  }
+
+  const actorId = (req as { auth_context?: { actor_id?: string } })?.auth_context
+    ?.actor_id
+
+  if (!actorId) {
+    return null
+  }
+
+  const userServiceCandidates = ["user", "users", "userService"]
+  for (const key of userServiceCandidates) {
+    try {
+      const service = req.scope.resolve(key) as {
+        retrieveUser?: (id: string) => Promise<AdminUser>
+      }
+      if (service?.retrieveUser) {
+        return await service.retrieveUser(actorId)
+      }
+    } catch (error) {
+      continue
+    }
+  }
+
+  return null
+}
+
+const resolveRepSalesPersonId = (user: AdminUser | null) => {
+  const metadata = user?.metadata || {}
+  const role =
+    typeof metadata.sales_role === "string"
+      ? metadata.sales_role
+      : typeof metadata.role === "string"
+      ? metadata.role
+      : ""
+  const salesPersonId =
+    typeof metadata.sales_person_id === "string"
+      ? metadata.sales_person_id
+      : typeof metadata.sales_rep_id === "string"
+      ? metadata.sales_rep_id
+      : ""
+  return role === "rep" || role === "sales_rep" ? salesPersonId : ""
+}
+
 export async function GET(req: MedusaRequest, res: MedusaResponse) {
   const orderService = req.scope.resolve("order") as {
     listOrders: (
       selector?: Record<string, unknown>,
       config?: Record<string, unknown>
     ) => Promise<OrderSummary[]>
+  }
+
+  const user = await resolveAdminUser(req)
+  const repSalesPersonId = resolveRepSalesPersonId(user)
+  if (repSalesPersonId) {
+    return res.status(403).json({
+      message: "Rep commissions are only available to admins.",
+    })
   }
 
   const from = typeof req.query?.from === "string" ? req.query.from : ""
