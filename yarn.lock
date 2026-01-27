@@ -16249,6 +16249,7 @@ __metadata:
     "@medusajs/medusa": "npm:^2.13.0"
     "@medusajs/test-utils": "npm:^2.13.0"
     "@medusajs/types": "npm:^2.13.0"
+    "@opentelemetry/exporter-trace-otlp-http": "npm:0.200.0"
     "@swc/core": "npm:^1.7.28"
     "@swc/jest": "npm:^0.2.36"
     "@types/jest": "npm:^29.5.13"
