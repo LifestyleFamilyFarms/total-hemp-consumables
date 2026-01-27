@@ -36,6 +36,7 @@
     "@medusajs/js-sdk": "^2.13.0",
     "@medusajs/medusa": "^2.13.0",
     "@medusajs/types": "^2.13.0",
+    "@opentelemetry/exporter-trace-otlp-http": "0.200.0",
     "awilix": "^8.0.1",
     "axios": "^1.9.0",
     "payment-authorizenet-medusa": "^1.0.1",
