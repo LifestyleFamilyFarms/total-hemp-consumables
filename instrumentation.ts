@@ -1,24 +1,42 @@
-// Uncomment this file to enable instrumentation and observability using OpenTelemetry
-// Refer to the docs for installation instructions: https://docs.medusajs.com/learn/debugging-and-testing/instrumentation
+import { registerOtel } from "@medusajs/medusa"
+import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-http"
 
-// import { registerOtel } from "@medusajs/medusa"
-// // If using an exporter other than Zipkin, require it here.
-// import { ZipkinExporter } from "@opentelemetry/exporter-zipkin"
+const OTEL_ENABLED = process.env.OTEL_ENABLED === "true"
 
-// // If using an exporter other than Zipkin, initialize it here.
-// const exporter = new ZipkinExporter({
-//   serviceName: 'my-medusa-project',
-// })
+function buildExporter() {
+  const endpoint = process.env.OTEL_EXPORTER_OTLP_ENDPOINT
+  return new OTLPTraceExporter(
+    endpoint
+      ? {
+          url: endpoint,
+          headers: process.env.OTEL_EXPORTER_OTLP_HEADERS
+            ? Object.fromEntries(
+                process.env.OTEL_EXPORTER_OTLP_HEADERS.split(",")
+                  .map((entry) => entry.trim())
+                  .filter(Boolean)
+                  .map((entry) => {
+                    const [key, ...rest] = entry.split("=")
+                    return [key, rest.join("=")]
+                  })
+              )
+            : undefined,
+        }
+      : undefined
+  )
+}
 
-// export function register() {
-//   registerOtel({
-//     serviceName: 'medusajs',
-//     // pass exporter
-//     exporter,
-//     instrument: {
-//       http: true,
-//       workflows: true,
-//       query: true
-//     },
-//   })
-// }
+export function register() {
+  if (!OTEL_ENABLED) {
+    return
+  }
+
+  registerOtel({
+    serviceName: process.env.OTEL_SERVICE_NAME || "total-hemp-consumables-backend",
+    exporter: buildExporter(),
+    instrument: {
+      http: true,
+      workflows: true,
+      query: true,
+    },
+  })
+}
