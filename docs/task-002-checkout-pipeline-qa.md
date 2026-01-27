@@ -47,19 +47,15 @@ Execute and document an end-to-end checkout flow (seed → mirror → storefront
   - Skip the pre-token `initiatePaymentSession` call for Authorize.Net.
   - Send `dataDescriptor` / `dataValue` and a cart snapshot (shipping + billing + selected shipping method) with the opaque token.
 - Successful end-to-end checkout recorded (cart, order, and payment collection references stored in private run logs).
-  - Added debug/introspection scripts:
-  - `src/scripts/debug-shipstation-options.ts`
-  - `src/scripts/link-shipstation-provider.ts`
-  - `src/scripts/create-shipstation-shipping-option.ts`
-  - `src/scripts/query-table-columns.ts`
+  - One-off debug/introspection scripts were used during this run and later removed to keep the repo tidy; check git history if you need to recreate them.
 - Linked ShipStation to the default stock location and created a calculated shipping option (USPS Ground Advantage).
 - Removed manual fulfillment entries (`medusa-config.ts`, `src/scripts/seed-fresh.ts`) and added `src/scripts/cleanup-manual-shipping-options.ts` to purge legacy manual shipping options/links from existing environments.
 - `src/scripts/seed-fresh.ts` now inspects available ShipStation services at runtime (via `retrieveFulfillmentOptions`) and creates shipping options for every service the account exposes, skipping ones that already exist.
 - Ran `yarn medusa exec ./src/scripts/cleanup-manual-shipping-options.ts` (`DISABLE_MEDUSA_ADMIN=true`) – no legacy `manual_manual` options or links remain in the database.
-- Confirmed ShipStation currently exposes 20 services (USPS + FedEx) via `debug-shipstation-options.ts`; staging checkout should only surface the services we intend to sell with (ground/advantage first) until the allowlist is added.
+- Confirmed ShipStation currently exposes 20 services (USPS + FedEx); staging checkout should only surface the services we intend to sell with (ground/advantage first) until the allowlist is added.
 - Restored the original ShipStation USPS Ground Advantage shipping option (`so_01K88TN3T3SZMD6PAYMTK2PMFV`) and reassigned it to the current service zone (`serzo_01K8KJYK7TNY65PTBCSHDZ705E`) so the storefront can consume it again.
 - Added `src/scripts/create-missing-shipstation-options.ts` to mirror every ShipStation carrier/service pair into Medusa (20 options created from the current sandbox account on Oct 29).
-- Added `src/scripts/ensure-shipstation-rules.ts` to backfill the `enabled_in_store = true` rule for every ShipStation option so the Store API surfaces them.
+- Backfilled `enabled_in_store = true` rules for ShipStation options so the Store API surfaces them.
 - Hardened the checkout address form: added Zod validation (city/state/zip/phone), required phone input, and a US state dropdown so ShipStation receives complete addresses.
 - Updated the delivery step to defer ShipStation price requests until a complete shipping address (including phone/state) is on file; prevents mass rate calls on initial load.
 - Added a visible “Clear cart” action (cart + checkout summary) and widened the checkout container (`max-w-[1440px]`) so the desktop layout breathes better.
@@ -114,7 +110,7 @@ Execute and document an end-to-end checkout flow (seed → mirror → storefront
 ### Useful Artifacts / References
 - Logs: `docs/task-002/artifacts/backend-dev-20251023-085703.log`, `docs/task-002/artifacts/storefront-dev-20251023-085740.log`. (Sensitive identifiers have been redacted in shared copies.)
 - Checkout session notes: `docs/task-002/artifacts/checkout-session-20251022.md` (sanitized summary; raw logs are stored in secure storage).
-- Scripts mentioned above for ShipStation debugging and DB access (`src/scripts/debug-orders-with-shipping.ts`, `debug-order-shipping.ts`, `debug-order-line-items.ts`, `debug-inventory-for-variant.ts`, `debug-order-fulfillments.ts`, `debug-reservations-for-line-item.ts`, `debug-shipstation-shipping-methods.ts`, `cleanup-manual-shipping-options.ts`).
+- Note: one-off debug scripts referenced earlier were removed after this QA pass. Use `cleanup-manual-shipping-options.ts` for current operations and recreate any debug tooling locally if needed.
 
 ### Next Steps
 - Restart backend (`yarn dev`) after clearing stray `node …/medusajs` processes when running scripts.

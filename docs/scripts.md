@@ -43,6 +43,12 @@ cd total-hemp-consumables
 - `rebuild:dev` — Drops/recreates the DB, then reminds you to follow the manual admin checklist.
   - `yarn db:reset:dev && echo 'Run the manual admin checklist (docs/admin-store-setup.md) before seeding catalog data.'`
   - Run from backend: `cd total-hemp-consumables && yarn rebuild:dev`
+- `rebuild:dev:config` — Drops/recreates the DB, then runs the guarded config bootstrap.
+  - `yarn db:reset:dev && ALLOW_CONFIG_SEED=true medusa exec ./src/scripts/seed-config.ts`
+  - Use when you want the baseline store config (sales channel, region, tax region, stock location, ShipStation options) seeded automatically.
+
+## Cleanup Note
+This repo now keeps only production‑relevant scripts in `src/scripts`. One‑off debug utilities were removed to reduce noise; recreate them locally as needed.
 
 ## Tests
 - `test:integration:http` — HTTP integration tests

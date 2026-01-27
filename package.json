@@ -21,6 +21,7 @@
     "mirror:inventory": "ts-node ./src/scripts/mirror-inventory.ts",
     "db:reset:dev": "ts-node ./src/scripts/db-reset-dev.ts && medusa db:migrate",
     "rebuild:dev": "yarn db:reset:dev && echo 'Run the manual admin checklist (docs/admin-store-setup.md) before seeding catalog data.'",
+    "rebuild:dev:config": "yarn db:reset:dev && ALLOW_CONFIG_SEED=true medusa exec ./src/scripts/seed-config.ts",
     "mirror:dev:all": "yarn mirror:dev && yarn mirror:inventory",
     "start": "medusa start",
     "dev": "medusa develop",
