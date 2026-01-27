@@ -107,4 +107,4 @@ Catalog seeding is temporarily **manual**—use the Admin UI to create products,
 
 ---
 
-Need an automated bootstrap? Use `ALLOW_CONFIG_SEED=true medusa exec ./src/scripts/seed-config.ts`, but only after updating this document—the manual checklist is the source of truth moving forward.
+Need an automated bootstrap? Use `ALLOW_CONFIG_SEED=true medusa exec ./src/scripts/seed-config.ts`, or run `yarn rebuild:dev:config` after a reset. This will seed baseline store config (sales channel, region, tax region, stock location, and ShipStation options) before catalog mirroring.
