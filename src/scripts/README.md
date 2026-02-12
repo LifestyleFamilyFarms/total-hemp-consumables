@@ -38,6 +38,40 @@ To run the custom CLI script, run the `exec` command:
 npx medusa exec ./src/scripts/my-script.ts
 ```
 
+## Catalog TSV Seed Script
+
+This repository also includes a standalone Admin API seed script for product/variant TSV files:
+
+```bash
+yarn seed:tsv        # default dry-run
+yarn seed:tsv:apply  # execute writes
+```
+
+Default file paths:
+
+- `docs/product-listings.tsv`
+- `docs/variant-listings.tsv`
+
+Override with env vars:
+
+- `SEED_PRODUCTS_FILE`
+- `SEED_VARIANTS_FILE`
+- `SEED_LOG_FILE` (plain text run log)
+- `SEED_REPORT_FILE` (JSON report with per-action summary)
+- `SEED_METADATA_ADMIN_MIRROR` (`1` default) to mirror array/object metadata fields to
+  admin-editable `__json` string keys.
+
+Product TSV optional columns:
+
+- `sales_channels` (comma-separated channel names; missing channels are created)
+- `shipping_profile` (shipping profile name to resolve and attach by ID)
+
+Operator docs:
+
+- `docs/catalog-tsv-operator-guide.md`
+- `docs/product-listings.template.tsv`
+- `docs/variant-listings.template.tsv`
+
 ---
 
 ## Custom CLI Script Arguments

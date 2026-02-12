@@ -26,6 +26,7 @@ import {
 } from "@medusajs/framework/utils"
 
 import type { ExecArgs } from "@medusajs/framework/types"
+import { resolveShipstationEnv } from "../utils/shipstation-env"
 
 const slugify = (value: string) =>
   value
@@ -121,10 +122,10 @@ export default async function seedConfig({ container }: ExecArgs) {
   const stockLocation = locations[0]
   logger.info(`[seed-config] Stock location ensured: ${stockLocation?.id}`)
 
-  const shipstationKey = process.env.SHIPSTATION_API_KEY
+  const shipstationKey = resolveShipstationEnv(process.env.NODE_ENV).apiKey
   if (!shipstationKey) {
     logger.warn(
-      "[seed-config] SHIPSTATION_API_KEY missing – ShipStation options will not be created."
+      "[seed-config] ShipStation API key missing (SHIPSTATION_API_KEY or SHIPSTATION_API_KEY_{PRODUCTION|TEST}) – ShipStation options will not be created."
     )
     return
   }

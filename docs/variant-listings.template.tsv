@@ -1,0 +1,2 @@
+product_handle	variant_title	sku	price_usd	price_usd_cents	acquisition_price_usd	acquisition_price_cents	manage_inventory	allow_backorder	option_1_name	option_1_value	option_2_name	option_2_value	option_3_name	option_3_value	weight	length	width	height	metadata_json
+example-product	Example Variant	EX-SKU-001	19.99	1999	8.5	850	FALSE	TRUE	Strength (mg)	25	Count (ct)	30			120	4	4	6	{"variant_description":"Example variant description","variant_product_details":["detail one","detail two"],"variant_ingredients":"ingredient list"}

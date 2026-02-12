@@ -1,0 +1,2 @@
+title	handle	status	type	categories	sales_channels	shipping_profile	subtitle	description	discountable	collection	tags	thumbnail_url	images	metadata_json
+Example Product	example-product	published	gummies	CBD Gummies	DTCWebStore	Default Shipping Profile	Brand • Subtitle	Short product description	TRUE		Tag One,Tag Two	https://example.com/thumb.jpg	https://example.com/image-1.jpg,https://example.com/image-2.jpg	{"product_faqs":[{"q":"Example question","a":"Example answer"}]}

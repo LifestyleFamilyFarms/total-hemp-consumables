@@ -1,18 +1,26 @@
 # ShipStation Integration Notes
 
 ## Credentials
-- `SHIPSTATION_API_KEY` must always be present.
-- `SHIPSTATION_API_SECRET` is optional for sandbox tokens. When the secret becomes available, add it to `.env` so all requests use explicit key + secret authentication.
+- Credential resolution priority:
+  1. `SHIPSTATION_API_KEY` / `SHIPSTATION_API_SECRET`
+  2. `SHIPSTATION_ENV=production|test` + `SHIPSTATION_API_KEY_PRODUCTION|TEST` (and matching secret vars if available)
+- For sandbox-only setups, key-only auth is acceptable. When secret values are available, add them so all requests use explicit key + secret authentication.
 
 ## Seeding & Provisioning
 - `src/scripts/seed-fresh.ts` dynamically inspects ShipStation using `retrieveFulfillmentOptions` and creates Medusa shipping options for each carrier/service pair returned.
 - `src/scripts/create-missing-shipstation-options.ts` can be executed at any time (`DISABLE_MEDUSA_ADMIN=true yarn medusa exec ./src/scripts/create-missing-shipstation-options.ts`) to backfill any new ShipStation services without touching seed data.
+- Convenience scripts:
+  - `yarn shipstation:doctor:test` / `yarn shipstation:doctor:prod` (auth diagnostics + request IDs)
+  - `yarn shipstation:inspect:test` / `yarn shipstation:inspect:prod` (list carriers + warehouses)
+  - `yarn shipstation:sync:test` / `yarn shipstation:sync:prod` (sync missing shipping options into Medusa)
 - When we’re ready for production, we’ll add a configuration allowlist so operations can restrict which ShipStation services surface in checkout without modifying the script.
 - For now, manual shipping options are removed via `src/scripts/cleanup-manual-shipping-options.ts` and all freight flows through ShipStation.
 
 ## Operational Checklist
 1. Verify the ShipStation account is “Verified” in their dashboard so API keys are accessible.
-2. Populate `.env` with `SHIPSTATION_API_KEY` (and `SHIPSTATION_API_SECRET` once issued).
+2. Populate `.env` with either:
+   - `SHIPSTATION_API_KEY` (+ `SHIPSTATION_API_SECRET`), or
+   - `SHIPSTATION_ENV` and split key vars (`SHIPSTATION_API_KEY_PRODUCTION` / `SHIPSTATION_API_KEY_TEST`).
 3. Run the cleanup script to remove any `manual_manual` legacy options:  
    `yarn medusa exec ./src/scripts/cleanup-manual-shipping-options.ts`
 4. Restart the backend (`yarn dev`) so new shipping providers and options load.

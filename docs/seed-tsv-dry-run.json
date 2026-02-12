@@ -1,0 +1,936 @@
+{
+  "generated_at": "2026-02-12T17:12:06.971Z",
+  "backend_url": "https://total-hemp-consumables.up.railway.app",
+  "dry_run": true,
+  "strict": true,
+  "currency_code": "usd",
+  "products_file": "/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/docs/product-listings.tsv",
+  "variants_file": "/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/docs/variant-listings.tsv",
+  "summary": {
+    "products_created": 0,
+    "products_updated": 20,
+    "variants_created": 70,
+    "variants_updated": 0
+  },
+  "error": null,
+  "actions": [
+    {
+      "entity": "product",
+      "mode": "update",
+      "handle": "cbd-tincture-fso",
+      "dryRun": true
+    },
+    {
+      "entity": "option",
+      "mode": "create",
+      "handle": "cbd-tincture-fso",
+      "ref": "Strength (mg)",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "cbd-tincture-fso",
+      "ref": "TNC-FS-CBD-500",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "cbd-tincture-fso",
+      "ref": "TNC-FS-CBD-1000",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "cbd-tincture-fso",
+      "ref": "TNC-FS-CBD-2500",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "cbd-tincture-fso",
+      "ref": "TNC-FS-CBD-5000",
+      "dryRun": true
+    },
+    {
+      "entity": "product",
+      "mode": "update",
+      "handle": "cbd-tincture-bso",
+      "dryRun": true
+    },
+    {
+      "entity": "option",
+      "mode": "create",
+      "handle": "cbd-tincture-bso",
+      "ref": "Strength (mg)",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "cbd-tincture-bso",
+      "ref": "TNC-BS-CBD-500",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "cbd-tincture-bso",
+      "ref": "TNC-BS-CBD-1000",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "cbd-tincture-bso",
+      "ref": "TNC-BS-CBD-2500",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "cbd-tincture-bso",
+      "ref": "TNC-BS-CBD-5000",
+      "dryRun": true
+    },
+    {
+      "entity": "product",
+      "mode": "update",
+      "handle": "cbd-capsules-isolate",
+      "dryRun": true
+    },
+    {
+      "entity": "option",
+      "mode": "create",
+      "handle": "cbd-capsules-isolate",
+      "ref": "Strength (mg)",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "cbd-capsules-isolate",
+      "ref": "CAP-ISO-CBD-25-30CT",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "cbd-capsules-isolate",
+      "ref": "CAP-ISO-CBD-50-30CT",
+      "dryRun": true
+    },
+    {
+      "entity": "product",
+      "mode": "update",
+      "handle": "cbd-gummies-broad-spectrum",
+      "dryRun": true
+    },
+    {
+      "entity": "option",
+      "mode": "create",
+      "handle": "cbd-gummies-broad-spectrum",
+      "ref": "Dose (mg)",
+      "dryRun": true
+    },
+    {
+      "entity": "option",
+      "mode": "create",
+      "handle": "cbd-gummies-broad-spectrum",
+      "ref": "Count (ct)",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "cbd-gummies-broad-spectrum",
+      "ref": "GUM-BS-CBD-25-4CT",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "cbd-gummies-broad-spectrum",
+      "ref": "GUM-BS-CBD-25-30CT",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "cbd-gummies-broad-spectrum",
+      "ref": "GUM-BS-CBD-25-100CT",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "cbd-gummies-broad-spectrum",
+      "ref": "GUM-BS-CBD-50-4CT",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "cbd-gummies-broad-spectrum",
+      "ref": "GUM-BS-CBD-50-30CT",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "cbd-gummies-broad-spectrum",
+      "ref": "GUM-BS-CBD-50-100CT",
+      "dryRun": true
+    },
+    {
+      "entity": "product",
+      "mode": "update",
+      "handle": "cbd-gummies-broad-spectrum-melatonin",
+      "dryRun": true
+    },
+    {
+      "entity": "option",
+      "mode": "create",
+      "handle": "cbd-gummies-broad-spectrum-melatonin",
+      "ref": "Dose (mg)",
+      "dryRun": true
+    },
+    {
+      "entity": "option",
+      "mode": "create",
+      "handle": "cbd-gummies-broad-spectrum-melatonin",
+      "ref": "Count (ct)",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "cbd-gummies-broad-spectrum-melatonin",
+      "ref": "GUM-BS-CBD-25-4CT-MEL",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "cbd-gummies-broad-spectrum-melatonin",
+      "ref": "GUM-BS-CBD-25-30CT-MEL",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "cbd-gummies-broad-spectrum-melatonin",
+      "ref": "GUM-BS-CBD-25-100CT-MEL",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "cbd-gummies-broad-spectrum-melatonin",
+      "ref": "GUM-BS-CBD-50-4CT-MEL",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "cbd-gummies-broad-spectrum-melatonin",
+      "ref": "GUM-BS-CBD-50-30CT-MEL",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "cbd-gummies-broad-spectrum-melatonin",
+      "ref": "GUM-BS-CBD-50-100CT-MEL",
+      "dryRun": true
+    },
+    {
+      "entity": "product",
+      "mode": "update",
+      "handle": "cbg-gummies",
+      "dryRun": true
+    },
+    {
+      "entity": "option",
+      "mode": "create",
+      "handle": "cbg-gummies",
+      "ref": "Dose (mg)",
+      "dryRun": true
+    },
+    {
+      "entity": "option",
+      "mode": "create",
+      "handle": "cbg-gummies",
+      "ref": "Count (ct)",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "cbg-gummies",
+      "ref": "GUM-BS-CBG-25-4CT",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "cbg-gummies",
+      "ref": "GUM-BS-CBG-25-30CT",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "cbg-gummies",
+      "ref": "GUM-BS-CBG-25-100CT",
+      "dryRun": true
+    },
+    {
+      "entity": "product",
+      "mode": "update",
+      "handle": "cbg-gummies-b12",
+      "dryRun": true
+    },
+    {
+      "entity": "option",
+      "mode": "create",
+      "handle": "cbg-gummies-b12",
+      "ref": "Dose (mg)",
+      "dryRun": true
+    },
+    {
+      "entity": "option",
+      "mode": "create",
+      "handle": "cbg-gummies-b12",
+      "ref": "Count (ct)",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "cbg-gummies-b12",
+      "ref": "GUM-BS-CBG-25-4CT-B12",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "cbg-gummies-b12",
+      "ref": "GUM-BS-CBG-25-30CT-B12",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "cbg-gummies-b12",
+      "ref": "GUM-BS-CBG-25-100CT-B12",
+      "dryRun": true
+    },
+    {
+      "entity": "product",
+      "mode": "update",
+      "handle": "cbd-isolate-salve",
+      "dryRun": true
+    },
+    {
+      "entity": "option",
+      "mode": "create",
+      "handle": "cbd-isolate-salve",
+      "ref": "Strength (mg)",
+      "dryRun": true
+    },
+    {
+      "entity": "option",
+      "mode": "create",
+      "handle": "cbd-isolate-salve",
+      "ref": "Size",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "cbd-isolate-salve",
+      "ref": "SAL-ISO-CBD-500-1OZ",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "cbd-isolate-salve",
+      "ref": "SAL-ISO-CBD-100-5G",
+      "dryRun": true
+    },
+    {
+      "entity": "product",
+      "mode": "update",
+      "handle": "cbd-isolate-lotion",
+      "dryRun": true
+    },
+    {
+      "entity": "option",
+      "mode": "create",
+      "handle": "cbd-isolate-lotion",
+      "ref": "Strength (mg)",
+      "dryRun": true
+    },
+    {
+      "entity": "option",
+      "mode": "create",
+      "handle": "cbd-isolate-lotion",
+      "ref": "Size",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "cbd-isolate-lotion",
+      "ref": "LOT-ISO-CBD-500-6OZ",
+      "dryRun": true
+    },
+    {
+      "entity": "product",
+      "mode": "update",
+      "handle": "cbd-full-spectrum-salve",
+      "dryRun": true
+    },
+    {
+      "entity": "option",
+      "mode": "create",
+      "handle": "cbd-full-spectrum-salve",
+      "ref": "Strength (mg)",
+      "dryRun": true
+    },
+    {
+      "entity": "option",
+      "mode": "create",
+      "handle": "cbd-full-spectrum-salve",
+      "ref": "Size",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "cbd-full-spectrum-salve",
+      "ref": "SAL-FS-CBD-500-1OZ",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "cbd-full-spectrum-salve",
+      "ref": "SAL-FS-CBD-100-5G",
+      "dryRun": true
+    },
+    {
+      "entity": "product",
+      "mode": "update",
+      "handle": "cbd-cooling-roll-on-bso",
+      "dryRun": true
+    },
+    {
+      "entity": "option",
+      "mode": "create",
+      "handle": "cbd-cooling-roll-on-bso",
+      "ref": "Strength (mg)",
+      "dryRun": true
+    },
+    {
+      "entity": "option",
+      "mode": "create",
+      "handle": "cbd-cooling-roll-on-bso",
+      "ref": "Size",
+      "dryRun": true
+    },
+    {
+      "entity": "option",
+      "mode": "create",
+      "handle": "cbd-cooling-roll-on-bso",
+      "ref": "Count (ct)",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "cbd-cooling-roll-on-bso",
+      "ref": "ROL-BS-CBD-2000-COOL",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "cbd-cooling-roll-on-bso",
+      "ref": "ROL-BS-CBD-2000-COOL-6CT",
+      "dryRun": true
+    },
+    {
+      "entity": "product",
+      "mode": "update",
+      "handle": "cbd-warming-roll-on-bso",
+      "dryRun": true
+    },
+    {
+      "entity": "option",
+      "mode": "create",
+      "handle": "cbd-warming-roll-on-bso",
+      "ref": "Strength (mg)",
+      "dryRun": true
+    },
+    {
+      "entity": "option",
+      "mode": "create",
+      "handle": "cbd-warming-roll-on-bso",
+      "ref": "Size",
+      "dryRun": true
+    },
+    {
+      "entity": "option",
+      "mode": "create",
+      "handle": "cbd-warming-roll-on-bso",
+      "ref": "Count (ct)",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "cbd-warming-roll-on-bso",
+      "ref": "ROL-BS-CBD-2000-WARM",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "cbd-warming-roll-on-bso",
+      "ref": "ROL-BS-CBD-2000-WARM-6CT",
+      "dryRun": true
+    },
+    {
+      "entity": "product",
+      "mode": "update",
+      "handle": "cbd-bath-bombs",
+      "dryRun": true
+    },
+    {
+      "entity": "option",
+      "mode": "create",
+      "handle": "cbd-bath-bombs",
+      "ref": "Type",
+      "dryRun": true
+    },
+    {
+      "entity": "option",
+      "mode": "create",
+      "handle": "cbd-bath-bombs",
+      "ref": "Strength (mg)",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "cbd-bath-bombs",
+      "ref": "BAT-CBD-35-CALM",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "cbd-bath-bombs",
+      "ref": "BAT-CBD-35-SOOTHE",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "cbd-bath-bombs",
+      "ref": "BAT-CBD-100-PURE",
+      "dryRun": true
+    },
+    {
+      "entity": "product",
+      "mode": "update",
+      "handle": "thc-gummies",
+      "dryRun": true
+    },
+    {
+      "entity": "option",
+      "mode": "create",
+      "handle": "thc-gummies",
+      "ref": "Dose (mg)",
+      "dryRun": true
+    },
+    {
+      "entity": "option",
+      "mode": "create",
+      "handle": "thc-gummies",
+      "ref": "Count (ct)",
+      "dryRun": true
+    },
+    {
+      "entity": "option",
+      "mode": "create",
+      "handle": "thc-gummies",
+      "ref": "Flavor",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "thc-gummies",
+      "ref": "D9-GUM-12-10CT",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "thc-gummies",
+      "ref": "D9-GUM-12-30CT",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "thc-gummies",
+      "ref": "D9-GUM-12-100CT",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "thc-gummies",
+      "ref": "D9-GUM-30-4CT",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "thc-gummies",
+      "ref": "D9-GUM-30-30CT",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "thc-gummies",
+      "ref": "D9-GUM-50-2CT",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "thc-gummies",
+      "ref": "D9-GUM-50-20CT",
+      "dryRun": true
+    },
+    {
+      "entity": "product",
+      "mode": "update",
+      "handle": "thc-drink-additives-4oz",
+      "dryRun": true
+    },
+    {
+      "entity": "option",
+      "mode": "create",
+      "handle": "thc-drink-additives-4oz",
+      "ref": "Flavor",
+      "dryRun": true
+    },
+    {
+      "entity": "option",
+      "mode": "create",
+      "handle": "thc-drink-additives-4oz",
+      "ref": "Size",
+      "dryRun": true
+    },
+    {
+      "entity": "option",
+      "mode": "create",
+      "handle": "thc-drink-additives-4oz",
+      "ref": "Strength (mg)",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "thc-drink-additives-4oz",
+      "ref": "D9-DRK-420-BLUERAZZ",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "thc-drink-additives-4oz",
+      "ref": "D9-DRK-420-TROP",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "thc-drink-additives-4oz",
+      "ref": "D9-DRK-420-PINE",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "thc-drink-additives-4oz",
+      "ref": "D9-DRK-420-BCHERRY",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "thc-drink-additives-4oz",
+      "ref": "D9-DRK-420-BLOODORG",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "thc-drink-additives-4oz",
+      "ref": "D9-DRK-420-WATERMEL",
+      "dryRun": true
+    },
+    {
+      "entity": "product",
+      "mode": "update",
+      "handle": "thc-drink-shots-50mg-40ct",
+      "dryRun": true
+    },
+    {
+      "entity": "option",
+      "mode": "create",
+      "handle": "thc-drink-shots-50mg-40ct",
+      "ref": "Flavor",
+      "dryRun": true
+    },
+    {
+      "entity": "option",
+      "mode": "create",
+      "handle": "thc-drink-shots-50mg-40ct",
+      "ref": "Count (ct)",
+      "dryRun": true
+    },
+    {
+      "entity": "option",
+      "mode": "create",
+      "handle": "thc-drink-shots-50mg-40ct",
+      "ref": "Strength (mg)",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "thc-drink-shots-50mg-40ct",
+      "ref": "D9-DRK-50-BLUERAZZ-40CT",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "thc-drink-shots-50mg-40ct",
+      "ref": "D9-DRK-50-PINE-40CT",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "thc-drink-shots-50mg-40ct",
+      "ref": "D9-DRK-50-TROP-40CT",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "thc-drink-shots-50mg-40ct",
+      "ref": "D9-DRK-50-PINKLEM-40CT",
+      "dryRun": true
+    },
+    {
+      "entity": "product",
+      "mode": "update",
+      "handle": "thc-drink-shots-50mg-1ct",
+      "dryRun": true
+    },
+    {
+      "entity": "option",
+      "mode": "create",
+      "handle": "thc-drink-shots-50mg-1ct",
+      "ref": "Flavor",
+      "dryRun": true
+    },
+    {
+      "entity": "option",
+      "mode": "create",
+      "handle": "thc-drink-shots-50mg-1ct",
+      "ref": "Count (ct)",
+      "dryRun": true
+    },
+    {
+      "entity": "option",
+      "mode": "create",
+      "handle": "thc-drink-shots-50mg-1ct",
+      "ref": "Strength (mg)",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "thc-drink-shots-50mg-1ct",
+      "ref": "D9-DRK-50-BLUERAZZ-1CT",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "thc-drink-shots-50mg-1ct",
+      "ref": "D9-DRK-50-PINKLEM-1CT",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "thc-drink-shots-50mg-1ct",
+      "ref": "D9-DRK-50-TROP-1CT",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "thc-drink-shots-50mg-1ct",
+      "ref": "D9-DRK-50-PINE-1CT",
+      "dryRun": true
+    },
+    {
+      "entity": "product",
+      "mode": "update",
+      "handle": "thc-cereal-bars",
+      "dryRun": true
+    },
+    {
+      "entity": "option",
+      "mode": "create",
+      "handle": "thc-cereal-bars",
+      "ref": "Flavor",
+      "dryRun": true
+    },
+    {
+      "entity": "option",
+      "mode": "create",
+      "handle": "thc-cereal-bars",
+      "ref": "Strength (mg)",
+      "dryRun": true
+    },
+    {
+      "entity": "option",
+      "mode": "create",
+      "handle": "thc-cereal-bars",
+      "ref": "Count (ct)",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "thc-cereal-bars",
+      "ref": "D9-CER-160-LUCKY",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "thc-cereal-bars",
+      "ref": "D9-CER-160-CINN",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "thc-cereal-bars",
+      "ref": "D9-CER-160-COCOA",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "thc-cereal-bars",
+      "ref": "D9-CER-160-RICE",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "thc-cereal-bars",
+      "ref": "D9-CER-160-APPLE",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "thc-cereal-bars",
+      "ref": "D9-CER-160-REESES",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "thc-cereal-bars",
+      "ref": "D9-CER-160-FRUIT",
+      "dryRun": true
+    },
+    {
+      "entity": "product",
+      "mode": "update",
+      "handle": "thc-chocolate-chunk-cookie",
+      "dryRun": true
+    },
+    {
+      "entity": "option",
+      "mode": "create",
+      "handle": "thc-chocolate-chunk-cookie",
+      "ref": "Strength",
+      "dryRun": true
+    },
+    {
+      "entity": "option",
+      "mode": "create",
+      "handle": "thc-chocolate-chunk-cookie",
+      "ref": "Count",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "thc-chocolate-chunk-cookie",
+      "ref": "D9-COO-100-CHOCCHUNK",
+      "dryRun": true
+    },
+    {
+      "entity": "product",
+      "mode": "update",
+      "handle": "thc-chocolate-brownie",
+      "dryRun": true
+    },
+    {
+      "entity": "option",
+      "mode": "create",
+      "handle": "thc-chocolate-brownie",
+      "ref": "Strength",
+      "dryRun": true
+    },
+    {
+      "entity": "option",
+      "mode": "create",
+      "handle": "thc-chocolate-brownie",
+      "ref": "Count",
+      "dryRun": true
+    },
+    {
+      "entity": "variant",
+      "mode": "create",
+      "handle": "thc-chocolate-brownie",
+      "ref": "D9-BRN-320-BROWNIE",
+      "dryRun": true
+    }
+  ]
+}

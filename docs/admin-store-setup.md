@@ -77,7 +77,7 @@ Catalog seeding is temporarily **manual**—use the Admin UI to create products,
    - Create a ShipStation option for USPS Ground Advantage (or the services you plan to expose).
    - Assign the stock location and the US service zone.
    - Toggle **Visible in store** so the Store API returns it.
-4. If no ShipStation services appear, re-check `SHIPSTATION_API_KEY` / `SHIPSTATION_API_SECRET` in the backend `.env` and retry.
+4. If no ShipStation services appear, re-check ShipStation credentials in backend `.env` and retry (`SHIPSTATION_API_KEY`/`SHIPSTATION_API_SECRET` or `SHIPSTATION_ENV` + split key vars).
 
 ## 7. Link Sales Channel ↔ Stock Location
 1. Return to **Sales Channels** and open `DTC Web Store`.
@@ -88,7 +88,7 @@ Catalog seeding is temporarily **manual**—use the Admin UI to create products,
 - Backend `.env`:
   - `MEDUSA_BACKEND_URL`
   - `ADMIN_CORS`, `AUTH_CORS`, `STORE_CORS`
-  - `SHIPSTATION_API_KEY`, `SHIPSTATION_API_SECRET`
+  - `SHIPSTATION_API_KEY`, `SHIPSTATION_API_SECRET` (or split key vars with `SHIPSTATION_ENV`)
   - `AUTHORIZE_NET_API_LOGIN_ID`, `AUTHORIZE_NET_TRANSACTION_KEY`
   - `SEED_LOCATION_ID=<stock_location_id>`
 - Storefront `.env`:

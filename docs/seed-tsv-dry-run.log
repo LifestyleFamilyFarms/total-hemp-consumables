@@ -1,0 +1,138 @@
+[seed-from-tsv] backend: https://total-hemp-consumables.up.railway.app
+[seed-from-tsv] products: 20, variants: 70
+[seed-from-tsv] dry-run: yes
+[dry-run] update product: cbd-tincture-fso
+[dry-run] create option: cbd-tincture-fso -> Strength (mg)
+[dry-run] create variant: cbd-tincture-fso -> TNC-FS-CBD-500
+[dry-run] create variant: cbd-tincture-fso -> TNC-FS-CBD-1000
+[dry-run] create variant: cbd-tincture-fso -> TNC-FS-CBD-2500
+[dry-run] create variant: cbd-tincture-fso -> TNC-FS-CBD-5000
+[dry-run] update product: cbd-tincture-bso
+[dry-run] create option: cbd-tincture-bso -> Strength (mg)
+[dry-run] create variant: cbd-tincture-bso -> TNC-BS-CBD-500
+[dry-run] create variant: cbd-tincture-bso -> TNC-BS-CBD-1000
+[dry-run] create variant: cbd-tincture-bso -> TNC-BS-CBD-2500
+[dry-run] create variant: cbd-tincture-bso -> TNC-BS-CBD-5000
+[dry-run] update product: cbd-capsules-isolate
+[dry-run] create option: cbd-capsules-isolate -> Strength (mg)
+[dry-run] create variant: cbd-capsules-isolate -> CAP-ISO-CBD-25-30CT
+[dry-run] create variant: cbd-capsules-isolate -> CAP-ISO-CBD-50-30CT
+[dry-run] update product: cbd-gummies-broad-spectrum
+[dry-run] create option: cbd-gummies-broad-spectrum -> Dose (mg)
+[dry-run] create option: cbd-gummies-broad-spectrum -> Count (ct)
+[dry-run] create variant: cbd-gummies-broad-spectrum -> GUM-BS-CBD-25-4CT
+[dry-run] create variant: cbd-gummies-broad-spectrum -> GUM-BS-CBD-25-30CT
+[dry-run] create variant: cbd-gummies-broad-spectrum -> GUM-BS-CBD-25-100CT
+[dry-run] create variant: cbd-gummies-broad-spectrum -> GUM-BS-CBD-50-4CT
+[dry-run] create variant: cbd-gummies-broad-spectrum -> GUM-BS-CBD-50-30CT
+[dry-run] create variant: cbd-gummies-broad-spectrum -> GUM-BS-CBD-50-100CT
+[dry-run] update product: cbd-gummies-broad-spectrum-melatonin
+[dry-run] create option: cbd-gummies-broad-spectrum-melatonin -> Dose (mg)
+[dry-run] create option: cbd-gummies-broad-spectrum-melatonin -> Count (ct)
+[dry-run] create variant: cbd-gummies-broad-spectrum-melatonin -> GUM-BS-CBD-25-4CT-MEL
+[dry-run] create variant: cbd-gummies-broad-spectrum-melatonin -> GUM-BS-CBD-25-30CT-MEL
+[dry-run] create variant: cbd-gummies-broad-spectrum-melatonin -> GUM-BS-CBD-25-100CT-MEL
+[dry-run] create variant: cbd-gummies-broad-spectrum-melatonin -> GUM-BS-CBD-50-4CT-MEL
+[dry-run] create variant: cbd-gummies-broad-spectrum-melatonin -> GUM-BS-CBD-50-30CT-MEL
+[dry-run] create variant: cbd-gummies-broad-spectrum-melatonin -> GUM-BS-CBD-50-100CT-MEL
+[dry-run] update product: cbg-gummies
+[dry-run] create option: cbg-gummies -> Dose (mg)
+[dry-run] create option: cbg-gummies -> Count (ct)
+[dry-run] create variant: cbg-gummies -> GUM-BS-CBG-25-4CT
+[dry-run] create variant: cbg-gummies -> GUM-BS-CBG-25-30CT
+[dry-run] create variant: cbg-gummies -> GUM-BS-CBG-25-100CT
+[dry-run] update product: cbg-gummies-b12
+[dry-run] create option: cbg-gummies-b12 -> Dose (mg)
+[dry-run] create option: cbg-gummies-b12 -> Count (ct)
+[dry-run] create variant: cbg-gummies-b12 -> GUM-BS-CBG-25-4CT-B12
+[dry-run] create variant: cbg-gummies-b12 -> GUM-BS-CBG-25-30CT-B12
+[dry-run] create variant: cbg-gummies-b12 -> GUM-BS-CBG-25-100CT-B12
+[dry-run] update product: cbd-isolate-salve
+[dry-run] create option: cbd-isolate-salve -> Strength (mg)
+[dry-run] create option: cbd-isolate-salve -> Size
+[dry-run] create variant: cbd-isolate-salve -> SAL-ISO-CBD-500-1OZ
+[dry-run] create variant: cbd-isolate-salve -> SAL-ISO-CBD-100-5G
+[dry-run] update product: cbd-isolate-lotion
+[dry-run] create option: cbd-isolate-lotion -> Strength (mg)
+[dry-run] create option: cbd-isolate-lotion -> Size
+[dry-run] create variant: cbd-isolate-lotion -> LOT-ISO-CBD-500-6OZ
+[dry-run] update product: cbd-full-spectrum-salve
+[dry-run] create option: cbd-full-spectrum-salve -> Strength (mg)
+[dry-run] create option: cbd-full-spectrum-salve -> Size
+[dry-run] create variant: cbd-full-spectrum-salve -> SAL-FS-CBD-500-1OZ
+[dry-run] create variant: cbd-full-spectrum-salve -> SAL-FS-CBD-100-5G
+[dry-run] update product: cbd-cooling-roll-on-bso
+[dry-run] create option: cbd-cooling-roll-on-bso -> Strength (mg)
+[dry-run] create option: cbd-cooling-roll-on-bso -> Size
+[dry-run] create option: cbd-cooling-roll-on-bso -> Count (ct)
+[dry-run] create variant: cbd-cooling-roll-on-bso -> ROL-BS-CBD-2000-COOL
+[dry-run] create variant: cbd-cooling-roll-on-bso -> ROL-BS-CBD-2000-COOL-6CT
+[dry-run] update product: cbd-warming-roll-on-bso
+[dry-run] create option: cbd-warming-roll-on-bso -> Strength (mg)
+[dry-run] create option: cbd-warming-roll-on-bso -> Size
+[dry-run] create option: cbd-warming-roll-on-bso -> Count (ct)
+[dry-run] create variant: cbd-warming-roll-on-bso -> ROL-BS-CBD-2000-WARM
+[dry-run] create variant: cbd-warming-roll-on-bso -> ROL-BS-CBD-2000-WARM-6CT
+[dry-run] update product: cbd-bath-bombs
+[dry-run] create option: cbd-bath-bombs -> Type
+[dry-run] create option: cbd-bath-bombs -> Strength (mg)
+[dry-run] create variant: cbd-bath-bombs -> BAT-CBD-35-CALM
+[dry-run] create variant: cbd-bath-bombs -> BAT-CBD-35-SOOTHE
+[dry-run] create variant: cbd-bath-bombs -> BAT-CBD-100-PURE
+[dry-run] update product: thc-gummies
+[dry-run] create option: thc-gummies -> Dose (mg)
+[dry-run] create option: thc-gummies -> Count (ct)
+[dry-run] create option: thc-gummies -> Flavor
+[dry-run] create variant: thc-gummies -> D9-GUM-12-10CT
+[dry-run] create variant: thc-gummies -> D9-GUM-12-30CT
+[dry-run] create variant: thc-gummies -> D9-GUM-12-100CT
+[dry-run] create variant: thc-gummies -> D9-GUM-30-4CT
+[dry-run] create variant: thc-gummies -> D9-GUM-30-30CT
+[dry-run] create variant: thc-gummies -> D9-GUM-50-2CT
+[dry-run] create variant: thc-gummies -> D9-GUM-50-20CT
+[dry-run] update product: thc-drink-additives-4oz
+[dry-run] create option: thc-drink-additives-4oz -> Flavor
+[dry-run] create option: thc-drink-additives-4oz -> Size
+[dry-run] create option: thc-drink-additives-4oz -> Strength (mg)
+[dry-run] create variant: thc-drink-additives-4oz -> D9-DRK-420-BLUERAZZ
+[dry-run] create variant: thc-drink-additives-4oz -> D9-DRK-420-TROP
+[dry-run] create variant: thc-drink-additives-4oz -> D9-DRK-420-PINE
+[dry-run] create variant: thc-drink-additives-4oz -> D9-DRK-420-BCHERRY
+[dry-run] create variant: thc-drink-additives-4oz -> D9-DRK-420-BLOODORG
+[dry-run] create variant: thc-drink-additives-4oz -> D9-DRK-420-WATERMEL
+[dry-run] update product: thc-drink-shots-50mg-40ct
+[dry-run] create option: thc-drink-shots-50mg-40ct -> Flavor
+[dry-run] create option: thc-drink-shots-50mg-40ct -> Count (ct)
+[dry-run] create option: thc-drink-shots-50mg-40ct -> Strength (mg)
+[dry-run] create variant: thc-drink-shots-50mg-40ct -> D9-DRK-50-BLUERAZZ-40CT
+[dry-run] create variant: thc-drink-shots-50mg-40ct -> D9-DRK-50-PINE-40CT
+[dry-run] create variant: thc-drink-shots-50mg-40ct -> D9-DRK-50-TROP-40CT
+[dry-run] create variant: thc-drink-shots-50mg-40ct -> D9-DRK-50-PINKLEM-40CT
+[dry-run] update product: thc-drink-shots-50mg-1ct
+[dry-run] create option: thc-drink-shots-50mg-1ct -> Flavor
+[dry-run] create option: thc-drink-shots-50mg-1ct -> Count (ct)
+[dry-run] create option: thc-drink-shots-50mg-1ct -> Strength (mg)
+[dry-run] create variant: thc-drink-shots-50mg-1ct -> D9-DRK-50-BLUERAZZ-1CT
+[dry-run] create variant: thc-drink-shots-50mg-1ct -> D9-DRK-50-PINKLEM-1CT
+[dry-run] create variant: thc-drink-shots-50mg-1ct -> D9-DRK-50-TROP-1CT
+[dry-run] create variant: thc-drink-shots-50mg-1ct -> D9-DRK-50-PINE-1CT
+[dry-run] update product: thc-cereal-bars
+[dry-run] create option: thc-cereal-bars -> Flavor
+[dry-run] create option: thc-cereal-bars -> Strength (mg)
+[dry-run] create option: thc-cereal-bars -> Count (ct)
+[dry-run] create variant: thc-cereal-bars -> D9-CER-160-LUCKY
+[dry-run] create variant: thc-cereal-bars -> D9-CER-160-CINN
+[dry-run] create variant: thc-cereal-bars -> D9-CER-160-COCOA
+[dry-run] create variant: thc-cereal-bars -> D9-CER-160-RICE
+[dry-run] create variant: thc-cereal-bars -> D9-CER-160-APPLE
+[dry-run] create variant: thc-cereal-bars -> D9-CER-160-REESES
+[dry-run] create variant: thc-cereal-bars -> D9-CER-160-FRUIT
+[dry-run] update product: thc-chocolate-chunk-cookie
+[dry-run] create option: thc-chocolate-chunk-cookie -> Strength
+[dry-run] create option: thc-chocolate-chunk-cookie -> Count
+[dry-run] create variant: thc-chocolate-chunk-cookie -> D9-COO-100-CHOCCHUNK
+[dry-run] update product: thc-chocolate-brownie
+[dry-run] create option: thc-chocolate-brownie -> Strength
+[dry-run] create option: thc-chocolate-brownie -> Count
+[dry-run] create variant: thc-chocolate-brownie -> D9-BRN-320-BROWNIE
+[seed-from-tsv] complete. products: +0/~20, variants: +70/~0

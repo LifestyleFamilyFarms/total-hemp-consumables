@@ -3,6 +3,7 @@ import type { ShipStationOptions } from "./service"
 import { MedusaError } from "@medusajs/framework/utils"
 import {
   CarriersResponse,
+  WarehousesResponse,
   Label,
   GetShippingRatesRequest,
   GetShippingRatesResponse,
@@ -87,6 +88,10 @@ export class ShipStationClient {
 
   async getCarriers(): Promise<CarriersResponse> {
     return await this.sendRequest("/carriers")
+  }
+
+  async getWarehouses(): Promise<WarehousesResponse> {
+    return await this.sendRequest("/warehouses")
   }
 
   async getShippingRates(
