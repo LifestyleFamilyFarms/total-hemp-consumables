@@ -16,6 +16,28 @@ export type CarriersResponse = {
     carriers: Carrier[]
 }
 
+export type Warehouse = {
+  warehouse_id: string
+  name: string
+  created_at?: string
+  origin_address?: {
+    name?: string
+    phone?: string
+    company_name?: string
+    address_line1?: string
+    address_line2?: string
+    city_locality?: string
+    state_province?: string
+    postal_code?: string
+    country_code?: string
+  }
+  [k: string]: unknown
+}
+
+export type WarehousesResponse = {
+  warehouses: Warehouse[]
+}
+
 export type ShipStationAddress = {
     name: string
     phone: string

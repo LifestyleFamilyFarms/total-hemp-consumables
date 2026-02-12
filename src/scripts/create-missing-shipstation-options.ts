@@ -17,7 +17,14 @@ export default async function createMissingShipstationOptions({
 
   const services = await fulfillmentModule
     .retrieveFulfillmentOptions(PROVIDER_ID)
-    .catch(() => [])
+    .catch((err) => {
+      console.warn(
+        `[create-missing-shipstation-options] Failed retrieving ShipStation services: ${
+          err?.message || err
+        }`
+      )
+      return []
+    })
 
   if (!services?.length) {
     console.warn("[create-missing-shipstation-options] No ShipStation services returned; aborting")

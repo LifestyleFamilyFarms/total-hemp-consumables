@@ -1,9 +1,11 @@
 import { loadEnv, defineConfig } from '@medusajs/framework/utils';
+import { resolveShipstationEnv } from "./src/utils/shipstation-env"
 
 loadEnv(process.env.NODE_ENV || 'development', process.cwd());
 
 const isProd = process.env.NODE_ENV === 'production';
 const dbSslRejectUnauthorized = process.env.DB_SSL_REJECT_UNAUTHORIZED;
+const shipstationEnv = resolveShipstationEnv(process.env.NODE_ENV)
 
 const databaseDriverOptions = (() => {
   if (isProd) {
@@ -156,8 +158,8 @@ module.exports = defineConfig({
             resolve: "./src/modules/shipstation",
             id: "shipstation",
             options: {
-              api_key: process.env.SHIPSTATION_API_KEY,
-              api_secret: process.env.SHIPSTATION_API_SECRET
+              api_key: shipstationEnv.apiKey,
+              api_secret: shipstationEnv.apiSecret
             }
           }
         ]
