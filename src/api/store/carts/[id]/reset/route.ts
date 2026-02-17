@@ -1,7 +1,11 @@
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { resetCartWorkflow } from "../../../../../workflows/carts"
+import type { ResetCartBody } from "./middlewares"
 
-export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
+export const POST = async (
+  req: MedusaRequest<ResetCartBody>,
+  res: MedusaResponse
+) => {
   const { id } = req.params as { id: string }
 
   if (!id) {

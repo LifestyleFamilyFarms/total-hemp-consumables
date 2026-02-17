@@ -1,31 +1,16 @@
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
-import { z } from "@medusajs/framework/zod"
 import { updateSalesPersonWorkflow } from "../../../../workflows/sales-people"
+import type { UpdateSalesPersonBody } from "./middlewares"
 
-const SalesPersonUpdateSchema = z.object({
-  name: z.string().trim().min(1).optional(),
-  email: z.string().trim().optional(),
-  phone: z.string().trim().optional(),
-  rep_code: z.string().trim().min(1).optional(),
-  active: z.boolean().optional(),
-  notes: z.string().optional(),
-})
-
-export async function POST(req: MedusaRequest, res: MedusaResponse) {
-  const parsed = SalesPersonUpdateSchema.safeParse(req.body)
-
-  if (!parsed.success) {
-    return res.status(400).json({
-      message: "Invalid sales person payload.",
-      errors: parsed.error.flatten(),
-    })
-  }
-
+export async function POST(
+  req: MedusaRequest<UpdateSalesPersonBody>,
+  res: MedusaResponse
+) {
   try {
     const { result } = await updateSalesPersonWorkflow(req.scope).run({
       input: {
         id: req.params.id,
-        ...parsed.data,
+        ...req.validatedBody,
       },
     })
 

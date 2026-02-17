@@ -15,7 +15,7 @@ type OrderService = {
 }
 
 export const updateOrderSalesPersonMetadataStep = createStep(
-  "sales-people.step.update-order-sales-person-metadata",
+  "update-order-sales-person-metadata",
   async (
     input: ResolveOrderSalesPersonMetadataStepOutput,
     { container }

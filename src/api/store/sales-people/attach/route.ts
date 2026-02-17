@@ -1,26 +1,14 @@
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
-import { z } from "@medusajs/framework/zod"
 import { attachRepAttributionWorkflow } from "../../../../workflows/sales-people"
+import type { AttachSalesPersonBody } from "./middlewares"
 
-const AttachSchema = z.object({
-  rep_code: z.string().trim().min(1),
-  cart_id: z.string().trim().optional(),
-  customer_id: z.string().trim().optional(),
-})
-
-export async function POST(req: MedusaRequest, res: MedusaResponse) {
-  const parsed = AttachSchema.safeParse(req.body)
-
-  if (!parsed.success) {
-    return res.status(400).json({
-      message: "Invalid rep attribution payload.",
-      errors: parsed.error.flatten(),
-    })
-  }
-
+export async function POST(
+  req: MedusaRequest<AttachSalesPersonBody>,
+  res: MedusaResponse
+) {
   try {
     const { result } = await attachRepAttributionWorkflow(req.scope).run({
-      input: parsed.data,
+      input: req.validatedBody,
     })
 
     return res.status(200).json({

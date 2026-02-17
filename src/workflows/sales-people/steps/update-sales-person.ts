@@ -25,10 +25,7 @@ type SalesPeopleService = {
     selector?: Record<string, unknown>,
     config?: Record<string, unknown>
   ) => Promise<SalesPersonRecord[]>
-  updateSalesPeople: (
-    selector: Record<string, unknown>,
-    data: Record<string, unknown>
-  ) => Promise<SalesPersonRecord>
+  updateSalesPeople: (data: Record<string, unknown>) => Promise<SalesPersonRecord>
 }
 
 type UpdateSalesPersonCompensationInput = {
@@ -36,7 +33,7 @@ type UpdateSalesPersonCompensationInput = {
 }
 
 export const updateSalesPersonStep = createStep(
-  "sales-people.step.update-sales-person",
+  "update-sales-person",
   async (input: UpdateSalesPersonStepInput, { container }) => {
     const salesPeople = container.resolve("salesPeople") as unknown as SalesPeopleService
 
@@ -46,17 +43,35 @@ export const updateSalesPersonStep = createStep(
       throw new Error("Sales person not found.")
     }
 
-    const person = await salesPeople.updateSalesPeople(
-      { id: input.id },
-      {
-        name: input.name,
-        email: input.email,
-        phone: input.phone,
-        rep_code: input.rep_code,
-        active: input.active,
-        notes: input.notes,
-      }
-    )
+    const updateData: Record<string, unknown> = {
+      id: input.id,
+    }
+
+    if (input.name !== undefined) {
+      updateData.name = input.name
+    }
+
+    if (input.email !== undefined) {
+      updateData.email = input.email
+    }
+
+    if (input.phone !== undefined) {
+      updateData.phone = input.phone
+    }
+
+    if (input.rep_code !== undefined) {
+      updateData.rep_code = input.rep_code
+    }
+
+    if (input.active !== undefined) {
+      updateData.active = input.active
+    }
+
+    if (input.notes !== undefined) {
+      updateData.notes = input.notes
+    }
+
+    const person = await salesPeople.updateSalesPeople(updateData)
 
     return new StepResponse(
       person,
@@ -71,16 +86,25 @@ export const updateSalesPersonStep = createStep(
     const salesPeople = container.resolve("salesPeople") as unknown as SalesPeopleService
     const previous = compensationInput.previous_sales_person
 
-    await salesPeople.updateSalesPeople(
-      { id: previous.id },
-      {
-        name: previous.name,
-        email: previous.email ?? null,
-        phone: previous.phone ?? null,
-        rep_code: previous.rep_code,
-        active: previous.active,
-        notes: previous.notes ?? null,
-      }
-    )
+    const compensationData: Record<string, unknown> = {
+      id: previous.id,
+      name: previous.name,
+      rep_code: previous.rep_code,
+      notes: previous.notes ?? null,
+    }
+
+    if (previous.email !== undefined) {
+      compensationData.email = previous.email ?? null
+    }
+
+    if (previous.phone !== undefined) {
+      compensationData.phone = previous.phone ?? null
+    }
+
+    if (previous.active !== undefined) {
+      compensationData.active = previous.active
+    }
+
+    await salesPeople.updateSalesPeople(compensationData)
   }
 )

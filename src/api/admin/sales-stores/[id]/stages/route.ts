@@ -1,27 +1,18 @@
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
-import { z } from "@medusajs/framework/zod"
 import { addSalesStoreStageWorkflow } from "../../../../../workflows/sales-stores"
+import type { AddSalesStoreStageBody } from "./middlewares"
 
-const StageSchema = z.object({
-  stage: z.string().trim().min(1),
-  notes: z.string().optional(),
-})
-
-export async function POST(req: MedusaRequest, res: MedusaResponse) {
-  const parsed = StageSchema.safeParse(req.body)
-
-  if (!parsed.success) {
-    return res.status(400).json({
-      message: "Invalid stage payload.",
-      errors: parsed.error.flatten(),
-    })
-  }
+export async function POST(
+  req: MedusaRequest<AddSalesStoreStageBody>,
+  res: MedusaResponse
+) {
+  const body = req.validatedBody
 
   const { result } = await addSalesStoreStageWorkflow(req.scope).run({
     input: {
       sales_store_id: req.params.id,
-      stage: parsed.data.stage,
-      notes: parsed.data.notes,
+      stage: body.stage,
+      notes: body.notes,
     },
   })
 

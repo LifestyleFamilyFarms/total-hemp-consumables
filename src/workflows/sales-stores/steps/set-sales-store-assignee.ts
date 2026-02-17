@@ -15,10 +15,7 @@ type SalesStoresService = {
     selector?: Record<string, unknown>,
     config?: Record<string, unknown>
   ) => Promise<SalesStoreRecord[]>
-  updateSalesStores: (
-    selector: Record<string, unknown>,
-    data: Record<string, unknown>
-  ) => Promise<SalesStoreRecord>
+  updateSalesStores: (data: Record<string, unknown>) => Promise<SalesStoreRecord>
 }
 
 type SetSalesStoreAssigneeCompensationInput = {
@@ -27,7 +24,7 @@ type SetSalesStoreAssigneeCompensationInput = {
 }
 
 export const setSalesStoreAssigneeStep = createStep(
-  "sales-stores.set-sales-store-assignee",
+  "set-sales-store-assignee",
   async (input: SetSalesStoreAssigneeStepInput, { container }) => {
     const salesStores = container.resolve("salesStores") as SalesStoresService
 
@@ -40,10 +37,10 @@ export const setSalesStoreAssigneeStep = createStep(
       throw new Error("Sales store not found.")
     }
 
-    const store = await salesStores.updateSalesStores(
-      { id: input.sales_store_id },
-      { assigned_sales_person_id: input.sales_person_id ?? null }
-    )
+    const store = await salesStores.updateSalesStores({
+      id: input.sales_store_id,
+      assigned_sales_person_id: input.sales_person_id ?? null,
+    })
 
     return new StepResponse(
       store,
@@ -60,9 +57,9 @@ export const setSalesStoreAssigneeStep = createStep(
 
     const salesStores = container.resolve("salesStores") as SalesStoresService
 
-    await salesStores.updateSalesStores(
-      { id: compensationInput.sales_store_id },
-      { assigned_sales_person_id: compensationInput.previous_sales_person_id }
-    )
+    await salesStores.updateSalesStores({
+      id: compensationInput.sales_store_id,
+      assigned_sales_person_id: compensationInput.previous_sales_person_id,
+    })
   }
 )

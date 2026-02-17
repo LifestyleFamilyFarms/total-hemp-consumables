@@ -8,14 +8,18 @@ type CloneCartStepInput = {
 
 type CartRecord = {
   id: string
-  region_id?: string
-  region?: { id?: string }
+  region_id?: string | null
   sales_channel_id?: string
-  sales_channel?: { id?: string }
   currency_code?: string
   customer_id?: string | null
   email?: string | null
   metadata?: Record<string, unknown>
+}
+
+type CartModuleService = {
+  retrieveCart: (id: string, config?: Record<string, unknown>) => Promise<CartRecord>
+  createCarts: (data: CartTypes.CreateCartDTO) => Promise<Record<string, unknown>>
+  deleteCarts: (id: string | string[]) => Promise<void>
 }
 
 type CloneCartStepOutput = {
@@ -27,48 +31,18 @@ type CloneCartCompensationInput = {
   new_cart_id: string | null
 }
 
-const deleteCartWithFallback = async (
-  cartModule: any,
-  id: string,
-  manager: unknown
-) => {
-  const tx = manager ? cartModule.withTransaction(manager) : cartModule
-  const cartInternalService = tx?.cartService_
-
-  if (!cartInternalService) {
-    return
-  }
-
-  try {
-    if (typeof cartInternalService.delete === "function") {
-      await cartInternalService.delete(id)
-    } else if (typeof cartInternalService.softDelete === "function") {
-      await cartInternalService.softDelete(id)
-    }
-  } catch (error) {
-    if (typeof cartInternalService.delete === "function") {
-      await cartInternalService.delete([id]).catch(() => undefined)
-    } else if (typeof cartInternalService.softDelete === "function") {
-      await cartInternalService.softDelete([id]).catch(() => undefined)
-    }
-  }
-}
-
 export const cloneCartStep = createStep(
-  "carts.step.clone-cart",
+  "clone-cart",
   async (
     input: CloneCartStepInput,
     { container }
   ): Promise<StepResponse<CloneCartStepOutput, CloneCartCompensationInput>> => {
-    const cartModule: any = container.resolve(Modules.CART)
+    const cartModule = container.resolve(Modules.CART) as unknown as CartModuleService
 
-    const existingCart: CartRecord | null = await cartModule
-      .retrieveCart(input.cart_id, {
-        relations: ["region", "sales_channel"],
-      })
-      .catch(() => null)
-
-    if (!existingCart) {
+    let existingCart: CartRecord
+    try {
+      existingCart = await cartModule.retrieveCart(input.cart_id)
+    } catch (error) {
       throw new Error("Cart not found.")
     }
 
@@ -77,17 +51,18 @@ export const cloneCartStep = createStep(
     }
 
     const createPayload: CartTypes.CreateCartDTO = {
-      region_id: existingCart.region_id ?? existingCart.region?.id,
-      sales_channel_id: existingCart.sales_channel_id ?? existingCart.sales_channel?.id,
+      region_id: existingCart.region_id ?? undefined,
+      sales_channel_id: existingCart.sales_channel_id,
       currency_code: existingCart.currency_code,
       customer_id: existingCart.customer_id ?? undefined,
       email: existingCart.email ?? undefined,
       metadata: existingCart.metadata ?? undefined,
     }
 
-    const manager = container.resolve("manager")
-    const tx = cartModule.withTransaction(manager)
-    const newCart = (await tx.createCarts(createPayload)) as Record<string, unknown>
+    const newCart = (await cartModule.createCarts(createPayload)) as Record<
+      string,
+      unknown
+    >
 
     return new StepResponse(
       {
@@ -105,8 +80,7 @@ export const cloneCartStep = createStep(
       return
     }
 
-    const cartModule: any = container.resolve(Modules.CART)
-    const manager = container.resolve("manager")
-    await deleteCartWithFallback(cartModule, compensationInput.new_cart_id, manager)
+    const cartModule = container.resolve(Modules.CART) as unknown as CartModuleService
+    await cartModule.deleteCarts(compensationInput.new_cart_id)
   }
 )

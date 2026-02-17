@@ -6,6 +6,18 @@ loadEnv(process.env.NODE_ENV || 'development', process.cwd());
 const isProd = process.env.NODE_ENV === 'production';
 const dbSslRejectUnauthorized = process.env.DB_SSL_REJECT_UNAUTHORIZED;
 const shipstationEnv = resolveShipstationEnv(process.env.NODE_ENV)
+const redisDisabled = process.env.DISABLE_REDIS_MODULES === "true"
+const sharedRedisUrl = process.env.REDIS_URL
+const cacheRedisUrl = process.env.CACHE_REDIS_URL || sharedRedisUrl
+const eventsRedisUrl = process.env.EVENTS_REDIS_URL || sharedRedisUrl
+const workflowRedisUrl = process.env.WORKFLOW_REDIS_URL || sharedRedisUrl
+const lockingRedisUrl = process.env.LOCKING_REDIS_URL || sharedRedisUrl
+
+const shouldUseRedisSessionStore = !redisDisabled && Boolean(sharedRedisUrl)
+const shouldUseCacheRedis = !redisDisabled && Boolean(cacheRedisUrl)
+const shouldUseEventsRedis = !redisDisabled && Boolean(eventsRedisUrl)
+const shouldUseWorkflowRedis = !redisDisabled && Boolean(workflowRedisUrl)
+const shouldUseRedisLocking = !redisDisabled && Boolean(lockingRedisUrl)
 
 const databaseDriverOptions = (() => {
   if (isProd) {
@@ -41,7 +53,7 @@ module.exports = defineConfig({
     // Use production-ready database settings dynamically
     databaseUrl: process.env.DATABASE_URL,
     databaseName: process.env.DATABASE_NAME,
-    redisUrl: process.env.REDIS_URL,
+    redisUrl: shouldUseRedisSessionStore ? sharedRedisUrl : undefined,
     workerMode: process.env.MEDUSA_WORKER_MODE as "shared" | "worker" | "server",
     http: {
       storeCors: process.env.STORE_CORS!,
@@ -72,31 +84,44 @@ module.exports = defineConfig({
         ]
       }
     },
-    // Redis Cache Module
-    {
-      resolve: '@medusajs/medusa/cache-redis',
-      options: {
-        redisUrl: process.env.CACHE_REDIS_URL,
-      },
-    },
-    // Redis Event Bus Module
-    {
-      resolve: '@medusajs/medusa/event-bus-redis',
-      options: {
-        redisUrl: process.env.EVENTS_REDIS_URL,
-      },
-    },
-    // Workflow Engine Redis Module
-    {
-      resolve: '@medusajs/medusa/workflow-engine-redis',
-      options: {
-        // Keep both keys for compatibility across loader versions.
-        redisUrl: process.env.WORKFLOW_REDIS_URL,
-        redis: {
-          url: process.env.WORKFLOW_REDIS_URL,
-        },
-      },
-    },
+    ...(shouldUseCacheRedis
+      ? [
+          // Redis Cache Module
+          {
+            resolve: '@medusajs/medusa/cache-redis',
+            options: {
+              redisUrl: cacheRedisUrl,
+            },
+          },
+        ]
+      : []),
+    ...(shouldUseEventsRedis
+      ? [
+          // Redis Event Bus Module
+          {
+            resolve: '@medusajs/medusa/event-bus-redis',
+            options: {
+              redisUrl: eventsRedisUrl,
+            },
+          },
+        ]
+      : []),
+    ...(shouldUseWorkflowRedis
+      ? [
+          // Workflow Engine Redis Module
+          {
+            resolve: '@medusajs/medusa/workflow-engine-redis',
+            options: {
+              // Keep both keys for compatibility across loader versions.
+              redisUrl: workflowRedisUrl,
+              redis: {
+                redisUrl: workflowRedisUrl,
+                url: workflowRedisUrl,
+              },
+            },
+          },
+        ]
+      : []),
     // S3 File Module Provider (for production)
     {
       resolve: '@medusajs/medusa/file',
@@ -121,15 +146,22 @@ module.exports = defineConfig({
     {
       resolve: "@medusajs/medusa/locking",
       options:{
-        providers: [
-          {
-            resolve: "@medusajs/medusa/locking-redis",
-            id: "locking-redis",
-            options:{
-              redisUrl: process.env.LOCKING_REDIS_URL
-            }
-          }
-        ]
+        providers: shouldUseRedisLocking
+          ? [
+              {
+                resolve: "@medusajs/medusa/locking-redis",
+                id: "locking-redis",
+                options: {
+                  redisUrl: lockingRedisUrl,
+                },
+              },
+            ]
+          : [
+              {
+                resolve: "@medusajs/medusa/locking-postgres",
+                id: "locking-postgres",
+              },
+            ]
       }
     },
     //SendGrid Notifications

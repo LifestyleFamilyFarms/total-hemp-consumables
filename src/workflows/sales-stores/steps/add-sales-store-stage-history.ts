@@ -16,7 +16,7 @@ type SalesStoresService = {
   createSalesStoreStages: (
     data: Record<string, unknown>
   ) => Promise<SalesStoreStageRecord>
-  deleteSalesStoreStages: (selector: Record<string, unknown>) => Promise<void>
+  deleteSalesStoreStages: (ids: string | string[]) => Promise<void>
 }
 
 type AddSalesStoreStageHistoryCompensationInput = {
@@ -24,7 +24,7 @@ type AddSalesStoreStageHistoryCompensationInput = {
 }
 
 export const addSalesStoreStageHistoryStep = createStep(
-  "sales-stores.add-sales-store-stage-history",
+  "add-sales-store-stage-history",
   async (input: AddSalesStoreStageHistoryStepInput, { container }) => {
     const salesStores = container.resolve("salesStores") as SalesStoresService
 
@@ -48,7 +48,7 @@ export const addSalesStoreStageHistoryStep = createStep(
 
     const salesStores = container.resolve("salesStores") as SalesStoresService
     await salesStores
-      .deleteSalesStoreStages({ id: compensationInput.stage_id })
+      .deleteSalesStoreStages(compensationInput.stage_id)
       .catch(() => undefined)
   }
 )

@@ -34,11 +34,8 @@ type SalesPeopleService = {
   createSalesPersonAssignments: (
     data: Record<string, unknown>
   ) => Promise<SalesPersonAssignmentRecord>
-  updateSalesPersonAssignments: (
-    selector: Record<string, unknown>,
-    data: Record<string, unknown>
-  ) => Promise<SalesPersonAssignmentRecord>
-  deleteSalesPersonAssignments: (selector: Record<string, unknown>) => Promise<void>
+  updateSalesPersonAssignments: (data: Record<string, unknown>) => Promise<SalesPersonAssignmentRecord>
+  deleteSalesPersonAssignments: (ids: string | string[]) => Promise<void>
 }
 
 type SalesStoresService = {
@@ -54,7 +51,7 @@ type UpsertSalesStoreAssignmentCompensationInput = {
 }
 
 export const upsertSalesStoreAssignmentStep = createStep(
-  "sales-people.assignment.upsert-sales-store-assignment",
+  "upsert-sales-store-assignment",
   async (input: UpsertSalesStoreAssignmentStepInput, { container }) => {
     const salesPeople = container.resolve("salesPeople") as unknown as SalesPeopleService
     const salesStores = container.resolve("salesStores") as SalesStoresService
@@ -88,14 +85,12 @@ export const upsertSalesStoreAssignmentStep = createStep(
     let createdAssignmentId: string | null = null
 
     if (existingAssignment) {
-      assignment = await salesPeople.updateSalesPersonAssignments(
-        { id: existingAssignment.id },
-        {
-          sales_person_id: input.sales_person_id,
-          notes: input.notes,
-          assigned_at: assignedAt,
-        }
-      )
+      assignment = await salesPeople.updateSalesPersonAssignments({
+        id: existingAssignment.id,
+        sales_person_id: input.sales_person_id,
+        notes: input.notes,
+        assigned_at: assignedAt,
+      })
     } else {
       assignment = await salesPeople.createSalesPersonAssignments({
         sales_person_id: input.sales_person_id,
@@ -123,22 +118,20 @@ export const upsertSalesStoreAssignmentStep = createStep(
 
     if (compensationInput.previous_assignment) {
       const previous = compensationInput.previous_assignment
-      await salesPeople.updateSalesPersonAssignments(
-        { id: previous.id },
-        {
-          sales_person_id: previous.sales_person_id,
-          notes: previous.notes ?? null,
-          assigned_at: previous.assigned_at
-            ? new Date(previous.assigned_at)
-            : new Date(),
-        }
-      )
+      await salesPeople.updateSalesPersonAssignments({
+        id: previous.id,
+        sales_person_id: previous.sales_person_id,
+        notes: previous.notes ?? null,
+        assigned_at: previous.assigned_at
+          ? new Date(previous.assigned_at)
+          : new Date(),
+      })
       return
     }
 
     if (compensationInput.created_assignment_id) {
       await salesPeople
-        .deleteSalesPersonAssignments({ id: compensationInput.created_assignment_id })
+        .deleteSalesPersonAssignments(compensationInput.created_assignment_id)
         .catch(() => undefined)
     }
   }

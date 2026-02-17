@@ -4,6 +4,14 @@ import {
   MedusaRequest,
   MedusaResponse,
 } from "@medusajs/framework/http"
+import { adminSalesPersonByIdMiddlewares } from "./admin/sales-people/[id]/middlewares"
+import { adminSalesPeopleAssignmentsMiddlewares } from "./admin/sales-people/assignments/middlewares"
+import { adminSalesPeopleUnassignMiddlewares } from "./admin/sales-people/assignments/unassign/middlewares"
+import { adminSalesPeopleMiddlewares } from "./admin/sales-people/middlewares"
+import { adminSalesStoreStagesMiddlewares } from "./admin/sales-stores/[id]/stages/middlewares"
+import { adminSalesStoresBulkMiddlewares } from "./admin/sales-stores/bulk/middlewares"
+import { storeCartResetMiddlewares } from "./store/carts/[id]/reset/middlewares"
+import { storeSalesPeopleAttachMiddlewares } from "./store/sales-people/attach/middlewares"
 
 type AdminUser = {
   id: string
@@ -563,6 +571,14 @@ const repGuard = async (
 
 export default defineMiddlewares({
   routes: [
+    ...adminSalesPeopleMiddlewares,
+    ...adminSalesPersonByIdMiddlewares,
+    ...adminSalesPeopleAssignmentsMiddlewares,
+    ...adminSalesPeopleUnassignMiddlewares,
+    ...adminSalesStoresBulkMiddlewares,
+    ...adminSalesStoreStagesMiddlewares,
+    ...storeSalesPeopleAttachMiddlewares,
+    ...storeCartResetMiddlewares,
     {
       matcher: /^\/admin\/.*/,
       middlewares: [repGuard],

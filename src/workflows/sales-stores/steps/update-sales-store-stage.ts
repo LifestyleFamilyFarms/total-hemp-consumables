@@ -16,10 +16,7 @@ type SalesStoresService = {
     selector?: Record<string, unknown>,
     config?: Record<string, unknown>
   ) => Promise<SalesStoreRecord[]>
-  updateSalesStores: (
-    selector: Record<string, unknown>,
-    data: Record<string, unknown>
-  ) => Promise<SalesStoreRecord>
+  updateSalesStores: (data: Record<string, unknown>) => Promise<SalesStoreRecord>
 }
 
 type UpdateSalesStoreStageStepOutput = {
@@ -34,7 +31,7 @@ type UpdateSalesStoreStageCompensationInput = {
 }
 
 export const updateSalesStoreStageStep = createStep(
-  "sales-stores.update-sales-store-stage",
+  "update-sales-store-stage",
   async (input: UpdateSalesStoreStageStepInput, { container }) => {
     const salesStores = container.resolve("salesStores") as SalesStoresService
     const [existingStore] = await salesStores.listSalesStores(
@@ -47,13 +44,11 @@ export const updateSalesStoreStageStep = createStep(
     }
 
     const stageUpdatedAt = new Date()
-    const store = await salesStores.updateSalesStores(
-      { id: input.sales_store_id },
-      {
-        stage: input.stage,
-        stage_updated_at: stageUpdatedAt,
-      }
-    )
+    const store = await salesStores.updateSalesStores({
+      id: input.sales_store_id,
+      stage: input.stage,
+      stage_updated_at: stageUpdatedAt,
+    })
 
     return new StepResponse(
       {
@@ -73,14 +68,12 @@ export const updateSalesStoreStageStep = createStep(
     }
 
     const salesStores = container.resolve("salesStores") as SalesStoresService
-    await salesStores.updateSalesStores(
-      { id: compensationInput.sales_store_id },
-      {
-        stage: compensationInput.previous_stage,
-        stage_updated_at: compensationInput.previous_stage_updated_at
-          ? new Date(compensationInput.previous_stage_updated_at)
-          : null,
-      }
-    )
+    await salesStores.updateSalesStores({
+      id: compensationInput.sales_store_id,
+      stage: compensationInput.previous_stage,
+      stage_updated_at: compensationInput.previous_stage_updated_at
+        ? new Date(compensationInput.previous_stage_updated_at)
+        : null,
+    })
   }
 )

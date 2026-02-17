@@ -20,7 +20,7 @@ type SalesPeopleService = {
   createSalesPersonAssignments: (
     data: Record<string, unknown>
   ) => Promise<SalesPersonAssignmentRecord>
-  deleteSalesPersonAssignments: (selector: Record<string, unknown>) => Promise<void>
+  deleteSalesPersonAssignments: (ids: string | string[]) => Promise<void>
 }
 
 type UnassignSalesStoreAssignmentCompensationInput = {
@@ -32,7 +32,7 @@ type UnassignSalesStoreAssignmentStepOutput = {
 }
 
 export const unassignSalesStoreAssignmentStep = createStep(
-  "sales-people.assignment.unassign-sales-store-assignment",
+  "unassign-sales-store-assignment",
   async (
     input: UnassignSalesStoreAssignmentStepInput,
     { container }
@@ -56,7 +56,7 @@ export const unassignSalesStoreAssignmentStep = createStep(
       )
     }
 
-    await salesPeople.deleteSalesPersonAssignments({ id: existingAssignment.id })
+    await salesPeople.deleteSalesPersonAssignments(existingAssignment.id)
 
     return new StepResponse(
       { assignment: existingAssignment } as UnassignSalesStoreAssignmentStepOutput,

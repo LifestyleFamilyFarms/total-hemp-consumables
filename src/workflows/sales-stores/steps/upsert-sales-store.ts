@@ -32,11 +32,8 @@ type SalesStoresService = {
     config?: Record<string, unknown>
   ) => Promise<SalesStoreRecord[]>
   createSalesStores: (data: Record<string, unknown>) => Promise<SalesStoreRecord>
-  updateSalesStores: (
-    selector: Record<string, unknown>,
-    data: Record<string, unknown>
-  ) => Promise<SalesStoreRecord>
-  deleteSalesStores: (selector: Record<string, unknown>) => Promise<void>
+  updateSalesStores: (data: Record<string, unknown>) => Promise<SalesStoreRecord>
+  deleteSalesStores: (ids: string | string[]) => Promise<void>
 }
 
 type UpsertSalesStoreStepOutput = {
@@ -54,7 +51,7 @@ type UpsertSalesStoreCompensationInput = {
 }
 
 export const upsertSalesStoreStep = createStep(
-  "sales-stores.step.upsert-sales-store",
+  "upsert-sales-store",
   async (
     input: UpsertSalesStoreStepInput,
     { container }
@@ -88,10 +85,10 @@ export const upsertSalesStoreStep = createStep(
     }
 
     if (existingStore) {
-      const updatedStore = await salesStores.updateSalesStores(
-        { id: existingStore.id },
-        payload
-      )
+      const updatedStore = await salesStores.updateSalesStores({
+        id: existingStore.id,
+        ...payload,
+      })
 
       return new StepResponse(
         ({
@@ -135,7 +132,7 @@ export const upsertSalesStoreStep = createStep(
 
     if (compensationInput.created_store_id) {
       await salesStores
-        .deleteSalesStores({ id: compensationInput.created_store_id })
+        .deleteSalesStores(compensationInput.created_store_id)
         .catch(() => undefined)
       return
     }
@@ -146,22 +143,20 @@ export const upsertSalesStoreStep = createStep(
 
     const previousStore = compensationInput.previous_store
 
-    await salesStores.updateSalesStores(
-      { id: previousStore.id },
-      {
-        name: previousStore.name ?? null,
-        address: previousStore.address,
-        normalized_address: previousStore.normalized_address,
-        lat: previousStore.lat ?? null,
-        lng: previousStore.lng ?? null,
-        source: previousStore.source ?? null,
-        stage: previousStore.stage ?? null,
-        stage_updated_at: previousStore.stage_updated_at
-          ? new Date(previousStore.stage_updated_at)
-          : null,
-        notes: previousStore.notes ?? null,
-        assigned_sales_person_id: previousStore.assigned_sales_person_id ?? null,
-      }
-    )
+    await salesStores.updateSalesStores({
+      id: previousStore.id,
+      name: previousStore.name ?? null,
+      address: previousStore.address,
+      normalized_address: previousStore.normalized_address,
+      lat: previousStore.lat ?? null,
+      lng: previousStore.lng ?? null,
+      source: previousStore.source ?? null,
+      stage: previousStore.stage ?? null,
+      stage_updated_at: previousStore.stage_updated_at
+        ? new Date(previousStore.stage_updated_at)
+        : null,
+      notes: previousStore.notes ?? null,
+      assigned_sales_person_id: previousStore.assigned_sales_person_id ?? null,
+    })
   }
 )

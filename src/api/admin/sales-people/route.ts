@@ -1,15 +1,6 @@
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
-import { z } from "@medusajs/framework/zod"
 import { createSalesPersonWorkflow } from "../../../workflows/sales-people"
-
-const SalesPersonSchema = z.object({
-  name: z.string().trim().min(1),
-  email: z.string().trim().optional(),
-  phone: z.string().trim().optional(),
-  rep_code: z.string().trim().min(1),
-  active: z.boolean().optional(),
-  notes: z.string().optional(),
-})
+import type { CreateSalesPersonBody } from "./middlewares"
 
 export async function GET(req: MedusaRequest, res: MedusaResponse) {
   try {
@@ -36,19 +27,13 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
   }
 }
 
-export async function POST(req: MedusaRequest, res: MedusaResponse) {
-  const parsed = SalesPersonSchema.safeParse(req.body)
-
-  if (!parsed.success) {
-    return res.status(400).json({
-      message: "Invalid sales person payload.",
-      errors: parsed.error.flatten(),
-    })
-  }
-
+export async function POST(
+  req: MedusaRequest<CreateSalesPersonBody>,
+  res: MedusaResponse
+) {
   try {
     const { result } = await createSalesPersonWorkflow(req.scope).run({
-      input: parsed.data,
+      input: req.validatedBody,
     })
 
     return res.status(200).json({ person: result.person })

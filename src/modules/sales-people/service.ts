@@ -7,16 +7,15 @@ class SalesPeopleModuleService extends MedusaService({
   SalesPersonAssignment,
 }) {
   async resolveByRepCode(repCode: string) {
-    const listSalesPeople = (
+    const [person] = await (
       this as unknown as {
         listSalesPeople: (
           selector?: Record<string, unknown>,
           config?: Record<string, unknown>
         ) => Promise<unknown[]>
       }
-    ).listSalesPeople
+    ).listSalesPeople({ rep_code: repCode }, { take: 1 })
 
-    const [person] = await listSalesPeople({ rep_code: repCode }, { take: 1 })
     return person || null
   }
 }

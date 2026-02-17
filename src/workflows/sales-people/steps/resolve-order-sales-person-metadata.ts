@@ -38,7 +38,7 @@ export type ResolveOrderSalesPersonMetadataStepOutput = {
 }
 
 export const resolveOrderSalesPersonMetadataStep = createStep(
-  "sales-people.step.resolve-order-sales-person-metadata",
+  "resolve-order-sales-person-metadata",
   async (input: ResolveOrderSalesPersonMetadataStepInput, { container }) => {
     const orderService = container.resolve("order") as OrderService
     const cartService = container.resolve("cart") as CartService

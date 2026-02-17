@@ -21,7 +21,7 @@ type SalesPersonRecord = {
 
 type SalesPeopleService = {
   createSalesPeople: (data: Record<string, unknown>) => Promise<SalesPersonRecord>
-  deleteSalesPeople: (selector: Record<string, unknown>) => Promise<void>
+  deleteSalesPeople: (ids: string | string[]) => Promise<void>
 }
 
 type CreateSalesPersonCompensationInput = {
@@ -29,7 +29,7 @@ type CreateSalesPersonCompensationInput = {
 }
 
 export const createSalesPersonStep = createStep(
-  "sales-people.step.create-sales-person",
+  "create-sales-person",
   async (input: CreateSalesPersonStepInput, { container }) => {
     const salesPeople = container.resolve("salesPeople") as unknown as SalesPeopleService
 
@@ -48,7 +48,7 @@ export const createSalesPersonStep = createStep(
     const salesPeople = container.resolve("salesPeople") as unknown as SalesPeopleService
 
     await salesPeople
-      .deleteSalesPeople({ id: compensationInput.created_sales_person_id })
+      .deleteSalesPeople(compensationInput.created_sales_person_id)
       .catch(() => undefined)
   }
 )

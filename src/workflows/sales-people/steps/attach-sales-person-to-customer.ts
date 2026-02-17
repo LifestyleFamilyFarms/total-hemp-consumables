@@ -25,7 +25,7 @@ type AttachSalesPersonToCustomerStepOutput = {
 }
 
 export const attachSalesPersonToCustomerStep = createStep(
-  "sales-people.step.attach-sales-person-to-customer",
+  "attach-sales-person-to-customer",
   async (
     input: AttachSalesPersonToCustomerStepInput,
     { container }

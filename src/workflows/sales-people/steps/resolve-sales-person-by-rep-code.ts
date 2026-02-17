@@ -15,7 +15,7 @@ type SalesPeopleService = {
 }
 
 export const resolveSalesPersonByRepCodeStep = createStep(
-  "sales-people.step.resolve-sales-person-by-rep-code",
+  "resolve-sales-person-by-rep-code",
   async (input: ResolveSalesPersonByRepCodeStepInput, { container }) => {
     const salesPeople = container.resolve("salesPeople") as unknown as SalesPeopleService
 
