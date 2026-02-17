@@ -46,9 +46,9 @@ const formatMoney = (amount?: number, currency?: string) => {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: currency.toUpperCase(),
-    }).format(amount / 100)
+    }).format(amount)
   } catch (error) {
-    return `${amount / 100} ${currency?.toUpperCase()}`
+    return `${amount} ${currency?.toUpperCase()}`
   }
 }
 

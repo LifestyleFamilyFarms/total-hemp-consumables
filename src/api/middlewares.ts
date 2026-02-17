@@ -4,6 +4,10 @@ import {
   MedusaRequest,
   MedusaResponse,
 } from "@medusajs/framework/http"
+import {
+  ContainerRegistrationKeys,
+  remoteQueryObjectFromString,
+} from "@medusajs/framework/utils"
 import { adminSalesPersonByIdMiddlewares } from "./admin/sales-people/[id]/middlewares"
 import { adminSalesPeopleAssignmentsMiddlewares } from "./admin/sales-people/assignments/middlewares"
 import { adminSalesPeopleUnassignMiddlewares } from "./admin/sales-people/assignments/unassign/middlewares"
@@ -85,6 +89,9 @@ const getPath = (req: MedusaRequest) => {
 
 const toSegments = (path: string) => path.split("/").filter(Boolean)
 
+const getRepDefaultStockLocationId = () =>
+  (process.env.REP_DEFAULT_STOCK_LOCATION_ID || "").trim()
+
 const getRequestId = (req: MedusaRequest) => {
   const header =
     (req.headers?.["x-request-id"] as string | undefined) ||
@@ -123,6 +130,14 @@ const isAllowedForRep = (path: string) => {
   if (path.startsWith("/admin/sales-reports/orders-by-rep")) return true
   if (path === "/admin/sales-people") return true
   if (path.startsWith("/admin/customers")) return true
+  if (path.startsWith("/admin/regions")) return true
+  if (path.startsWith("/admin/sales-channels")) return true
+  if (path.startsWith("/admin/product-variants")) return true
+  if (path.startsWith("/admin/shipping-options")) return true
+  if (path.startsWith("/admin/stock-locations")) return true
+  if (path.startsWith("/admin/promotions")) return true
+  if (path === "/admin/users/me") return true
+  if (path.startsWith("/admin/users/")) return true
   return false
 }
 
@@ -248,7 +263,28 @@ const ensureStoreOwnershipByAddress = async (
   return store.assigned_sales_person_id === salesPersonId
 }
 
-const repGuard = async (
+const stockLocationExists = async (req: MedusaRequest, locationId: string) => {
+  if (!locationId) {
+    return false
+  }
+
+  const remoteQuery = req.scope.resolve(
+    ContainerRegistrationKeys.REMOTE_QUERY
+  ) as (query: unknown) => Promise<Array<{ id: string }>>
+
+  const query = remoteQueryObjectFromString({
+    entryPoint: "stock_location",
+    variables: {
+      filters: { id: locationId },
+    },
+    fields: ["id"],
+  })
+
+  const stockLocations = await remoteQuery(query)
+  return stockLocations.some((location) => location.id === locationId)
+}
+
+export const repGuard = async (
   req: MedusaRequest,
   res: MedusaResponse,
   next: MedusaNextFunction
@@ -393,6 +429,48 @@ const repGuard = async (
         message: "Sales reps can only access their own orders.",
       })
     }
+
+    if (isWriteMethod(req.method)) {
+      const isCreateFulfillment =
+        req.method === "POST" &&
+        segments.length === 4 &&
+        segments[3] === "fulfillments"
+
+      if (!isCreateFulfillment) {
+        return res.status(403).json({
+          message:
+            "Sales reps can only create fulfillments for their own orders.",
+        })
+      }
+
+      const defaultStockLocationId = getRepDefaultStockLocationId()
+      const body = (req.body || {}) as Record<string, unknown>
+
+      if (defaultStockLocationId) {
+        body.location_id = defaultStockLocationId
+      } else {
+        const requestedLocationId =
+          typeof body.location_id === "string" ? body.location_id.trim() : ""
+
+        if (!requestedLocationId) {
+          return res.status(400).json({
+            message:
+              "A stock location must be selected before creating fulfillment.",
+          })
+        }
+
+        const locationFound = await stockLocationExists(req, requestedLocationId)
+        if (!locationFound) {
+          return res.status(400).json({
+            message: "Selected stock location is invalid.",
+          })
+        }
+
+        body.location_id = requestedLocationId
+      }
+
+      req.body = body
+    }
   }
 
   if (path.startsWith("/admin/rep-orders")) {
@@ -461,6 +539,96 @@ const repGuard = async (
     }
   }
 
+  if (path.startsWith("/admin/regions")) {
+    if (req.method !== "GET") {
+      return res.status(403).json({
+        message: "Sales reps can only view regions.",
+      })
+    }
+  }
+
+  if (path.startsWith("/admin/sales-channels")) {
+    if (req.method !== "GET") {
+      return res.status(403).json({
+        message: "Sales reps can only view sales channels.",
+      })
+    }
+  }
+
+  if (path.startsWith("/admin/product-variants")) {
+    if (req.method !== "GET") {
+      return res.status(403).json({
+        message: "Sales reps can only view product variants.",
+      })
+    }
+  }
+
+  if (path.startsWith("/admin/shipping-options")) {
+    if (req.method !== "GET") {
+      return res.status(403).json({
+        message: "Sales reps can only view shipping options.",
+      })
+    }
+  }
+
+  if (path.startsWith("/admin/stock-locations")) {
+    if (req.method !== "GET") {
+      return res.status(403).json({
+        message: "Sales reps can only view stock locations.",
+      })
+    }
+
+    const defaultStockLocationId = getRepDefaultStockLocationId()
+
+    if (defaultStockLocationId) {
+      const segments = toSegments(path)
+      const locationId = segments[2]
+      if (locationId && locationId !== defaultStockLocationId) {
+        return res.status(403).json({
+          message: "Sales reps can only access the default stock location.",
+        })
+      }
+
+      if (!locationId) {
+        const query = (req.query || {}) as Record<string, unknown>
+        query.id = defaultStockLocationId
+        ;(req as unknown as { query: Record<string, unknown> }).query = query
+      }
+    }
+  }
+
+  if (path.startsWith("/admin/promotions")) {
+    if (req.method !== "GET") {
+      return res.status(403).json({
+        message: "Sales reps can only view promotions.",
+      })
+    }
+  }
+
+  if (path === "/admin/users/me") {
+    if (req.method !== "GET") {
+      return res.status(403).json({
+        message: "Sales reps can only view their own user profile.",
+      })
+    }
+  }
+
+  if (path.startsWith("/admin/users/") && path !== "/admin/users/me") {
+    if (req.method !== "GET") {
+      return res.status(403).json({
+        message: "Sales reps can only view their own user profile.",
+      })
+    }
+
+    const segments = toSegments(path)
+    const requestedUserId = segments[2]
+    if (!requestedUserId || requestedUserId !== user?.id) {
+      return res.status(403).json({
+        message: "Sales reps can only access their own user profile.",
+      })
+    }
+  }
+
   if (path === "/admin/sales-stores" && req.method === "GET") {
     const query = (req.query || {}) as Record<string, unknown>
     query.sales_person_id = salesPersonId
@@ -513,9 +681,14 @@ const repGuard = async (
 
     if (!customerMatch) {
       if (req.method === "GET") {
-        return res.status(403).json({
-          message: "Sales reps can only access assigned customers directly.",
-        })
+        const query = (req.query || {}) as Record<string, unknown>
+        query.sales_person_id = salesPersonId
+        query.metadata = {
+          ...(typeof query.metadata === "object" && query.metadata ? query.metadata : {}),
+          sales_person_id: salesPersonId,
+        }
+        ;(req as unknown as { query: Record<string, unknown> }).query = query
+        return next()
       }
 
       if (req.method === "POST") {
@@ -536,6 +709,10 @@ const repGuard = async (
         }
         return next()
       }
+
+      return res.status(403).json({
+        message: "Sales reps can only list or create assigned customers.",
+      })
     }
 
     if (customerMatch) {
@@ -566,7 +743,14 @@ const repGuard = async (
     path.startsWith("/admin/orders") ||
     path.startsWith("/admin/draft-orders") ||
     path.startsWith("/admin/sales-stores") ||
-    path.startsWith("/admin/customers")
+    path.startsWith("/admin/customers") ||
+    path.startsWith("/admin/regions") ||
+    path.startsWith("/admin/sales-channels") ||
+    path.startsWith("/admin/product-variants") ||
+    path.startsWith("/admin/shipping-options") ||
+    path.startsWith("/admin/stock-locations") ||
+    path.startsWith("/admin/promotions") ||
+    path.startsWith("/admin/users")
 
   if (shouldLog) {
     logRepAction({
