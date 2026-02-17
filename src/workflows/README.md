@@ -6,6 +6,15 @@ The workflow is created in a TypeScript or JavaScript file under the `src/workfl
 
 > Learn more about workflows in [this documentation](https://docs.medusajs.com/learn/fundamentals/workflows).
 
+## Conventions
+
+Use domain-oriented folders so workflows stay discoverable as the codebase grows.
+
+- Workflow compositions: `src/workflows/<domain>/*.ts`
+- Workflow steps: `src/workflows/<domain>/steps/*.ts`
+- Domain exports: `src/workflows/<domain>/index.ts`
+- Workflow and step IDs should be namespaced by domain (for example, `sales-stores.upsert-sales-store`).
+
 For example:
 
 ```ts

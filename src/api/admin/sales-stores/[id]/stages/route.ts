@@ -1,5 +1,6 @@
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { z } from "@medusajs/framework/zod"
+import { addSalesStoreStageWorkflow } from "../../../../../workflows/sales-stores"
 
 const StageSchema = z.object({
   stage: z.string().trim().min(1),
@@ -16,17 +17,15 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
     })
   }
 
-  const service = req.scope.resolve("salesStores") as {
-    addStage: (storeId: string, stage: string, notes?: string) => Promise<unknown>
-  }
+  const { result } = await addSalesStoreStageWorkflow(req.scope).run({
+    input: {
+      sales_store_id: req.params.id,
+      stage: parsed.data.stage,
+      notes: parsed.data.notes,
+    },
+  })
 
-  const store = await service.addStage(
-    req.params.id,
-    parsed.data.stage,
-    parsed.data.notes
-  )
-
-  return res.status(200).json({ store })
+  return res.status(200).json({ store: result.store })
 }
 
 export async function GET(req: MedusaRequest, res: MedusaResponse) {

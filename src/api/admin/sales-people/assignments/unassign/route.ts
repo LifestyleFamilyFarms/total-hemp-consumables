@@ -1,5 +1,6 @@
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { z } from "@medusajs/framework/zod"
+import { unassignSalesStoreWorkflow } from "../../../../../workflows/sales-people"
 
 const UnassignSchema = z.object({
   sales_store_id: z.string().trim().min(1),
@@ -15,16 +16,11 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
     })
   }
 
-  const salesPeople = req.scope.resolve("salesPeople") as {
-    unassignStore: (salesStoreId: string) => Promise<unknown>
-  }
-
-  const salesStores = req.scope.resolve("salesStores") as {
-    assignSalesPerson: (storeId: string, salesPersonId?: string) => Promise<unknown>
-  }
-
-  await salesPeople.unassignStore(parsed.data.sales_store_id)
-  await salesStores.assignSalesPerson(parsed.data.sales_store_id, undefined)
+  await unassignSalesStoreWorkflow(req.scope).run({
+    input: {
+      sales_store_id: parsed.data.sales_store_id,
+    },
+  })
 
   return res.status(200).json({ success: true })
 }

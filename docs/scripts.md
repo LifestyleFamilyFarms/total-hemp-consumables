@@ -6,6 +6,8 @@ This file documents the backend scripts. Run them from the backend directory:
 cd total-hemp-consumables
 ```
 
+For end-to-end media operating rules, see `docs/image-asset-management.md`.
+
 ## Core
 - `build` — Compile Medusa server (used for prod builds)
 - `start` — Start Medusa in prod mode
@@ -24,6 +26,28 @@ cd total-hemp-consumables
 - `seed:dev` — Same as `seed:prod` but for DEV; also sets variants non‑blocking for demos (`manage_inventory=false`, `allow_backorder=true`).
   - `NODE_ENV=development ts-node ./src/scripts/seed-remote.ts`
   - Requires `MEDUSA_DEV_BACKEND_URL` and `MEDUSA_DEV_ADMIN_TOKEN`
+- `media:prepare` — Build `product-media.tsv` and `variant-media.tsv` from the local media tree (`docs/thc-site-pictures` by default) and normalize known SKU folder mismatches.
+  - `ts-node ./src/scripts/prepare-media-manifests.ts`
+  - Writes `docs/media-prepare-report.json` with missing assets/anomalies.
+- `media:prepare:dry` — Dry-run media manifest prep (no file changes).
+  - `MEDIA_PREP_DRY_RUN=1 ts-node ./src/scripts/prepare-media-manifests.ts`
+- `media:sync` — Upload local files directly to S3 and assign product/variant media URLs through Admin API. Dry-run by default.
+  - `ts-node ./src/scripts/sync-media-to-s3.ts`
+  - Requires S3 env vars (`S3_BUCKET`, `S3_REGION`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`) and media mapping TSVs.
+- `media:sync:dev` / `media:sync:dev:apply` — Same sync targeting DEV explicitly (`MEDIA_TARGET_ENV=dev`).
+- `media:sync:prod` / `media:sync:prod:apply` — Same sync targeting PROD explicitly (`MEDIA_TARGET_ENV=prod`).
+- `media:sync:apply` — Apply mode for media sync.
+  - `MEDIA_DRY_RUN=0 ts-node ./src/scripts/sync-media-to-s3.ts`
+  - See `docs/media-sync-guide.md` for setup and TSV templates.
+- `media:s3:gc` — Dry-run garbage collection for S3 media keys under `catalog/products` (or `MEDIA_GC_PREFIX`), keeping only URLs currently referenced by Medusa products/variants.
+  - `ts-node ./src/scripts/gc-media-s3.ts`
+  - Writes `docs/media-s3-gc-dry-run.json` and `docs/media-s3-gc-dry-run.log`.
+- `media:s3:gc:dev` / `media:s3:gc:dev:apply` — Same GC targeting DEV explicitly (`MEDIA_TARGET_ENV=dev`).
+- `media:s3:gc:prod` / `media:s3:gc:prod:apply` — Same GC targeting PROD explicitly (`MEDIA_TARGET_ENV=prod`).
+- `media:s3:gc:apply` — Apply mode for S3 media garbage collection.
+  - `MEDIA_GC_DRY_RUN=0 ts-node ./src/scripts/gc-media-s3.ts`
+  - Safety guard: apply aborts when `referenced_urls=0` unless `MEDIA_GC_ALLOW_ZERO_REFERENCES=1`.
+  - Writes `docs/media-s3-gc.json` and `docs/media-s3-gc.log`.
 - `mirror:dev` — Mirror catalog from PROD → DEV via Admin API (types/categories/products/variants/prices/metadata/images).
   - `ts-node ./src/scripts/mirror-prod-to-dev.ts`
   - Requires both PROD and DEV URL/token envs

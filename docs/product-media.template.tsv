@@ -1,0 +1,3 @@
+product_handle	thumbnail_file	image_files	replace_images
+cbd-tincture-fso	cbd-tincture-fso/thumb.jpg	cbd-tincture-fso/front.jpg,cbd-tincture-fso/back.jpg	TRUE
+thc-gummies	thc-gummies/thumb.jpg	thc-gummies/full-1.jpg,thc-gummies/full-2.jpg	TRUE
