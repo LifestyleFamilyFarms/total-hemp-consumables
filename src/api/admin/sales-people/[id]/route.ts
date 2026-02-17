@@ -18,6 +18,12 @@ export async function POST(
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Failed to update sales person."
+    if (
+      message.toLowerCase().includes("duplicate") ||
+      message.includes("IDX_sales_person_rep_code_unique")
+    ) {
+      return res.status(409).json({ message: "Rep code already exists." })
+    }
     const friendly = message.includes("relation") && message.includes("sales_person")
       ? "Sales People tables are missing. Run migrations for salesPeople."
       : message

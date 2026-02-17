@@ -2,12 +2,14 @@ import { createStep, StepResponse } from "@medusajs/framework/workflows-sdk"
 
 type AttachSalesPersonToCartStepInput = {
   cart_id?: string
+  customer_id?: string
   sales_person_id: string
   sales_person_code: string
 }
 
 type CartRecord = {
   metadata?: Record<string, unknown>
+  customer_id?: string | null
 }
 
 type CartService = {
@@ -42,6 +44,19 @@ export const attachSalesPersonToCartStep = createStep(
     const cartService = container.resolve("cart") as CartService
     const cart = await cartService.retrieveCart(input.cart_id)
     const previousMetadata = { ...(cart?.metadata || {}) }
+    const cartCustomerId =
+      typeof cart?.customer_id === "string" ? cart.customer_id : ""
+
+    if (cartCustomerId) {
+      const providedCustomerId =
+        typeof input.customer_id === "string" ? input.customer_id : ""
+
+      if (!providedCustomerId || providedCustomerId !== cartCustomerId) {
+        throw new Error(
+          "Cart customer mismatch. Use the authenticated customer's cart."
+        )
+      }
+    }
 
     await cartService.updateCarts(input.cart_id, {
       metadata: {

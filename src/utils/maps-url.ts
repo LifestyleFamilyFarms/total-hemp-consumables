@@ -40,8 +40,9 @@ export const buildMapsSegments = (
   while (cursor < stops.length - 1) {
     let endIndex = Math.min(cursor + waypointLimit + 1, stops.length - 1)
     let url = ""
+    let fitsInLimit = false
 
-    while (endIndex > cursor) {
+    while (endIndex > cursor + 1) {
       const waypoints = stops
         .slice(cursor + 1, endIndex)
         .map((stop) => stop.address)
@@ -53,10 +54,17 @@ export const buildMapsSegments = (
       )
 
       if (url.length <= MAX_URL_LENGTH) {
+        fitsInLimit = true
         break
       }
 
       endIndex -= 1
+    }
+
+    if (!fitsInLimit) {
+      // Always advance at least one edge to avoid non-progress loops on very long addresses.
+      endIndex = Math.min(cursor + 1, stops.length - 1)
+      url = buildUrl(stops[cursor].address, stops[endIndex].address, [])
     }
 
     segments.push({

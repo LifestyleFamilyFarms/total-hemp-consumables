@@ -7,6 +7,7 @@ class SalesPeopleModuleService extends MedusaService({
   SalesPersonAssignment,
 }) {
   async resolveByRepCode(repCode: string) {
+    const normalizedRepCode = repCode.trim()
     const [person] = await (
       this as unknown as {
         listSalesPeople: (
@@ -14,7 +15,13 @@ class SalesPeopleModuleService extends MedusaService({
           config?: Record<string, unknown>
         ) => Promise<unknown[]>
       }
-    ).listSalesPeople({ rep_code: repCode }, { take: 1 })
+    ).listSalesPeople(
+      {
+        rep_code: { $ilike: normalizedRepCode },
+        active: true,
+      },
+      { take: 1 }
+    )
 
     return person || null
   }

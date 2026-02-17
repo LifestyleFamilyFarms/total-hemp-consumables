@@ -17,12 +17,12 @@ type AdminUser = {
 
 const resolveAdminUser = async (req: MedusaRequest): Promise<AdminUser | null> => {
   const directUser = (req as { user?: AdminUser }).user
-  if (directUser?.metadata) {
+  if (directUser) {
     return directUser
   }
 
   const authUser = (req as { auth?: { user?: AdminUser } }).auth?.user
-  if (authUser?.metadata) {
+  if (authUser) {
     return authUser
   }
 
@@ -77,6 +77,13 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
   }
 
   const user = await resolveAdminUser(req)
+  const actorId = (req as { auth_context?: { actor_id?: string } })?.auth_context
+    ?.actor_id
+  if (actorId && !user) {
+    return res.status(403).json({
+      message: "Unable to resolve user context for this request.",
+    })
+  }
   const repSalesPersonId = resolveRepSalesPersonId(user)
   const q = typeof req.query?.q === "string" ? req.query.q.trim() : ""
   const take = Math.min(Number(req.query?.take || 50) || 50, 200)
@@ -127,9 +134,12 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
       ? await customerService.countCustomers(selector)
       : filtered.length
 
+  const adjustedTotal =
+    salesPersonId && filtered.length !== customers.length ? filtered.length : total
+
   return res.status(200).json({
     customers: filtered,
-    total,
+    total: adjustedTotal,
     take,
     skip,
   })

@@ -2,6 +2,7 @@ import { createStep, StepResponse } from "@medusajs/framework/workflows-sdk"
 
 type AttachSalesPersonToCustomerStepInput = {
   customer_id?: string
+  cart_id?: string
   sales_person_id: string
   sales_person_code: string
 }
@@ -13,6 +14,14 @@ type CustomerRecord = {
 type CustomerService = {
   retrieveCustomer: (id: string) => Promise<CustomerRecord>
   updateCustomers: (id: string, data: Record<string, unknown>) => Promise<unknown>
+}
+
+type CartRecord = {
+  customer_id?: string | null
+}
+
+type CartService = {
+  retrieveCart: (id: string) => Promise<CartRecord>
 }
 
 type AttachSalesPersonToCustomerCompensationInput = {
@@ -42,7 +51,24 @@ export const attachSalesPersonToCustomerStep = createStep(
       )
     }
 
+    if (!input.cart_id) {
+      throw new Error(
+        "cart_id is required when attaching sales metadata to a customer."
+      )
+    }
+
     const customerService = container.resolve("customer") as CustomerService
+    const cartService = container.resolve("cart") as CartService
+    const cart = await cartService.retrieveCart(input.cart_id)
+    const cartCustomerId =
+      typeof cart?.customer_id === "string" ? cart.customer_id : ""
+
+    if (!cartCustomerId || cartCustomerId !== input.customer_id) {
+      throw new Error(
+        "Customer does not match cart. Use the authenticated customer's cart."
+      )
+    }
+
     const customer = await customerService.retrieveCustomer(input.customer_id)
     const previousMetadata = { ...(customer?.metadata || {}) }
 

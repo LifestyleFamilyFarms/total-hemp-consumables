@@ -18,12 +18,14 @@ const attachRepAttributionWorkflow = createWorkflow(
 
     attachSalesPersonToCartStep({
       cart_id: input.cart_id,
+      customer_id: input.customer_id,
       sales_person_id: person.id,
       sales_person_code: person.rep_code,
     })
 
     attachSalesPersonToCustomerStep({
       customer_id: input.customer_id,
+      cart_id: input.cart_id,
       sales_person_id: person.id,
       sales_person_code: person.rep_code,
     })

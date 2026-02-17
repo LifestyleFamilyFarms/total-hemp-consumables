@@ -36,4 +36,21 @@ describe("buildMapsSegments", () => {
     expect(buildMapsSegments([], 3)).toEqual([])
     expect(buildMapsSegments([{ address: "Only" }], 3)).toEqual([])
   })
+
+  it("always progresses for oversized addresses", () => {
+    const long = "A".repeat(3000)
+    const stops = [
+      { address: `${long}-start` },
+      { address: `${long}-middle` },
+      { address: `${long}-end` },
+    ]
+
+    const segments = buildMapsSegments(stops, 10)
+
+    expect(segments.length).toBeGreaterThan(0)
+    segments.forEach((segment) => {
+      expect(segment.stopCount).toBeGreaterThanOrEqual(2)
+      expect(segment.url).toContain("google.com/maps/dir")
+    })
+  })
 })

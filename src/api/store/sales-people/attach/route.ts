@@ -21,6 +21,13 @@ export async function POST(
     if (message.includes("Sales person not found")) {
       return res.status(404).json({ message: "Sales person not found." })
     }
+    if (
+      message.includes("Cart customer mismatch") ||
+      message.includes("Customer does not match cart") ||
+      message.includes("cart_id is required")
+    ) {
+      return res.status(400).json({ message })
+    }
     return res.status(500).json({ message })
   }
 }
