@@ -1,5 +1,6 @@
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { z } from "@medusajs/framework/zod"
+import { updateSalesPersonWorkflow } from "../../../../workflows/sales-people"
 
 const SalesPersonUpdateSchema = z.object({
   name: z.string().trim().min(1).optional(),
@@ -21,19 +22,14 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
   }
 
   try {
-    const service = req.scope.resolve("salesPeople") as unknown as {
-      updateSalesPeople: (
-        selector: Record<string, unknown>,
-        input: Record<string, unknown>
-      ) => Promise<unknown>
-    }
+    const { result } = await updateSalesPersonWorkflow(req.scope).run({
+      input: {
+        id: req.params.id,
+        ...parsed.data,
+      },
+    })
 
-    const person = await service.updateSalesPeople(
-      { id: req.params.id },
-      parsed.data
-    )
-
-    return res.status(200).json({ person })
+    return res.status(200).json({ person: result.person })
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Failed to update sales person."

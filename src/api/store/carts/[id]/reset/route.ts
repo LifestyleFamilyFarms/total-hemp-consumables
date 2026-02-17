@@ -1,6 +1,5 @@
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
-import { Modules } from "@medusajs/framework/utils"
-import type { CartTypes } from "@medusajs/framework/types"
+import { resetCartWorkflow } from "../../../../../workflows/carts"
 
 export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
   const { id } = req.params as { id: string }
@@ -10,58 +9,19 @@ export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
     return
   }
 
-  const cartModule: any = req.scope.resolve(Modules.CART)
-
-  const existingCart = await cartModule
-    .retrieveCart(id, {
-      relations: ["region", "sales_channel"],
+  try {
+    const { result } = await resetCartWorkflow(req.scope).run({
+      input: { cart_id: id },
     })
-    .catch(() => null)
 
-  if (!existingCart) {
-    res.status(404).json({ message: "Cart not found" })
+    res.status(200).json(result)
     return
-  }
-
-  const createPayload: CartTypes.CreateCartDTO = {
-    region_id:
-      existingCart.region_id ??
-      (existingCart.region?.id as string | undefined),
-    sales_channel_id:
-      existingCart.sales_channel_id ??
-      (existingCart.sales_channel?.id as string | undefined),
-    currency_code: existingCart.currency_code,
-    customer_id: existingCart.customer_id ?? undefined,
-    email: existingCart.email ?? undefined,
-    metadata: existingCart.metadata ?? undefined,
-  }
-
-  const manager = req.scope.resolve("manager")
-  const tx = cartModule.withTransaction(manager)
-
-  const newCart = await tx.createCarts(createPayload)
-
-  const cartInternalService = tx?.cartService_
-
-  if (cartInternalService) {
-    try {
-      if (typeof cartInternalService.delete === "function") {
-        await cartInternalService.delete(id)
-      } else if (typeof cartInternalService.softDelete === "function") {
-        await cartInternalService.softDelete(id)
-      }
-    } catch (e) {
-      if (typeof cartInternalService.delete === "function") {
-        await cartInternalService.delete([id]).catch(() => undefined)
-      } else if (typeof cartInternalService.softDelete === "function") {
-        await cartInternalService.softDelete([id]).catch(() => undefined)
-      }
-      // swallow errors to avoid blocking cart reset
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Failed to reset cart."
+    if (message.includes("Cart not found")) {
+      res.status(404).json({ message: "Cart not found" })
+      return
     }
+    res.status(500).json({ message })
   }
-
-  res.status(200).json({
-    cart: newCart,
-    previous_cart_id: id,
-  })
 }

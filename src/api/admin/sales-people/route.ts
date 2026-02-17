@@ -1,5 +1,6 @@
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { z } from "@medusajs/framework/zod"
+import { createSalesPersonWorkflow } from "../../../workflows/sales-people"
 
 const SalesPersonSchema = z.object({
   name: z.string().trim().min(1),
@@ -46,13 +47,11 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
   }
 
   try {
-    const service = req.scope.resolve("salesPeople") as unknown as {
-      createSalesPeople: (input: Record<string, unknown>) => Promise<unknown>
-    }
+    const { result } = await createSalesPersonWorkflow(req.scope).run({
+      input: parsed.data,
+    })
 
-    const person = await service.createSalesPeople(parsed.data)
-
-    return res.status(200).json({ person })
+    return res.status(200).json({ person: result.person })
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Failed to create sales person."

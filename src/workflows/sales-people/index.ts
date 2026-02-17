@@ -1,2 +1,6 @@
 export { default as assignSalesStoreWorkflow } from "./assign-sales-store"
+export { default as attachRepAttributionWorkflow } from "./attach-rep-attribution"
+export { default as createSalesPersonWorkflow } from "./create-sales-person"
+export { default as propagateOrderSalesPersonMetadataWorkflow } from "./propagate-order-sales-person-metadata"
+export { default as updateSalesPersonWorkflow } from "./update-sales-person"
 export { default as unassignSalesStoreWorkflow } from "./unassign-sales-store"
