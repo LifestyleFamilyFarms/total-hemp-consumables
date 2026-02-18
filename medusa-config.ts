@@ -7,11 +7,27 @@ const isProd = process.env.NODE_ENV === 'production';
 const dbSslRejectUnauthorized = process.env.DB_SSL_REJECT_UNAUTHORIZED;
 const shipstationEnv = resolveShipstationEnv(process.env.NODE_ENV)
 const redisDisabled = process.env.DISABLE_REDIS_MODULES === "true"
-const sharedRedisUrl = process.env.REDIS_URL
-const cacheRedisUrl = process.env.CACHE_REDIS_URL || sharedRedisUrl
-const eventsRedisUrl = process.env.EVENTS_REDIS_URL || sharedRedisUrl
-const workflowRedisUrl = process.env.WORKFLOW_REDIS_URL || sharedRedisUrl
-const lockingRedisUrl = process.env.LOCKING_REDIS_URL || sharedRedisUrl
+const redisUrlMode = process.env.REDIS_URL_MODE === "split" ? "split" : "shared"
+const sharedRedisUrl = process.env.REDIS_URL?.trim()
+const cacheRedisUrl =
+  redisUrlMode === "split"
+    ? (process.env.CACHE_REDIS_URL?.trim() || sharedRedisUrl)
+    : sharedRedisUrl
+const eventsRedisUrl =
+  redisUrlMode === "split"
+    ? (process.env.EVENTS_REDIS_URL?.trim() || sharedRedisUrl)
+    : sharedRedisUrl
+const workflowRedisUrl =
+  redisUrlMode === "split"
+    ? (process.env.WORKFLOW_REDIS_URL?.trim() || sharedRedisUrl)
+    : sharedRedisUrl
+const lockingRedisUrl =
+  redisUrlMode === "split"
+    ? (process.env.LOCKING_REDIS_URL?.trim() || sharedRedisUrl)
+    : sharedRedisUrl
+const redisOptions = {
+  family: 0,
+}
 
 const shouldUseRedisSessionStore = !redisDisabled && Boolean(sharedRedisUrl)
 const shouldUseCacheRedis = !redisDisabled && Boolean(cacheRedisUrl)
@@ -91,6 +107,7 @@ module.exports = defineConfig({
             resolve: '@medusajs/medusa/cache-redis',
             options: {
               redisUrl: cacheRedisUrl,
+              redisOptions,
             },
           },
         ]
@@ -102,6 +119,7 @@ module.exports = defineConfig({
             resolve: '@medusajs/medusa/event-bus-redis',
             options: {
               redisUrl: eventsRedisUrl,
+              redisOptions,
             },
           },
         ]
@@ -117,6 +135,8 @@ module.exports = defineConfig({
               redis: {
                 redisUrl: workflowRedisUrl,
                 url: workflowRedisUrl,
+                redisOptions,
+                options: redisOptions,
               },
             },
           },
@@ -153,6 +173,7 @@ module.exports = defineConfig({
                 id: "locking-redis",
                 options: {
                   redisUrl: lockingRedisUrl,
+                  redisOptions,
                 },
               },
             ]
