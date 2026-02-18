@@ -10,6 +10,8 @@
   - INVENTORY_LOCATION_MAP (JSON mapping of prod location name → dev location name)
   - INVENTORY_MIRROR_RESERVED (set to 0 to skip mirroring reservations)
   - INVENTORY_WIPE_RESERVATIONS (set to 0 to keep non-mirror reservations in DEV)
+  - INVENTORY_DRY_RUN (set to 1 for dry-run)
+  - INVENTORY_STRICT (default 1; set to 0 to keep DEV inventory items missing in PROD)
 
   Run:
     yarn ts-node src/scripts/mirror-inventory.ts
@@ -40,6 +42,11 @@ const LOCATION_MAP: Record<string, string> = (() => {
   }
 })()
 
+const MIRROR_RESERVED = (process.env.INVENTORY_MIRROR_RESERVED || "1") !== "0"
+const WIPE_EXISTING_RESERVATIONS = (process.env.INVENTORY_WIPE_RESERVATIONS || "1") !== "0"
+const DRY_RUN = (process.env.INVENTORY_DRY_RUN || "0") === "1"
+const INVENTORY_STRICT = (process.env.INVENTORY_STRICT || "1") !== "0"
+
 const prod = new Medusa({ baseUrl: PROD_URL, apiKey: PROD_TOKEN })
 const dev = new Medusa({ baseUrl: DEV_URL, apiKey: DEV_TOKEN })
 
@@ -47,6 +54,7 @@ async function listAll<T>(client: Medusa, path: string, key: string, limit = 100
   const results: T[] = []
   let offset = 0
   const maxPages = 100
+
   for (let page = 0; page < maxPages; page++) {
     const response = await client.client.fetch<{ [k: string]: T[] }>(path, {
       method: "GET",
@@ -54,16 +62,20 @@ async function listAll<T>(client: Medusa, path: string, key: string, limit = 100
     })
     const batch = (response[key] as T[]) || []
     results.push(...batch)
+
     if (batch.length < limit) {
       break
     }
+
     offset += limit
+
     if (page === maxPages - 1) {
       throw new Error(
         `Pagination overflow fetching ${path}. Retrieved at least ${results.length} records (limit=${limit}).`
       )
     }
   }
+
   return results
 }
 
@@ -75,6 +87,7 @@ async function listInventoryLevels(
   const levels: Array<{ id: string; location_id: string; stocked_quantity: number }> = []
   let offset = 0
   const maxPages = 100
+
   for (let page = 0; page < maxPages; page++) {
     const response = await client.client.fetch<{ inventory_levels: any[] }>(
       `/admin/inventory-items/${inventoryItemId}/location-levels`,
@@ -83,22 +96,28 @@ async function listInventoryLevels(
         query: { limit, offset },
       }
     )
-    const batch = (response.inventory_levels || []).map((lv: any) => ({
-      id: lv.id,
-      location_id: lv.location_id,
-      stocked_quantity: Number(lv.stocked_quantity || 0),
+
+    const batch = (response.inventory_levels || []).map((level: any) => ({
+      id: level.id,
+      location_id: level.location_id,
+      stocked_quantity: Number(level.stocked_quantity || 0),
     }))
+
     levels.push(...batch)
+
     if (batch.length < limit) {
       break
     }
+
     offset += limit
+
     if (page === maxPages - 1) {
       throw new Error(
         `Pagination overflow fetching location levels for inventory item ${inventoryItemId}. Retrieved at least ${levels.length} records (limit=${limit}).`
       )
     }
   }
+
   return levels
 }
 
@@ -110,29 +129,31 @@ async function listReservationsByInventoryItem(
   const reservations: any[] = []
   let offset = 0
   const maxPages = 100
+
   for (let page = 0; page < maxPages; page++) {
     const response = await client.client.fetch<{ reservations: any[] }>(`/admin/reservations`, {
       method: "GET",
       query: { inventory_item_id: inventoryItemId, limit, offset },
     })
+
     const batch = response.reservations || []
     reservations.push(...batch)
+
     if (batch.length < limit) {
       break
     }
+
     offset += limit
+
     if (page === maxPages - 1) {
       throw new Error(
         `Pagination overflow fetching reservations for inventory item ${inventoryItemId}. Retrieved at least ${reservations.length} records (limit=${limit}).`
       )
     }
   }
+
   return reservations
 }
-
-const MIRROR_RESERVED = (process.env.INVENTORY_MIRROR_RESERVED || "1") !== "0"
-const WIPE_EXISTING_RESERVATIONS = (process.env.INVENTORY_WIPE_RESERVATIONS || "1") !== "0"
-const DRY_RUN = (process.env.INVENTORY_DRY_RUN || "0") === "1"
 
 type LevelShape = { stocked_quantity: number }
 type InventorySnapshot = Map<string, Map<string, LevelShape>>
@@ -143,85 +164,89 @@ type DiffEntry = {
   prodQty: number
 }
 
+function normalizeName(value: string) {
+  return (value || "").toLowerCase()
+}
+
 async function mirrorInventory() {
   console.log(DRY_RUN ? `Dry-running inventory mirror PROD → DEV` : `Mirroring inventory from PROD → DEV`)
 
   // 1) Gather PROD locations (id → name)
-  const prodLocs = await listAll<{ id: string; name: string }>(prod, `/admin/stock-locations`, "stock_locations")
-  if (!prodLocs.length) {
+  const prodLocations = await listAll<{ id: string; name: string }>(prod, `/admin/stock-locations`, "stock_locations")
+  if (!prodLocations.length) {
     throw new Error("No stock locations found in PROD. Cannot mirror inventory.")
   }
-  const prodLocNameById = new Map<string, string>()
-  prodLocs.forEach((l) => prodLocNameById.set(l.id, l.name || ""))
+
+  const prodLocationNameById = new Map<string, string>()
+  prodLocations.forEach((location) => prodLocationNameById.set(location.id, location.name || ""))
 
   // 2) Gather DEV locations (name → id)
-  const devLocs = await listAll<{ id: string; name: string }>(dev, `/admin/stock-locations`, "stock_locations")
-  if (!devLocs.length) {
+  const devLocations = await listAll<{ id: string; name: string }>(dev, `/admin/stock-locations`, "stock_locations")
+  if (!devLocations.length) {
     throw new Error(
-      "No stock locations found in DEV. Create at least one location via the Admin UI (see docs/admin-store-setup.md) before mirroring."
+      "No stock locations found in DEV. Create at least one location via Admin before mirroring inventory."
     )
   }
-  const devLocIdByName = new Map<string, string>()
-  const devLocNameById = new Map<string, string>()
-  devLocs.forEach((l) => {
-    const name = l.name || ""
-    devLocIdByName.set(name.toLowerCase(), l.id)
-    devLocNameById.set(l.id, name)
+
+  const devLocationIdByName = new Map<string, string>()
+  const devLocationNameById = new Map<string, string>()
+  devLocations.forEach((location) => {
+    const key = normalizeName(location.name || "")
+    devLocationIdByName.set(key, location.id)
+    devLocationNameById.set(location.id, location.name || "")
   })
 
-  // 3) Build DEV variant map by SKU (for linking)
+  // 3) Build DEV variant map by SKU
   const devProducts = await listAll<any>(dev, `/admin/products`, "products")
   const devVariantIdBySku = new Map<string, string>()
-  for (const p of devProducts) {
-    for (const v of p.variants || []) {
-      if (v.sku) devVariantIdBySku.set((v.sku as string).toLowerCase(), v.id)
+  for (const product of devProducts) {
+    for (const variant of product.variants || []) {
+      if (variant.sku) devVariantIdBySku.set(normalizeName(variant.sku as string), variant.id)
     }
   }
 
-  // 4) Build PROD inventory map by SKU → item + levels
+  // 4) Build PROD inventory map by SKU
   const prodItems = await listAll<any>(prod, `/admin/inventory-items`, "inventory_items")
+  const prodItemIdBySku = new Map<string, string>()
   const prodSkuByItemId = new Map<string, string>()
   const prodLevelsByItemId = new Map<string, any[]>()
-  // fetch levels per item (batching could be added later)
-  for (const it of prodItems) {
-    if (it.sku) {
-      prodSkuByItemId.set(it.id, (it.sku as string).toLowerCase())
-    }
+
+  for (const item of prodItems) {
+    const sku = normalizeName(item?.sku || "")
+    if (!sku) continue
+
+    prodItemIdBySku.set(sku, item.id)
+    prodSkuByItemId.set(item.id, sku)
+
     try {
-      const levels = await listInventoryLevels(prod, it.id)
-      prodLevelsByItemId.set(it.id, levels)
-    } catch (e) {
-      console.warn(
-        `Failed to load PROD inventory levels for item ${it.id}:`,
-        (e as any)?.message || e
-      )
-      prodLevelsByItemId.set(it.id, [])
+      const levels = await listInventoryLevels(prod, item.id)
+      prodLevelsByItemId.set(item.id, levels)
+    } catch (e: any) {
+      console.warn(`Failed to load PROD levels for item ${item.id}:`, e?.message || e)
+      prodLevelsByItemId.set(item.id, [])
     }
   }
 
-  // Map PROD sku → levels ({ locationName: qty })
   const prodSkuLevels: InventorySnapshot = new Map()
-  for (const it of prodItems) {
-    const sku: string = prodSkuByItemId.get(it.id) || (it.sku ? (it.sku as string).toLowerCase() : "")
-    if (!sku) continue
-    const levels = prodLevelsByItemId.get(it.id) || []
+  for (const [sku, itemId] of prodItemIdBySku) {
+    const levels = prodLevelsByItemId.get(itemId) || []
     const map = new Map<string, LevelShape>()
-    for (const lv of levels) {
-      const locName = prodLocNameById.get(lv.location_id) || ""
-      if (!locName) continue
-      map.set(locName.toLowerCase(), {
-        stocked_quantity: Number(lv.stocked_quantity || 0),
+
+    for (const level of levels) {
+      const locationName = prodLocationNameById.get(level.location_id) || ""
+      if (!locationName) continue
+
+      map.set(normalizeName(locationName), {
+        stocked_quantity: Number(level.stocked_quantity || 0),
       })
     }
+
     prodSkuLevels.set(sku, map)
   }
 
-  const missingDevSkus: string[] = []
-  for (const sku of prodSkuLevels.keys()) {
-    if (!devVariantIdBySku.has(sku)) {
-      missingDevSkus.push(sku)
-    }
-  }
+  const prodSkuSet = new Set(prodItemIdBySku.keys())
+
+  const missingDevSkus = Array.from(prodSkuSet).filter((sku) => !devVariantIdBySku.has(sku))
   if (missingDevSkus.length) {
     throw new Error(
       `Missing DEV variants for ${missingDevSkus.length} PROD SKU(s): ${missingDevSkus
@@ -230,218 +255,244 @@ async function mirrorInventory() {
     )
   }
 
+  // 5) Build PROD reserved map by SKU + location
   const prodReservations = await listAll<any>(prod, `/admin/reservations`, "reservations")
   const prodReservedBySku = new Map<string, Map<string, number>>()
-  for (const res of prodReservations) {
-    const sku = prodSkuByItemId.get(res.inventory_item_id) || ""
+
+  for (const reservation of prodReservations) {
+    const sku = prodSkuByItemId.get(reservation.inventory_item_id) || ""
     if (!sku) continue
-    const locName = prodLocNameById.get(res.location_id) || ""
-    if (!locName) continue
-    const qty = Number(res.quantity || 0)
+
+    const locationName = prodLocationNameById.get(reservation.location_id) || ""
+    if (!locationName) continue
+
+    const qty = Number(reservation.quantity || 0)
     if (!qty) continue
+
+    const locationKey = normalizeName(locationName)
     if (!prodReservedBySku.has(sku)) {
       prodReservedBySku.set(sku, new Map())
     }
-    const locKey = locName.toLowerCase()
-    const locMap = prodReservedBySku.get(sku)!
-    locMap.set(locKey, (locMap.get(locKey) || 0) + qty)
+
+    const map = prodReservedBySku.get(sku)!
+    map.set(locationKey, (map.get(locationKey) || 0) + qty)
   }
 
-  // 5) Upsert DEV inventory items + levels
-  let createdItems = 0,
-    updatedLevels = 0,
-    createdLevels = 0,
-    zeroedLevels = 0,
-    reservationsDeleted = 0,
-    reservationsCreated = 0
+  // 6) Build DEV inventory item lookup
+  const devItems = await listAll<any>(dev, `/admin/inventory-items`, "inventory_items")
+  const devItemIdBySku = new Map<string, string>()
+
+  for (const item of devItems) {
+    const sku = normalizeName(item?.sku || "")
+    if (sku) devItemIdBySku.set(sku, item.id)
+  }
+
+  let createdItems = 0
+  let deletedExtraItems = 0
+  let updatedLevels = 0
+  let createdLevels = 0
+  let zeroedLevels = 0
+  let reservationsDeleted = 0
+  let reservationsCreated = 0
+
   const diffEntries: DiffEntry[] = []
   const missingLocationMappings = new Set<string>()
 
-  // Build DEV inventory items list for lookup
-  const devItems = await listAll<any>(dev, `/admin/inventory-items`, "inventory_items")
-  const devItemIdBySku = new Map<string, string>()
-  devItems.forEach((it) => {
-    if (it.sku) devItemIdBySku.set((it.sku as string).toLowerCase(), it.id)
-  })
+  // 7) Strict prune DEV inventory items that don't exist in PROD
+  if (INVENTORY_STRICT) {
+    for (const [sku, devItemId] of devItemIdBySku) {
+      if (prodSkuSet.has(sku)) continue
 
-  for (const [sku, variantId] of devVariantIdBySku) {
-    const prodLevels = prodSkuLevels.get(sku)
-    const hasProd = !!prodLevels && prodLevels.size > 0
+      if (DRY_RUN) {
+        deletedExtraItems++
+        continue
+      }
 
-    // Ensure dev inventory item exists (or record requirement in dry-run)
+      try {
+        const reservations = await listReservationsByInventoryItem(dev, devItemId)
+        for (const reservation of reservations) {
+          try {
+            await dev.client.fetch(`/admin/reservations/${reservation.id}`, { method: "DELETE" })
+            reservationsDeleted++
+          } catch {
+            // best effort
+          }
+        }
+
+        await dev.client.fetch(`/admin/inventory-items/${devItemId}`, { method: "DELETE" })
+        deletedExtraItems++
+      } catch (e: any) {
+        console.warn(`Failed deleting extra DEV inventory item sku=${sku}:`, e?.message || e)
+      }
+    }
+  }
+
+  // 8) Mirror PROD inventory items + levels + reservations
+  for (const sku of prodSkuSet) {
+    const variantId = devVariantIdBySku.get(sku)
+    if (!variantId) continue
+
     let devItemId = devItemIdBySku.get(sku)
-    let devItemExists = !!devItemId
     if (!devItemId) {
       if (DRY_RUN) {
         createdItems++
       } else {
         try {
-          devItemId = await dev.client
-            .fetch<{ inventory_item: { id: string } }>(`/admin/inventory-items`, {
+          const created = await dev.client.fetch<{ inventory_item: { id: string } }>(
+            `/admin/inventory-items`,
+            {
               method: "POST",
               body: { sku },
-            })
-            .then((r) => r.inventory_item.id)
-          if (devItemId) {
-            devItemIdBySku.set(sku, devItemId)
-            devItemExists = true
-            createdItems++
-          }
-        } catch (e) {
-          console.warn(`Failed to create dev inventory item for sku=${sku}:`, (e as any)?.message || e)
+            }
+          )
+          devItemId = created.inventory_item.id
+          devItemIdBySku.set(sku, devItemId)
+          createdItems++
+        } catch (e: any) {
+          console.warn(`Failed to create DEV inventory item sku=${sku}:`, e?.message || e)
           continue
         }
       }
     }
 
-    if (!devItemExists && !devItemId) {
-      // Dry-run: record diff using missing item, skip mutation steps
-      const targetLevels = prodSkuLevels.get(sku)
-      if (DRY_RUN && targetLevels?.size) {
-        for (const [prodLocName, data] of targetLevels) {
-          const mappedName = (LOCATION_MAP[prodLocName] || prodLocName).toLowerCase()
-          const devLocId = devLocIdByName.get(mappedName)
-          if (!devLocId) continue
-          diffEntries.push({
-            sku,
-            location: devLocNameById.get(devLocId) || mappedName,
-            devQty: 0,
-            prodQty: data.stocked_quantity,
-          })
-        }
+    // Dry-run: dev item would be created; assume zero current levels.
+    if (!devItemId) {
+      const targetLevels = prodSkuLevels.get(sku) || new Map<string, LevelShape>()
+      for (const [prodLocationName, data] of targetLevels) {
+        const mappedName = normalizeName(LOCATION_MAP[prodLocationName] || prodLocationName)
+        const devLocationId = devLocationIdByName.get(mappedName)
+        if (!devLocationId) continue
+        diffEntries.push({
+          sku,
+          location: devLocationNameById.get(devLocationId) || mappedName,
+          devQty: 0,
+          prodQty: data.stocked_quantity,
+        })
       }
       continue
     }
 
-    if (!devItemId) {
-      continue
-    }
-
-    // Link item ↔ variant (best-effort)
-    if (!DRY_RUN && devItemExists && devItemId) {
+    if (!DRY_RUN) {
       try {
         await dev.client.fetch(`/admin/variants/${variantId}/inventory-items`, {
           method: "POST",
           body: { inventory_item_id: devItemId },
         })
-      } catch {}
-    }
-
-    // Determine target levels
-    const targetLevels: Array<{ location_id: string; stocked_quantity: number }> = []
-    if (hasProd) {
-      for (const [prodLocName, data] of prodLevels!) {
-        const mappedName = (LOCATION_MAP[prodLocName] || prodLocName).toLowerCase()
-        const devLocId = devLocIdByName.get(mappedName)
-        if (devLocId) {
-          targetLevels.push({
-            location_id: devLocId,
-            stocked_quantity: data.stocked_quantity,
-          })
-        } else {
-          missingLocationMappings.add(`${sku} → ${prodLocName}`)
-        }
+      } catch {
+        // link may already exist
       }
     }
 
-    // Fetch current DEV levels for this item (to prune or zero out if needed)
+    const targetLevelsRaw = prodSkuLevels.get(sku) || new Map<string, LevelShape>()
+    const targetLevels: Array<{ location_id: string; stocked_quantity: number }> = []
+
+    for (const [prodLocationName, data] of targetLevelsRaw) {
+      const mappedName = normalizeName(LOCATION_MAP[prodLocationName] || prodLocationName)
+      const devLocationId = devLocationIdByName.get(mappedName)
+      if (!devLocationId) {
+        missingLocationMappings.add(`${sku} → ${prodLocationName}`)
+        continue
+      }
+      targetLevels.push({
+        location_id: devLocationId,
+        stocked_quantity: data.stocked_quantity,
+      })
+    }
+
     let currentDevLevels: Array<{ id: string; location_id: string; stocked_quantity: number }> = []
     try {
       currentDevLevels = await listInventoryLevels(dev, devItemId)
-    } catch (e) {
-      console.warn(
-        `Failed to load DEV inventory levels for sku=${sku}:`,
-        (e as any)?.message || e
-      )
-    }
-
-    const originalDevLevelsMap = new Map<string, number>()
-    currentDevLevels.forEach((lv) => originalDevLevelsMap.set(lv.location_id, lv.stocked_quantity))
-
-    if (DRY_RUN) {
-      const targetByLocation = new Map<string, number>()
-      for (const tl of targetLevels) {
-        targetByLocation.set(tl.location_id, tl.stocked_quantity)
-      }
-      const combinedLocIds = new Set<string>([
-        ...targetByLocation.keys(),
-        ...originalDevLevelsMap.keys(),
-      ])
-      for (const locId of combinedLocIds) {
-        const prodQty = targetByLocation.get(locId) || 0
-        const devQty = originalDevLevelsMap.get(locId) || 0
-        if (prodQty === devQty) continue
-        diffEntries.push({
-          sku,
-          location: devLocNameById.get(locId) || locId,
-          devQty,
-          prodQty,
-        })
-      }
-      // Skip mutation logic in dry-run mode
-      continue
+    } catch (e: any) {
+      console.warn(`Failed to load DEV levels for sku=${sku}:`, e?.message || e)
     }
 
     const currentDevLevelsMap = new Map<string, { id: string; location_id: string; stocked_quantity: number }>()
-    currentDevLevels.forEach((lv) => currentDevLevelsMap.set(lv.location_id, lv))
+    currentDevLevels.forEach((level) => currentDevLevelsMap.set(level.location_id, level))
 
-    if (hasProd) {
-      // Upsert target levels to match PROD
-      for (const tl of targetLevels) {
-        const existingLevel = currentDevLevelsMap.get(tl.location_id)
-        if (existingLevel) {
-          try {
-            await dev.client.fetch(
-              `/admin/inventory-items/${devItemId}/location-levels/${tl.location_id}`,
-              {
-                method: "POST",
-                body: {
-                  stocked_quantity: tl.stocked_quantity,
-                },
-              }
-            )
-            updatedLevels++
-            currentDevLevelsMap.set(tl.location_id, {
-              ...existingLevel,
-              stocked_quantity: tl.stocked_quantity,
-            })
-          } catch (e) {
-            console.warn(
-              `Failed to update level for sku=${sku} location=${tl.location_id}:`,
-              (e as any)?.message || e
-            )
+    if (DRY_RUN) {
+      for (const target of targetLevels) {
+        const current = currentDevLevelsMap.get(target.location_id)
+        const currentQty = current?.stocked_quantity || 0
+        if (currentQty !== target.stocked_quantity) {
+          diffEntries.push({
+            sku,
+            location: devLocationNameById.get(target.location_id) || target.location_id,
+            devQty: currentQty,
+            prodQty: target.stocked_quantity,
+          })
+        }
+      }
+
+      const targetSet = new Set(targetLevels.map((level) => level.location_id))
+      for (const current of currentDevLevels) {
+        if (!targetSet.has(current.location_id) && current.stocked_quantity !== 0) {
+          diffEntries.push({
+            sku,
+            location: devLocationNameById.get(current.location_id) || current.location_id,
+            devQty: current.stocked_quantity,
+            prodQty: 0,
+          })
+        }
+      }
+
+      continue
+    }
+
+    if (targetLevels.length > 0) {
+      for (const target of targetLevels) {
+        const existing = currentDevLevelsMap.get(target.location_id)
+
+        if (existing) {
+          if (existing.stocked_quantity !== target.stocked_quantity) {
+            try {
+              await dev.client.fetch(
+                `/admin/inventory-items/${devItemId}/location-levels/${target.location_id}`,
+                {
+                  method: "POST",
+                  body: {
+                    stocked_quantity: target.stocked_quantity,
+                  },
+                }
+              )
+              updatedLevels++
+              currentDevLevelsMap.set(target.location_id, {
+                ...existing,
+                stocked_quantity: target.stocked_quantity,
+              })
+            } catch (e: any) {
+              console.warn(
+                `Failed to update level sku=${sku} location=${target.location_id}:`,
+                e?.message || e
+              )
+            }
           }
         } else {
           try {
             await dev.client.fetch(`/admin/inventory-items/${devItemId}/location-levels`, {
               method: "POST",
-              body: {
-                location_id: tl.location_id,
-                stocked_quantity: tl.stocked_quantity,
-              },
+              body: target,
             })
             createdLevels++
-            currentDevLevelsMap.set(tl.location_id, {
+            currentDevLevelsMap.set(target.location_id, {
               id: "",
-              location_id: tl.location_id,
-              stocked_quantity: tl.stocked_quantity,
+              location_id: target.location_id,
+              stocked_quantity: target.stocked_quantity,
             })
-          } catch (e) {
+          } catch (e: any) {
             console.warn(
-              `Failed to create level for sku=${sku} location=${tl.location_id}:`,
-              (e as any)?.message || e
+              `Failed to create level sku=${sku} location=${target.location_id}:`,
+              e?.message || e
             )
           }
         }
       }
 
-      // For any DEV level not present in PROD targets, zero it out for parity
-      const targetLocSet = new Set(targetLevels.map((l) => l.location_id))
-      for (const lv of currentDevLevels) {
-        if (!targetLocSet.has(lv.location_id) && lv.stocked_quantity !== 0) {
+      const targetSet = new Set(targetLevels.map((level) => level.location_id))
+      for (const current of currentDevLevels) {
+        if (!targetSet.has(current.location_id) && current.stocked_quantity !== 0) {
           try {
             await dev.client.fetch(
-              `/admin/inventory-items/${devItemId}/location-levels/${lv.location_id}`,
+              `/admin/inventory-items/${devItemId}/location-levels/${current.location_id}`,
               {
                 method: "POST",
                 body: {
@@ -450,23 +501,22 @@ async function mirrorInventory() {
               }
             )
             zeroedLevels++
-            currentDevLevelsMap.set(lv.location_id, { ...lv, stocked_quantity: 0 })
-          } catch (e) {
+          } catch (e: any) {
             console.warn(
-              `Failed to zero inventory level for sku=${sku} location=${lv.location_id}:`,
-              (e as any)?.message || e
+              `Failed to zero level sku=${sku} location=${current.location_id}:`,
+              e?.message || e
             )
           }
         }
       }
     } else {
-      // No PROD levels: reflect out-of-stock in DEV by zeroing any existing levels
+      // No PROD levels. Keep exact zero unless DEFAULT_QTY fallback is set.
       if (!DEFAULT_QTY) {
-        for (const lv of currentDevLevels) {
-          if (lv.stocked_quantity !== 0) {
+        for (const current of currentDevLevels) {
+          if (current.stocked_quantity !== 0) {
             try {
               await dev.client.fetch(
-                `/admin/inventory-items/${devItemId}/location-levels/${lv.location_id}`,
+                `/admin/inventory-items/${devItemId}/location-levels/${current.location_id}`,
                 {
                   method: "POST",
                   body: {
@@ -475,58 +525,28 @@ async function mirrorInventory() {
                 }
               )
               zeroedLevels++
-              currentDevLevelsMap.set(lv.location_id, { ...lv, stocked_quantity: 0 })
-            } catch (e) {
+            } catch (e: any) {
               console.warn(
-                `Failed to zero inventory level for sku=${sku} location=${lv.location_id}:`,
-                (e as any)?.message || e
+                `Failed to zero level sku=${sku} location=${current.location_id}:`,
+                e?.message || e
               )
             }
           }
         }
       } else {
-        // If a fallback is explicitly provided, allow it (opt-in)
-        const firstLoc = devLocs[0]?.id
-        if (firstLoc) {
-          const existingLevel = currentDevLevelsMap.get(firstLoc)
-          if (existingLevel) {
-            try {
-              await dev.client.fetch(
-                `/admin/inventory-items/${devItemId}/location-levels/${firstLoc}`,
-                {
-                  method: "POST",
-                  body: { stocked_quantity: DEFAULT_QTY },
-                }
-              )
-              updatedLevels++
-              currentDevLevelsMap.set(firstLoc, {
-                ...existingLevel,
+        const firstLocationId = devLocations[0]?.id
+        if (firstLocationId) {
+          try {
+            await dev.client.fetch(`/admin/inventory-items/${devItemId}/location-levels`, {
+              method: "POST",
+              body: {
+                location_id: firstLocationId,
                 stocked_quantity: DEFAULT_QTY,
-              })
-            } catch (e) {
-              console.warn(
-                `Failed to update fallback level for sku=${sku} location=${firstLoc}:`,
-                (e as any)?.message || e
-              )
-            }
-          } else {
-            try {
-              await dev.client.fetch(`/admin/inventory-items/${devItemId}/location-levels`, {
-                method: "POST",
-                body: { location_id: firstLoc, stocked_quantity: DEFAULT_QTY },
-              })
-              createdLevels++
-              currentDevLevelsMap.set(firstLoc, {
-                id: "",
-                location_id: firstLoc,
-                stocked_quantity: DEFAULT_QTY,
-              })
-            } catch (e) {
-              console.warn(
-                `Failed to create fallback level for sku=${sku} location=${firstLoc}:`,
-                (e as any)?.message || e
-              )
-            }
+              },
+            })
+            createdLevels++
+          } catch {
+            // best effort
           }
         }
       }
@@ -534,60 +554,57 @@ async function mirrorInventory() {
 
     if (MIRROR_RESERVED) {
       const targetReserved = prodReservedBySku.get(sku)
-
       let devReservations: any[] = []
+
       try {
         devReservations = await listReservationsByInventoryItem(dev, devItemId)
-      } catch (e) {
-        console.warn(
-          `Failed to load DEV reservations for sku=${sku}:`,
-          (e as any)?.message || e
-        )
+      } catch (e: any) {
+        console.warn(`Failed to load DEV reservations sku=${sku}:`, e?.message || e)
       }
 
-      let skippedReservationDeletes = false
-      for (const res of devReservations) {
-        if (!WIPE_EXISTING_RESERVATIONS && res?.metadata?.source !== "mirror-prod") {
-          skippedReservationDeletes = true
+      for (const reservation of devReservations) {
+        if (!WIPE_EXISTING_RESERVATIONS && reservation?.metadata?.source !== "mirror-prod") {
           continue
         }
+
         try {
-          await dev.client.fetch(`/admin/reservations/${res.id}`, { method: "DELETE" })
+          await dev.client.fetch(`/admin/reservations/${reservation.id}`, { method: "DELETE" })
           reservationsDeleted++
-        } catch {}
-      }
-      if (!WIPE_EXISTING_RESERVATIONS && skippedReservationDeletes) {
-        console.warn(
-          `Skipped deleting some DEV reservations for sku=${sku} (set INVENTORY_WIPE_RESERVATIONS=1 for strict parity)`
-        )
+        } catch {
+          // best effort
+        }
       }
 
       if (targetReserved && targetReserved.size) {
-        for (const [prodLocName, qty] of targetReserved) {
+        for (const [prodLocationName, qty] of targetReserved) {
           if (!qty) continue
-          const mappedName = (LOCATION_MAP[prodLocName] || prodLocName).toLowerCase()
-          const devLocId = devLocIdByName.get(mappedName)
-          if (!devLocId) {
-            console.warn(`No DEV stock location match for reservation sku=${sku} location=${prodLocName}`)
-            missingLocationMappings.add(`${sku} → ${prodLocName}`)
+
+          const mappedName = normalizeName(LOCATION_MAP[prodLocationName] || prodLocationName)
+          const devLocationId = devLocationIdByName.get(mappedName)
+          if (!devLocationId) {
+            missingLocationMappings.add(`${sku} → ${prodLocationName}`)
             continue
           }
+
           try {
             await dev.client.fetch(`/admin/reservations`, {
               method: "POST",
               body: {
                 inventory_item_id: devItemId,
-                location_id: devLocId,
+                location_id: devLocationId,
                 quantity: qty,
                 description: "Mirrored from PROD",
-                metadata: { source: "mirror-prod", prod_location: prodLocName },
+                metadata: {
+                  source: "mirror-prod",
+                  prod_location: prodLocationName,
+                },
               },
             })
             reservationsCreated++
-          } catch (e) {
+          } catch (e: any) {
             console.warn(
-              `Failed to create reservation for sku=${sku} location=${prodLocName}:`,
-              (e as any)?.message || e
+              `Failed creating reservation sku=${sku} location=${prodLocationName}:`,
+              e?.message || e
             )
           }
         }
@@ -606,16 +623,23 @@ async function mirrorInventory() {
   }
 
   if (DRY_RUN) {
+    if (deletedExtraItems > 0) {
+      console.log(
+        colors.yellow(
+          `Dry-run: ${deletedExtraItems} DEV inventory item(s) would be removed (missing in PROD) because INVENTORY_STRICT=1.`
+        )
+      )
+    }
+
     if (diffEntries.length === 0) {
-      console.log(colors.green("Dry-run: DEV inventory already matches PROD for all mirrored SKUs. No changes needed."))
+      console.log(colors.green("Dry-run: DEV inventory already matches PROD for mirrored SKUs. No changes needed."))
     } else {
       const bySku = new Map<string, DiffEntry[]>()
       for (const entry of diffEntries) {
-        if (!bySku.has(entry.sku)) {
-          bySku.set(entry.sku, [])
-        }
+        if (!bySku.has(entry.sku)) bySku.set(entry.sku, [])
         bySku.get(entry.sku)!.push(entry)
       }
+
       console.log(
         colors.bold(
           colors.yellow(
@@ -625,6 +649,7 @@ async function mirrorInventory() {
           )
         )
       )
+
       for (const [sku, entries] of bySku) {
         console.log(`  ${colors.bold(sku)}`)
         for (const entry of entries) {
@@ -633,17 +658,21 @@ async function mirrorInventory() {
           const deltaText =
             delta > 0 ? colors.green(`+${delta}`) : delta < 0 ? colors.red(`${delta}`) : colors.gray("0")
           console.log(
-            `    ${entry.location}: DEV ${colors.cyan(String(entry.devQty))} ${arrow} PROD ${colors.magenta(String(entry.prodQty))} (Δ ${deltaText})`
+            `    ${entry.location}: DEV ${colors.cyan(String(entry.devQty))} ${arrow} PROD ${colors.magenta(
+              String(entry.prodQty)
+            )} (Δ ${deltaText})`
           )
         }
       }
+
       console.log(colors.gray("Dry-run only: no changes were applied."))
     }
+
     return
   }
 
   console.log(
-    `Inventory mirror complete. items_created=${createdItems}, levels_updated=${updatedLevels}, levels_created=${createdLevels}, levels_zeroed=${zeroedLevels}, reservations_created=${reservationsCreated}, reservations_deleted=${reservationsDeleted}`
+    `Inventory mirror complete. strict=${INVENTORY_STRICT ? 1 : 0}, items_created=${createdItems}, items_deleted=${deletedExtraItems}, levels_updated=${updatedLevels}, levels_created=${createdLevels}, levels_zeroed=${zeroedLevels}, reservations_created=${reservationsCreated}, reservations_deleted=${reservationsDeleted}`
   )
 }
 

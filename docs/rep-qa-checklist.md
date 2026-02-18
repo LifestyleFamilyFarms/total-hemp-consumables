@@ -58,3 +58,6 @@
 3. Validate cross-rep protection: second rep gets 403 on first rep's order/customer.
 4. Pilot with 1-2 reps and monitor backend logs for rep 403 denials on `/admin/*`.
 5. Roll out to all reps after pilot passes.
+
+## Deferred TODOs
+- [ ] Run full rep end-to-end validation (rep login -> draft order -> convert -> payment link paid -> fulfillment) after distributor information is complete.

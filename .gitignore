@@ -31,3 +31,9 @@ teamBoard.md
 llms-full.txt
 
 docs/thc-site-pictures
+docs/task-*/artifacts/
+docs/task-*/artifacts/**
+docs/*-dry-run.log
+docs/*-dry-run.json
+docs/media-s3-gc.log
+docs/media-s3-gc.json

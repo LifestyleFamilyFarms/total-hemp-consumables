@@ -108,8 +108,8 @@ Execute and document an end-to-end checkout flow (seed → mirror → storefront
 - Output verification script: list seeded sales channels, inventory levels, shipping options, and payment provider states.
 
 ### Useful Artifacts / References
-- Logs: `docs/task-002/artifacts/backend-dev-20251023-085703.log`, `docs/task-002/artifacts/storefront-dev-20251023-085740.log`. (Sensitive identifiers have been redacted in shared copies.)
-- Checkout session notes: `docs/task-002/artifacts/checkout-session-20251022.md` (sanitized summary; raw logs are stored in secure storage).
+- Logs: archived outside the repository in secure storage (sensitive identifiers redacted).
+- Checkout session notes: archived outside the repository in secure storage.
 - Note: one-off debug scripts referenced earlier were removed after this QA pass. Use `cleanup-manual-shipping-options.ts` for current operations and recreate any debug tooling locally if needed.
 
 ### Next Steps
@@ -155,7 +155,7 @@ Execute and document an end-to-end checkout flow (seed → mirror → storefront
 
 ### 2025-11-01 — Store rebuild baseline
 - Re-ran the full bootstrap (`yarn db:reset:dev`, `yarn seed:fresh`, `yarn mirror:dev`, `yarn mirror:inventory`) after publishing new dev credentials. Mirror now succeeds against localhost with the seeded admin API key.
-- Seeded matching API credentials directly in Postgres so the CLI token values stay stable: `sk_REDACTED` (admin) and `pk_REDACTED` (publishable). Both map to the new DTC sales channel (`sc_01K90994T2KA90YV245Z3NWV1S`) and the legacy default channel for parity.
+- Seeded matching API credentials directly in Postgres so the CLI token values stay stable: `[REDACTED_SECRET_API_KEY]` (admin) and `[REDACTED_PUBLISHABLE_API_KEY]` (publishable). Both map to the new DTC sales channel (`sc_01K90994T2KA90YV245Z3NWV1S`) and the legacy default channel for parity.
 - Updated the store’s default sales channel to `DTCWebStore` and linked it to the ShipStation-backed stock location (`sloc_01K90994N7WV7CXQKHQ4VABFZA`) so carts created via the Store API resolve inventory and pricing correctly.
   - Storefront now auto-discovers the store’s default sales channel via the Store API, so no manual env sync is required.
 - Outstanding issue: programmatic Store API smoke tests still return `500` when adding line items (`addToCartWorkflowId` emits an `unknown_error`). Need to trace the workflow logs or reproduce through the Next.js UI to capture the stack trace before we can run the checkout QA script end-to-end.
@@ -186,7 +186,7 @@ Execute and document an end-to-end checkout flow (seed → mirror → storefront
 - [ ] **Browser QA pass** — Walk through checkout end-to-end (address → shipping quote → Authorize.Net Accept.js → place order) and capture:
   - `[shipstation-debug]` rate response for the order
   - Authorize.Net sandbox approval details (transaction ID, auth code)
-  - Screenshots for each step (attach under `docs/task-002/artifacts/`)
+  - Screenshots for each step (store in secure project storage; do not commit raw artifacts to git)
 - [ ] **Medusa log capture** — Export backend logs for the successful order (payment + fulfillment events) and link them here.
 - [ ] **Docs refresh** — Incorporate the QA artifacts into this runbook (test date, cart/order IDs, key observations) once the run above succeeds.
 - [ ] **Tax follow-up** — Model state-level tax rates and validate totals against Authorize.Net / ShipStation expectations before launch.
