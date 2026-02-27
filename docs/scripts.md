@@ -51,12 +51,19 @@ For end-to-end media operating rules, see `docs/image-asset-management.md`.
 - `mirror:dev` — Mirror catalog from PROD → DEV via Admin API (types/categories/products/variants/prices/metadata/images).
   - `ts-node ./src/scripts/mirror-prod-to-dev.ts`
   - Requires both PROD and DEV URL/token envs
+- `mirror:audit` — Audit PROD vs DEV parity for mirrored catalog/config entities and report mismatches.
+  - `ts-node ./src/scripts/audit-mirror-parity.ts`
+  - Optional envs: `AUDIT_VERBOSE=1`, `AUDIT_MAX_FINDINGS=200`, `AUDIT_FAIL_ON_DIFF=1`
+- `mirror:master` — Master command for current distributor-managed flow (no inventory mirror): mirror catalog, then audit.
+  - `yarn mirror:dev && yarn mirror:audit`
 - `mirror:inventory` — Mirror inventory items + levels (and reservations) from PROD → DEV by SKU and location name.
   - Mirrors `stocked_quantity` and creates reservations so `available` matches PROD.
   - `ts-node ./src/scripts/mirror-inventory.ts`
   - Optional envs: `INVENTORY_DEFAULT_QTY=100`, `INVENTORY_LOCATION_MAP='{"Prod Loc":"Dev Loc"}', INVENTORY_MIRROR_RESERVED=0`, `INVENTORY_WIPE_RESERVATIONS=0`
 - `mirror:dev:all` — Run catalog mirror then inventory mirror.
   - `yarn mirror:dev && yarn mirror:inventory`
+- `mirror:master:all` — Full mirror sequence (catalog + inventory + audit).
+  - `yarn mirror:dev && yarn mirror:inventory && yarn mirror:audit`
 
 ## DB Utilities (dev only)
 - `db:reset:dev` — Drops and recreates the dev database defined by `DATABASE_URL`/`POSTGRES_URL`, then runs migrations.
@@ -98,7 +105,8 @@ This repo now keeps only production‑relevant scripts in `src/scripts`. One‑o
 3) Manually add/verify catalog data via Medusa Admin (temporary until the new seed strategy ships).
 4) Start backend: `yarn dev`
 5) Generate a new Admin API token in local Admin → Settings → API Keys, set `MEDUSA_DEV_ADMIN_TOKEN` in `.env`
-6) Mirror prod catalog: `yarn mirror:dev` (and inventory: `yarn mirror:inventory` or `yarn mirror:dev:all`)
-7) Start storefront: `cd ../total-hemp-consumables-storefront && yarn dev`
+6) Run master mirror flow (no inventory): `yarn mirror:master`
+8) Complete manual follow-up items in `docs/post-mirror-operational-checklist.md`
+9) Start storefront: `cd ../total-hemp-consumables-storefront && yarn dev`
 
 Note: After `db:reset:dev`, previously issued Admin API tokens are invalidated. Ensure `MEDUSA_DEV_ADMIN_TOKEN` is refreshed before running any Admin API mirror/seed targeting DEV.

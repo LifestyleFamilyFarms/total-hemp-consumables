@@ -1,6 +1,6 @@
-import { createRevalidateSubscriber } from "./revalidate-factory"
+import { createRevalidateSubscriber } from "../utils/revalidate-factory"
 
-export const { handler, config } = createRevalidateSubscriber({
+const { handler, config } = createRevalidateSubscriber({
   tags: ["types"],
   events: [
     "product-type.created",
@@ -8,3 +8,6 @@ export const { handler, config } = createRevalidateSubscriber({
     "product-type.deleted",
   ],
 })
+
+export default handler
+export { config }

@@ -55,6 +55,33 @@ function cleanObject(obj: Record<string, any>) {
   return out
 }
 
+function toIdSet(items: Array<{ id?: string | null }> | undefined | null) {
+  const ids = new Set<string>()
+
+  for (const item of items || []) {
+    const id = (item?.id || "").trim()
+    if (id) {
+      ids.add(id)
+    }
+  }
+
+  return ids
+}
+
+function areSetsEqual(left: Set<string>, right: Set<string>) {
+  if (left.size !== right.size) {
+    return false
+  }
+
+  for (const value of left) {
+    if (!right.has(value)) {
+      return false
+    }
+  }
+
+  return true
+}
+
 function mapAddress(address: any) {
   if (!address) return undefined
 
@@ -310,6 +337,50 @@ async function mirror() {
     prodRegionIdToDevId.set(prodRegion.id, devRegion.id)
   }
 
+  // 3b) Tax regions
+  // Ensure DEV tax regions have a provider. A null provider breaks add-to-cart tax line workflows.
+  const prodTaxRegions = await listAll<any>(prod, `/admin/tax-regions`, "tax_regions")
+  const devTaxRegions = await listAll<any>(dev, `/admin/tax-regions`, "tax_regions")
+
+  const prodTaxRegionByKey = new Map<string, any>()
+  for (const taxRegion of prodTaxRegions) {
+    const key = [
+      normalizeName(taxRegion.country_code),
+      normalizeName(taxRegion.province_code),
+      normalizeName(taxRegion.parent_id),
+    ].join("::")
+    prodTaxRegionByKey.set(key, taxRegion)
+  }
+
+  let taxRegionProvidersUpdated = 0
+
+  for (const devTaxRegion of devTaxRegions) {
+    if (devTaxRegion.provider_id) {
+      continue
+    }
+
+    const key = [
+      normalizeName(devTaxRegion.country_code),
+      normalizeName(devTaxRegion.province_code),
+      normalizeName(devTaxRegion.parent_id),
+    ].join("::")
+    const matchedProdTaxRegion = prodTaxRegionByKey.get(key)
+    const providerId = matchedProdTaxRegion?.provider_id || "tp_system"
+
+    await dev.client.fetch(`/admin/tax-regions/${devTaxRegion.id}`, {
+      method: "POST",
+      body: {
+        provider_id: providerId,
+      },
+    })
+
+    taxRegionProvidersUpdated += 1
+  }
+
+  if (taxRegionProvidersUpdated > 0) {
+    console.log(`Updated ${taxRegionProvidersUpdated} DEV tax region provider assignment(s).`)
+  }
+
   // 4) Product types
   const prodTypes = await listAll<any>(prod, `/admin/product-types`, "product_types")
   const devTypes = await listAll<any>(dev, `/admin/product-types`, "product_types")
@@ -533,11 +604,46 @@ async function mirror() {
   // 9) Products
   const prodProducts = await listAll<any>(prod, `/admin/products`, "products")
   const prodProductByHandle = new Map<string, any>()
+  const productMirrorFields = [
+    "id",
+    "title",
+    "subtitle",
+    "description",
+    "handle",
+    "status",
+    "is_giftcard",
+    "discountable",
+    "thumbnail",
+    "external_id",
+    "type_id",
+    "collection_id",
+    "shipping_profile_id",
+    "metadata",
+    "weight",
+    "length",
+    "height",
+    "width",
+    "hs_code",
+    "mid_code",
+    "origin_country",
+    "material",
+    "*categories",
+    "*tags",
+    "*options",
+    "*variants",
+    "*variants.options",
+    "*variants.prices",
+    "*images",
+    "*sales_channels",
+  ].join(",")
 
   for (const product of prodProducts) {
     if (!product?.id) continue
     const fetched = await prod.client.fetch<{ product: any }>(`/admin/products/${product.id}`, {
       method: "GET",
+      query: {
+        fields: productMirrorFields,
+      },
     })
 
     const full = fetched.product || product
@@ -596,6 +702,10 @@ async function mirror() {
       if (variantSku) existingVariantIdBySku.set(variantSku, variant.id)
       if (variantTitle) existingVariantIdByTitle.set(variantTitle, variant.id)
     }
+    const desiredCategoryIds: string[] = (product.categories || [])
+      .map((category: any) => prodCategoryIdToDevId.get(category.id))
+      .filter((id: unknown): id is string => typeof id === "string" && id.length > 0)
+    const desiredCategorySet: Set<string> = new Set<string>(desiredCategoryIds)
 
     const payload: any = cleanObject({
       title: product.title,
@@ -614,9 +724,7 @@ async function mirror() {
       shipping_profile_id: product.shipping_profile_id
         ? prodShippingProfileIdToDevId.get(product.shipping_profile_id)
         : undefined,
-      categories: (product.categories || [])
-        .map((category: any) => ({ id: prodCategoryIdToDevId.get(category.id) }))
-        .filter((category: any) => !!category.id),
+      categories: desiredCategoryIds.map((id) => ({ id })),
       tags: (product.tags || [])
         .map((tag: any) => ({ id: prodTagIdToDevId.get(tag.id) }))
         .filter((tag: any) => !!tag.id),
@@ -692,6 +800,39 @@ async function mirror() {
             body: payload,
           })
           .then((response) => response.product)
+
+    const devProductWithCategories = await dev.client
+      .fetch<{ product: any }>(`/admin/products/${updatedOrCreated.id}`, {
+        method: "GET",
+        query: {
+          fields: "id,handle,*categories",
+        },
+      })
+      .then((response) => response.product)
+      .catch(() => updatedOrCreated)
+
+    const currentCategorySet = toIdSet(devProductWithCategories?.categories)
+    if (!areSetsEqual(currentCategorySet, desiredCategorySet)) {
+      const categorySync = await dev.client.fetch<{ product: any }>(
+        `/admin/products/${updatedOrCreated.id}`,
+        {
+          method: "POST",
+          body: {
+            categories: desiredCategoryIds.map((id) => ({ id })),
+          },
+          query: {
+            fields: "id,handle,*categories",
+          },
+        }
+      )
+
+      const syncedCategorySet = toIdSet(categorySync.product?.categories)
+      if (!areSetsEqual(syncedCategorySet, desiredCategorySet)) {
+        console.warn(
+          `Category sync mismatch for product ${updatedOrCreated?.handle || updatedOrCreated?.id}. Expected ${desiredCategorySet.size}, got ${syncedCategorySet.size}.`
+        )
+      }
+    }
 
     if (CHANNEL_ENFORCE_MIRROR && Array.isArray(updatedOrCreated?.sales_channels)) {
       const desired = new Set(salesChannels.map((channel) => channel.id))

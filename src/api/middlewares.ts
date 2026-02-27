@@ -14,7 +14,9 @@ import { adminSalesPeopleUnassignMiddlewares } from "./admin/sales-people/assign
 import { adminSalesPeopleMiddlewares } from "./admin/sales-people/middlewares"
 import { adminSalesStoreStagesMiddlewares } from "./admin/sales-stores/[id]/stages/middlewares"
 import { adminSalesStoresBulkMiddlewares } from "./admin/sales-stores/bulk/middlewares"
+import { storeCartLoyaltyPointsMiddlewares } from "./store/carts/[id]/loyalty-points/middlewares"
 import { storeCartResetMiddlewares } from "./store/carts/[id]/reset/middlewares"
+import { storeCustomerLoyaltyHistoryMiddlewares } from "./store/customers/me/loyalty-points/history/middlewares"
 import { storeSalesPeopleAttachMiddlewares } from "./store/sales-people/attach/middlewares"
 
 type AdminUser = {
@@ -775,6 +777,8 @@ export default defineMiddlewares({
     ...adminSalesStoreStagesMiddlewares,
     ...storeSalesPeopleAttachMiddlewares,
     ...storeCartResetMiddlewares,
+    ...storeCartLoyaltyPointsMiddlewares,
+    ...storeCustomerLoyaltyHistoryMiddlewares,
     {
       matcher: /^\/admin\/.*/,
       middlewares: [repGuard],
