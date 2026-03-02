@@ -7,7 +7,7 @@ type LoyaltyPoint = InferTypeOf<typeof LoyaltyPointModel>
 type LoyaltyTransaction = InferTypeOf<typeof LoyaltyTransactionModel>
 
 const DEFAULT_EARN_POINTS_PER_CURRENCY_UNIT = 1
-const DEFAULT_REDEEM_POINTS_PER_CURRENCY_UNIT = 25
+const DEFAULT_REDEEM_POINTS_PER_CURRENCY_UNIT = 20
 
 const parsePositiveRate = (value: string | undefined, fallback: number, envName: string) => {
   if (!value) {

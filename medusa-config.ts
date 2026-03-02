@@ -229,6 +229,12 @@ module.exports = defineConfig({
       resolve: "./src/modules/sales-people",
     },
     {
+      resolve: "./src/modules/product-review",
+    },
+    {
+      resolve: "./src/modules/wishlist",
+    },
+    {
       resolve: "./src/modules/loyalty",
     },
   ],

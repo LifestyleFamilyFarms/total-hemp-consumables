@@ -14,9 +14,18 @@ import { adminSalesPeopleUnassignMiddlewares } from "./admin/sales-people/assign
 import { adminSalesPeopleMiddlewares } from "./admin/sales-people/middlewares"
 import { adminSalesStoreStagesMiddlewares } from "./admin/sales-stores/[id]/stages/middlewares"
 import { adminSalesStoresBulkMiddlewares } from "./admin/sales-stores/bulk/middlewares"
+import { adminAbandonedCartsProcessMiddlewares } from "./admin/abandoned-carts/process/middlewares"
+import { adminAbandonedCartsVisibilityMiddlewares } from "./admin/abandoned-carts/visibility/middlewares"
+import { adminCategoryImagesMiddlewares } from "./admin/product-categories/[id]/images/middlewares"
+import { productFeedMiddlewares } from "./product-feed/middlewares"
 import { storeCartLoyaltyPointsMiddlewares } from "./store/carts/[id]/loyalty-points/middlewares"
+import { storeFirstPurchaseDiscountMiddlewares } from "./store/carts/[id]/first-purchase-discount/middlewares"
 import { storeCartResetMiddlewares } from "./store/carts/[id]/reset/middlewares"
 import { storeCustomerLoyaltyHistoryMiddlewares } from "./store/customers/me/loyalty-points/history/middlewares"
+import { storeCustomerOrderReorderMiddlewares } from "./store/customers/me/orders/[id]/reorder/middlewares"
+import { storeWishlistMiddlewares } from "./store/customers/me/wishlists/middlewares"
+import { storeWishlistItemMiddlewares } from "./store/customers/me/wishlists/items/middlewares"
+import { storeProductReviewsMiddlewares } from "./store/products/[id]/reviews/middlewares"
 import { storeSalesPeopleAttachMiddlewares } from "./store/sales-people/attach/middlewares"
 
 type AdminUser = {
@@ -769,15 +778,24 @@ export const repGuard = async (
 
 export default defineMiddlewares({
   routes: [
+    ...productFeedMiddlewares,
+    ...adminAbandonedCartsProcessMiddlewares,
+    ...adminAbandonedCartsVisibilityMiddlewares,
+    ...adminCategoryImagesMiddlewares,
     ...adminSalesPeopleMiddlewares,
     ...adminSalesPersonByIdMiddlewares,
     ...adminSalesPeopleAssignmentsMiddlewares,
     ...adminSalesPeopleUnassignMiddlewares,
     ...adminSalesStoresBulkMiddlewares,
     ...adminSalesStoreStagesMiddlewares,
+    ...storeProductReviewsMiddlewares,
+    ...storeCustomerOrderReorderMiddlewares,
+    ...storeWishlistMiddlewares,
+    ...storeWishlistItemMiddlewares,
     ...storeSalesPeopleAttachMiddlewares,
     ...storeCartResetMiddlewares,
     ...storeCartLoyaltyPointsMiddlewares,
+    ...storeFirstPurchaseDiscountMiddlewares,
     ...storeCustomerLoyaltyHistoryMiddlewares,
     {
       matcher: /^\/admin\/.*/,

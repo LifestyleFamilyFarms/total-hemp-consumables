@@ -1,4 +1,5 @@
 import {
+  authenticate,
   MiddlewareRoute,
   validateAndTransformQuery,
 } from "@medusajs/framework/http"
@@ -26,11 +27,15 @@ export const GetLoyaltyHistoryQuerySchema = z.object({
 })
 
 export type GetLoyaltyHistoryQuery = z.infer<typeof GetLoyaltyHistoryQuerySchema>
+const customerAuth = authenticate("customer", ["session", "bearer"])
 
 export const storeCustomerLoyaltyHistoryMiddlewares: MiddlewareRoute[] = [
   {
     matcher: "/store/customers/me/loyalty-points/history",
     method: "GET",
-    middlewares: [validateAndTransformQuery(GetLoyaltyHistoryQuerySchema, {})],
+    middlewares: [
+      customerAuth,
+      validateAndTransformQuery(GetLoyaltyHistoryQuerySchema, {}),
+    ],
   },
 ]
