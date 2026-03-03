@@ -1,3 +1,4 @@
+import { MedusaError } from "@medusajs/framework/utils"
 import { createStep, StepResponse } from "@medusajs/framework/workflows-sdk"
 import { PRODUCT_REVIEW_MODULE } from "../../../modules/product-review"
 
@@ -20,18 +21,24 @@ type ReviewRecord = {
 }
 
 type ProductReviewModuleService = {
-  createReviews: (data: Record<string, unknown>) => Promise<ReviewRecord>
+  createReviews: (
+    data: Record<string, unknown> | Array<Record<string, unknown>>
+  ) => Promise<ReviewRecord | ReviewRecord[]>
   deleteReviews: (id: string | string[]) => Promise<void>
 }
 
+type CreateReviewCompensationInput = {
+  review_id: string | null
+}
+
 export const createReviewStep = createStep(
-  "reviews.create-review",
+  "reviews-create-review",
   async (input: CreateReviewStepInput, { container }) => {
     const reviewService = container.resolve(
       PRODUCT_REVIEW_MODULE
     ) as ProductReviewModuleService
 
-    const review = await reviewService.createReviews({
+    const created = await reviewService.createReviews({
       product_id: input.product_id,
       customer_id: input.customer_id,
       rating: input.rating,
@@ -40,10 +47,21 @@ export const createReviewStep = createStep(
       status: "pending",
     })
 
-    return new StepResponse(review, review.id)
+    const review = Array.isArray(created) ? created[0] : created
+
+    if (!review?.id) {
+      throw new MedusaError(
+        MedusaError.Types.UNEXPECTED_STATE,
+        "Failed to create review"
+      )
+    }
+
+    return new StepResponse<ReviewRecord, CreateReviewCompensationInput>(review, {
+      review_id: review.id,
+    })
   },
-  async (reviewId, { container }) => {
-    if (!reviewId) {
+  async (compensationInput, { container }) => {
+    if (!compensationInput?.review_id) {
       return
     }
 
@@ -51,6 +69,6 @@ export const createReviewStep = createStep(
       PRODUCT_REVIEW_MODULE
     ) as ProductReviewModuleService
 
-    await reviewService.deleteReviews(reviewId)
+    await reviewService.deleteReviews(compensationInput.review_id)
   }
 )

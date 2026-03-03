@@ -8,7 +8,7 @@ export type RemoveWishlistItemWorkflowInput = {
 }
 
 const removeWishlistItemWorkflow = createWorkflow(
-  "wishlist.remove-item",
+  "wishlist-remove-item",
   function (input: RemoveWishlistItemWorkflowInput) {
     const item = resolveRemovableWishlistItemStep({
       item_id: input.item_id,

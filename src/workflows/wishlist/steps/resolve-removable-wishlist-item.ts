@@ -16,7 +16,7 @@ type WishlistItemRecord = {
 }
 
 export const resolveRemovableWishlistItemStep = createStep(
-  "wishlist.resolve-removable-item",
+  "wishlist-resolve-removable-item",
   async (input: ResolveRemovableWishlistItemStepInput, { container }) => {
     const query = container.resolve("query") as {
       graph: (input: Record<string, unknown>) => Promise<{

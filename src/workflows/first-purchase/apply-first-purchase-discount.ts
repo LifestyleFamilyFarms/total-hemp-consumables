@@ -18,7 +18,7 @@ export type ApplyFirstPurchaseDiscountWorkflowInput = {
 }
 
 const applyFirstPurchaseDiscountWorkflow = createWorkflow(
-  "first-purchase.apply-discount",
+  "first-purchase-apply-discount",
   function (input: ApplyFirstPurchaseDiscountWorkflowInput) {
     const evaluation = evaluateFirstPurchaseStep({
       cart_id: input.cart_id,

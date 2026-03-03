@@ -20,12 +20,37 @@ type ReviewListRecord = {
   created_at: string
 }
 
+type SortDirection = "ASC" | "DESC"
+
+const resolveReviewOrder = (order: string | undefined): SortDirection => {
+  if (!order) {
+    return "DESC"
+  }
+
+  const normalized = order.trim().toLowerCase()
+
+  if (normalized === "-created_at" || normalized === "created_at:desc") {
+    return "DESC"
+  }
+
+  if (
+    normalized === "created_at" ||
+    normalized === "+created_at" ||
+    normalized === "created_at:asc"
+  ) {
+    return "ASC"
+  }
+
+  return "DESC"
+}
+
 export async function GET(
   req: MedusaRequest<ListProductReviewsQuery>,
   res: MedusaResponse
 ) {
   const { id: productId } = req.params as { id: string }
-  const { limit, offset } = req.validatedQuery
+  const { limit, offset, order } = req.validatedQuery
+  const sortDirection = resolveReviewOrder(order)
 
   const query = req.scope.resolve("query") as {
     graph: (input: Record<string, unknown>) => Promise<{
@@ -55,7 +80,7 @@ export async function GET(
       skip: offset,
     },
     order: {
-      created_at: "DESC",
+      created_at: sortDirection,
     },
   })
 

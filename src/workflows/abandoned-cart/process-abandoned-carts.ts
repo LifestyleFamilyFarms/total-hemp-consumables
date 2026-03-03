@@ -15,46 +15,66 @@ export type ProcessAbandonedCartsWorkflowInput = {
 }
 
 const processAbandonedCartsWorkflow = createWorkflow(
-  "abandoned-cart.process",
+  "abandoned-cart-process",
   function (input: ProcessAbandonedCartsWorkflowInput) {
     const found = findAbandonedCartsStep({
       lookback_hours: input.lookback_hours,
       limit: input.limit,
     })
 
-    when({ input, found }, (data) => {
-      return !Boolean(data.input.dry_run) && data.found.carts.length > 0
+    const notifications = sendAbandonedNotificationsStep({
+      carts: found.carts,
+      dry_run: input.dry_run,
+    })
+
+    when({ notifications }, (data) => {
+      return data.notifications.processed_cart_ids.length > 0
     }).then(() => {
-      sendAbandonedNotificationsStep({
-        carts: found.carts,
-      })
-
-      const updates = transform({ found }, (data) => {
+      const updates = transform({ found, notifications }, (data) => {
         const notifiedAt = new Date().toISOString()
+        const processedCartIds = new Set(data.notifications.processed_cart_ids)
 
-        return data.found.carts.map((cart) => ({
-          id: cart.id,
-          metadata: {
-            ...(cart.metadata || {}),
-            abandoned_notification_at: notifiedAt,
-          },
-        }))
+        return data.found.carts
+          .filter((cart) => processedCartIds.has(cart.id))
+          .map((cart) => ({
+            id: cart.id,
+            metadata: {
+              ...(cart.metadata || {}),
+              abandoned_notification_at: notifiedAt,
+            },
+          }))
       })
 
       updateCartsStep(updates)
     })
 
     const cartIds = transform({ found }, (data) => data.found.carts.map((cart) => cart.id))
-    const processedCount = transform({ input, found }, (data) =>
-      Boolean(data.input.dry_run) ? 0 : data.found.carts.length
+    const notifiedCartIds = transform(
+      { notifications },
+      (data) => data.notifications.processed_cart_ids
     )
+    const candidateCount = transform({ found }, (data) => data.found.carts.length)
+    const processedCount = transform({ input, found }, (data) => {
+      if (data.input.dry_run) {
+        return 0
+      }
+
+      return data.found.carts.length
+    })
+    const notificationSentCount = transform(
+      { notifications },
+      (data) => data.notifications.processed_cart_ids.length
+    )
+    const dryRun = transform({ input }, (data) => Boolean(data.input.dry_run))
 
     return new WorkflowResponse({
       candidates: found.carts,
-      candidate_count: found.carts.length,
+      candidate_count: candidateCount,
       processed_count: processedCount,
-      dry_run: Boolean(input.dry_run),
+      notification_sent_count: notificationSentCount,
+      dry_run: dryRun,
       cart_ids: cartIds,
+      notification_sent_cart_ids: notifiedCartIds,
     })
   }
 )

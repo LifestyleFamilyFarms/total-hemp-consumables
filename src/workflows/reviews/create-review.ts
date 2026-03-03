@@ -1,6 +1,6 @@
-import { createWorkflow, transform, WorkflowResponse } from "@medusajs/framework/workflows-sdk"
-import { useQueryGraphStep } from "@medusajs/medusa/core-flows"
+import { createWorkflow, WorkflowResponse } from "@medusajs/framework/workflows-sdk"
 import { createReviewStep } from "./steps/create-review"
+import { ensureProductExistsStep } from "./steps/ensure-product-exists"
 
 export type CreateReviewWorkflowInput = {
   product_id: string
@@ -11,23 +11,14 @@ export type CreateReviewWorkflowInput = {
 }
 
 const createReviewWorkflow = createWorkflow(
-  "reviews.create-review-workflow",
+  "reviews-create-review-workflow",
   function (input: CreateReviewWorkflowInput) {
-    const { data: products } = useQueryGraphStep({
-      entity: "product",
-      fields: ["id"],
-      filters: {
-        id: input.product_id,
-      },
-      options: {
-        throwIfKeyNotFound: true,
-      },
+    const { product_id } = ensureProductExistsStep({
+      product_id: input.product_id,
     })
 
-    const productId = transform({ products }, (data) => data.products[0].id)
-
     const review = createReviewStep({
-      product_id: productId,
+      product_id,
       customer_id: input.customer_id,
       rating: input.rating,
       title: input.title,

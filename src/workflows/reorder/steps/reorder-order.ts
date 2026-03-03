@@ -90,8 +90,25 @@ type ReorderOrderStepOutput = {
   suggested_variants: SuggestedVariants[]
 }
 
+const sanitizeAddressForCart = (
+  address: Record<string, unknown> | null | undefined
+) => {
+  if (!address || typeof address !== "object") {
+    return undefined
+  }
+
+  const cloned = { ...address }
+  delete cloned.id
+  delete cloned.created_at
+  delete cloned.updated_at
+  delete cloned.deleted_at
+  delete cloned.customer_id
+
+  return cloned
+}
+
 export const reorderOrderStep = createStep(
-  "reorder.reorder-order",
+  "reorder-reorder-order",
   async (input: ReorderOrderStepInput, { container }) => {
     const query = container.resolve("query") as {
       graph: (input: Record<string, unknown>) => Promise<{ data: any[] }>
@@ -147,8 +164,8 @@ export const reorderOrderStep = createStep(
       currency_code: order.currency_code || undefined,
       customer_id: order.customer_id,
       email: order.email || undefined,
-      billing_address: order.billing_address || undefined,
-      shipping_address: order.shipping_address || undefined,
+      billing_address: sanitizeAddressForCart(order.billing_address),
+      shipping_address: sanitizeAddressForCart(order.shipping_address),
       metadata: {
         reorder_source_order_id: order.id,
       },

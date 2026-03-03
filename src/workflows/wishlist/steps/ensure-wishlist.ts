@@ -1,4 +1,5 @@
 import { createStep, StepResponse } from "@medusajs/framework/workflows-sdk"
+import { MedusaError } from "@medusajs/framework/utils"
 import { WISHLIST_MODULE } from "../../../modules/wishlist"
 
 type WishlistRecord = {
@@ -11,7 +12,9 @@ type WishlistService = {
     selector?: Record<string, unknown>,
     config?: Record<string, unknown>
   ) => Promise<WishlistRecord[]>
-  createWishlists: (data: Record<string, unknown>) => Promise<WishlistRecord>
+  createWishlists: (
+    data: Record<string, unknown> | Array<Record<string, unknown>>
+  ) => Promise<WishlistRecord | WishlistRecord[]>
   deleteWishlists: (id: string | string[]) => Promise<void>
 }
 
@@ -24,7 +27,7 @@ type EnsureWishlistCompensationInput = {
 }
 
 export const ensureWishlistStep = createStep(
-  "wishlist.ensure-wishlist",
+  "wishlist-ensure-wishlist",
   async (input: EnsureWishlistStepInput, { container }) => {
     const wishlistService = container.resolve(WISHLIST_MODULE) as WishlistService
 
@@ -44,9 +47,19 @@ export const ensureWishlistStep = createStep(
       )
     }
 
-    const created = await wishlistService.createWishlists({
+    const createdResult = await wishlistService.createWishlists({
       customer_id: input.customer_id,
     })
+    const created = Array.isArray(createdResult)
+      ? createdResult[0]
+      : createdResult
+
+    if (!created?.id) {
+      throw new MedusaError(
+        MedusaError.Types.UNEXPECTED_STATE,
+        "Failed to create wishlist"
+      )
+    }
 
     return new StepResponse(
       {

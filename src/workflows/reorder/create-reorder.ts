@@ -7,7 +7,7 @@ export type CreateReorderWorkflowInput = {
 }
 
 const createReorderWorkflow = createWorkflow(
-  "reorder.create-reorder",
+  "reorder-create-reorder",
   function (input: CreateReorderWorkflowInput) {
     const result = reorderOrderStep({
       order_id: input.order_id,

@@ -21,6 +21,7 @@ export const ListProductReviewsQuerySchema = z.object({
     (value) => (typeof value === "string" ? Number.parseInt(value, 10) : value),
     z.number().int().min(0).default(0)
   ),
+  order: z.string().trim().min(1).max(40).optional(),
 })
 
 export type CreateProductReviewBody = z.infer<typeof CreateProductReviewBodySchema>

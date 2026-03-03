@@ -10,7 +10,7 @@ export type AddWishlistItemWorkflowInput = {
 }
 
 const addWishlistItemWorkflow = createWorkflow(
-  "wishlist.add-item",
+  "wishlist-add-item",
   function (input: AddWishlistItemWorkflowInput) {
     useQueryGraphStep({
       entity: "product_variant",

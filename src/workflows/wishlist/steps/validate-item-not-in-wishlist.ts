@@ -19,7 +19,7 @@ type ValidateItemNotInWishlistStepInput = {
 }
 
 export const validateItemNotInWishlistStep = createStep(
-  "wishlist.validate-item-not-in-wishlist",
+  "wishlist-validate-item-not-in-wishlist",
   async (input: ValidateItemNotInWishlistStepInput, { container }) => {
     const wishlistService = container.resolve(WISHLIST_MODULE) as WishlistService
 

@@ -45,7 +45,7 @@ const pickFirstImage = (product: Record<string, any>) => {
 }
 
 export const getProductFeedItemsStep = createStep(
-  "meta-feed.get-product-feed-items",
+  "meta-feed-get-product-feed-items",
   async (input: GetProductFeedItemsStepInput, { container }) => {
     const query = container.resolve("query") as any
     const configModule = container.resolve("configModule") as {

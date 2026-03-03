@@ -23,7 +23,7 @@ const node = (key: string, value?: string | null) => {
 }
 
 export const buildProductFeedXmlStep = createStep(
-  "meta-feed.build-product-feed-xml",
+  "meta-feed-build-product-feed-xml",
   async (input: BuildProductFeedXmlStepInput) => {
     const itemXml = input.items
       .map((item) => {

@@ -8,7 +8,7 @@ export type GenerateMetaFeedWorkflowInput = {
 }
 
 const generateMetaFeedWorkflow = createWorkflow(
-  "meta-feed.generate",
+  "meta-feed-generate",
   function (input: GenerateMetaFeedWorkflowInput) {
     const { items } = getProductFeedItemsStep({
       currency_code: input.currency_code,

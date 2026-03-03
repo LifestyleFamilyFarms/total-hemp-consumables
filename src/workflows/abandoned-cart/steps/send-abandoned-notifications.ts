@@ -1,4 +1,4 @@
-import { Modules } from "@medusajs/framework/utils"
+import { ContainerRegistrationKeys, Modules } from "@medusajs/framework/utils"
 import { createStep, StepResponse } from "@medusajs/framework/workflows-sdk"
 
 type CartRecord = {
@@ -22,6 +22,7 @@ type CartRecord = {
 
 type SendAbandonedNotificationsStepInput = {
   carts: CartRecord[]
+  dry_run?: boolean
 }
 
 type NotificationService = {
@@ -29,39 +30,73 @@ type NotificationService = {
 }
 
 export const sendAbandonedNotificationsStep = createStep(
-  "abandoned-cart.send-notifications",
+  "abandoned-cart-send-notifications",
   async (input: SendAbandonedNotificationsStepInput, { container }) => {
-    if (!input.carts.length) {
-      return new StepResponse({ notifications: [] })
+    if (input.dry_run || !input.carts.length) {
+      return new StepResponse({
+        notifications: [],
+        processed_cart_ids: [],
+      })
     }
 
     const notificationModule = container.resolve(
       Modules.NOTIFICATION
     ) as unknown as NotificationService
 
-    const template = process.env.ABANDONED_CART_TEMPLATE_ID || "abandoned-cart"
+    const logger = container.resolve(ContainerRegistrationKeys.LOGGER) as {
+      warn: (message: string) => void
+    }
+    const template = (process.env.ABANDONED_CART_TEMPLATE_ID || "").trim()
 
-    const payload = input.carts.map((cart) => ({
-      to: cart.email,
-      channel: "email",
-      template,
-      data: {
-        customer: {
-          first_name: cart.customer?.first_name || cart.shipping_address?.first_name || "",
-          last_name: cart.customer?.last_name || cart.shipping_address?.last_name || "",
+    if (!template) {
+      logger.warn(
+        "[abandoned-cart] ABANDONED_CART_TEMPLATE_ID is not set; skipping abandoned-cart notification send."
+      )
+
+      return new StepResponse({
+        notifications: [],
+        processed_cart_ids: [],
+      })
+    }
+
+    const notifications: unknown[] = []
+    const processedCartIds: string[] = []
+
+    for (const cart of input.carts) {
+      const payload = {
+        to: cart.email,
+        channel: "email",
+        template,
+        data: {
+          customer: {
+            first_name: cart.customer?.first_name || cart.shipping_address?.first_name || "",
+            last_name: cart.customer?.last_name || cart.shipping_address?.last_name || "",
+          },
+          cart_id: cart.id,
+          items: (cart.items || []).map((item) => ({
+            title: item.title,
+            quantity: item.quantity,
+            unit_price: item.unit_price,
+            thumbnail: item.thumbnail,
+          })),
         },
-        cart_id: cart.id,
-        items: (cart.items || []).map((item) => ({
-          title: item.title,
-          quantity: item.quantity,
-          unit_price: item.unit_price,
-          thumbnail: item.thumbnail,
-        })),
-      },
-    }))
+      }
 
-    const notifications = await notificationModule.createNotifications(payload)
+      try {
+        const created = await notificationModule.createNotifications([payload])
+        notifications.push(...created)
+        processedCartIds.push(cart.id)
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "Unknown notification error"
+        logger.warn(
+          `[abandoned-cart] Failed to send notification for cart ${cart.id}: ${message}`
+        )
+      }
+    }
 
-    return new StepResponse({ notifications })
+    return new StepResponse({
+      notifications,
+      processed_cart_ids: processedCartIds,
+    })
   }
 )

@@ -31,16 +31,8 @@ type EvaluateFirstPurchaseStepOutput = {
 }
 
 export const evaluateFirstPurchaseStep = createStep(
-  "first-purchase.evaluate",
+  "first-purchase-evaluate",
   async (input: EvaluateFirstPurchaseStepInput, { container }) => {
-    if (!isFirstPurchaseDiscountEnabled()) {
-      return new StepResponse<EvaluateFirstPurchaseStepOutput>({
-        eligible: false,
-        reason: "First purchase discount is disabled",
-        promotion_code: input.promotion_code,
-      })
-    }
-
     const query = container.resolve("query") as {
       graph: (input: Record<string, unknown>) => Promise<{ data: any[] }>
     }
@@ -72,6 +64,14 @@ export const evaluateFirstPurchaseStep = createStep(
         MedusaError.Types.NOT_ALLOWED,
         "You can only apply first-purchase discounts on your own cart"
       )
+    }
+
+    if (!isFirstPurchaseDiscountEnabled()) {
+      return new StepResponse<EvaluateFirstPurchaseStepOutput>({
+        eligible: false,
+        reason: "First purchase discount is disabled",
+        promotion_code: input.promotion_code,
+      })
     }
 
     const existingCodes = (cart.promotions || [])
