@@ -17,7 +17,7 @@ export default async function onCustomerCreated({
   if (!customer?.email) return
   if (!customer?.metadata?.gamma_gummies_event_2025) return
 
-  const template = process.env.SENDGRID_TEMPLATE_GAMMA_SIGNUP
+  const template = process.env.SENDGRID_TEMPLATE_GAMMA_GUMMIES
   if (!template) return
 
   await notification.createNotifications([
