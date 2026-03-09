@@ -2,17 +2,26 @@
 
 This directory contains backend-specific documentation for `total-hemp-consumables`.
 
-## Cross-Repo Coordination Docs
+## Canonical Command Center
 
-Canonical cross-repo release/finalization docs are maintained at:
+Cross-repo orchestration now lives in this repo under:
 
-- `/Users/franciscraven/Desktop/total-hemp/docs/finalization-phases`
+- `/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/docs/finalization-phases`
 
 If you need to run implementation agents or release orchestration, start here:
 
-- `/Users/franciscraven/Desktop/total-hemp/docs/finalization-phases/README.md`
+- `/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/docs/finalization-phases/README.md`
+
+## Shared References
+
+- SDK references:
+  - `/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/docs/js-sdk`
+- Wave 1 backend references:
+  - `/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/docs/wave-1-docs`
+- Project to-do tracker (now tracked):
+  - `/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/docs/to-do-prod.md`
 
 ## Rule of Placement
 
 - Put backend implementation details in this folder.
-- Put cross-repo orchestration docs in root `/docs/finalization-phases`.
+- Put cross-repo orchestration docs in this repo’s `docs/finalization-phases`.

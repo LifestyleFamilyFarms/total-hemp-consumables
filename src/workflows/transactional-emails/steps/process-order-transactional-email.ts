@@ -119,6 +119,36 @@ const toAbsoluteUrl = (value: string | undefined): string | null => {
   return trimmed
 }
 
+const toCurrencyCode = (value: string | null | undefined): string => {
+  const normalized = (value || "").trim().toUpperCase()
+  if (/^[A-Z]{3}$/.test(normalized)) {
+    return normalized
+  }
+  return "USD"
+}
+
+const formatCurrency = (
+  amount: number | null,
+  currencyCode: string | null | undefined
+): string | null => {
+  if (typeof amount !== "number" || !Number.isFinite(amount)) {
+    return null
+  }
+
+  const code = toCurrencyCode(currencyCode)
+
+  try {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: code,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(amount)
+  } catch {
+    return `$${amount.toFixed(2)}`
+  }
+}
+
 const buildTemplateData = (order: OrderRecord, type: TransactionalEmailTrigger) => {
   const storefrontUrl = toAbsoluteUrl(process.env.STOREFRONT_URL)
   const websiteUrl = toAbsoluteUrl(process.env.SENDGRID_WEBSITE_URL) || storefrontUrl
@@ -128,8 +158,10 @@ const buildTemplateData = (order: OrderRecord, type: TransactionalEmailTrigger) 
   const orderUrl = storefrontUrl ? `${storefrontUrl}/account/orders/details/${order.id}` : null
   const topWordmarkUrl = toAbsoluteUrl(process.env.SENDGRID_BRAND_TOP_WORDMARK_URL)
   const footerLogoUrl = toAbsoluteUrl(process.env.SENDGRID_BRAND_FOOTER_LOGO_URL)
+  const currencyCode = toCurrencyCode(order.currency_code || null)
 
   const nowIso = new Date().toISOString()
+  const totalAmount = asNumber(order.total)
 
   return {
     order: {
@@ -141,17 +173,29 @@ const buildTemplateData = (order: OrderRecord, type: TransactionalEmailTrigger) 
       fulfillment_status: order.fulfillment_status || null,
       currency_code: order.currency_code || null,
       totals: {
-        total: asNumber(order.total),
+        total: totalAmount,
+        total_display: formatCurrency(totalAmount, currencyCode),
         subtotal: asNumber(order.subtotal),
+        subtotal_display: formatCurrency(asNumber(order.subtotal), currencyCode),
         tax_total: asNumber(order.tax_total),
+        tax_total_display: formatCurrency(asNumber(order.tax_total), currencyCode),
         shipping_total: asNumber(order.shipping_total),
+        shipping_total_display: formatCurrency(
+          asNumber(order.shipping_total),
+          currencyCode
+        ),
         discount_total: asNumber(order.discount_total),
+        discount_total_display: formatCurrency(
+          asNumber(order.discount_total),
+          currencyCode
+        ),
       },
       items: (order.items || []).map((item) => ({
         id: item.id,
         title: item.title || "Item",
         quantity: asNumber(item.quantity) ?? 0,
         unit_price: asNumber(item.unit_price),
+        unit_price_display: formatCurrency(asNumber(item.unit_price), currencyCode),
         thumbnail: item.thumbnail || null,
       })),
     },
@@ -170,7 +214,11 @@ const buildTemplateData = (order: OrderRecord, type: TransactionalEmailTrigger) 
     refund: {
       amount:
         toStatus(order.payment_status) === "refunded"
-          ? asNumber(order.total)
+          ? totalAmount
+          : null,
+      amount_display:
+        toStatus(order.payment_status) === "refunded"
+          ? formatCurrency(totalAmount, currencyCode)
           : null,
       reason: null,
       timestamp: type === "refund_status" ? nowIso : null,

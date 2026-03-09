@@ -39,6 +39,8 @@
     "shipstation:inspect:prod": "SHIPSTATION_ENV=production DISABLE_MEDUSA_ADMIN=true yarn medusa exec ./src/scripts/inspect-shipstation.ts",
     "shipstation:sync:test": "SHIPSTATION_ENV=test DISABLE_MEDUSA_ADMIN=true yarn medusa exec ./src/scripts/create-missing-shipstation-options.ts",
     "shipstation:sync:prod": "SHIPSTATION_ENV=production DISABLE_MEDUSA_ADMIN=true yarn medusa exec ./src/scripts/create-missing-shipstation-options.ts",
+    "abandoned:process:dry": "ABANDONED_CART_PROCESS_DRY_RUN=1 medusa exec ./src/scripts/run-abandoned-carts-process.ts",
+    "abandoned:process": "ABANDONED_CART_PROCESS_DRY_RUN=0 medusa exec ./src/scripts/run-abandoned-carts-process.ts",
     "shipping:ensure:pickup": "medusa exec ./src/scripts/ensure-pickup-shipping-option.ts",
     "loyalty:credit": "medusa exec ./src/scripts/credit-loyalty-points.ts",
     "mirror:dev": "ts-node ./src/scripts/mirror-prod-to-dev.ts",

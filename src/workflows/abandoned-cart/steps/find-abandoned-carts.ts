@@ -8,6 +8,7 @@ type FindAbandonedCartsStepInput = {
 type CartRecord = {
   id: string
   email?: string | null
+  currency_code?: string | null
   updated_at?: string | Date | null
   metadata?: Record<string, unknown> | null
   customer?: {
@@ -50,6 +51,7 @@ export const findAbandonedCartsStep = createStep(
     }
 
     const abandoned: CartRecord[] = []
+    const seenEmails = new Set<string>()
     let offset = 0
     let total = Number.POSITIVE_INFINITY
 
@@ -59,6 +61,7 @@ export const findAbandonedCartsStep = createStep(
         fields: [
           "id",
           "email",
+          "currency_code",
           "updated_at",
           "completed_at",
           "metadata",
@@ -87,7 +90,7 @@ export const findAbandonedCartsStep = createStep(
           skip: offset,
         },
         order: {
-          updated_at: "ASC",
+          updated_at: "DESC",
         },
       })
 
@@ -101,9 +104,11 @@ export const findAbandonedCartsStep = createStep(
       for (const cart of fetched) {
         const hasItems = Array.isArray(cart.items) && cart.items.length > 0
         const alreadyNotified = Boolean(cart.metadata?.abandoned_notification_at)
+        const emailKey = (cart.email || "").trim().toLowerCase()
 
-        if (hasItems && !alreadyNotified) {
+        if (hasItems && !alreadyNotified && emailKey && !seenEmails.has(emailKey)) {
           abandoned.push(cart)
+          seenEmails.add(emailKey)
         }
 
         if (abandoned.length >= limit) {

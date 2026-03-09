@@ -1,0 +1,143 @@
+<html>
+  <!--
+    Template: Abandoned Cart (Re-engagement)
+    Recommended Subject: You left something good in your cart
+    Alt Subject: Your Total Hemp cart is still saved
+    Preheader: Your cart is still saved at Total Hemp. Return anytime to finish checkout.
+    Required Variables:
+      customer.first_name
+      cart_id
+      recover_url (signed /cart/recover?token=... when configured; /cart fallback)
+      links.website_url
+      links.support_url
+      items[].title
+      items[].quantity
+      items[].unit_price
+      items[].unit_price_display
+      items[].thumbnail
+      {{{unsubscribe}}}
+      {{{unsubscribe_preferences}}}
+    Manual Substitutions:
+      https://YOUR_SENDGRID_CDN/top-wordmark.png
+      https://YOUR_SENDGRID_CDN/footer-full-logo.png
+    Compliance:
+      Re-engagement email. Unsubscribe and preferences links are allowed.
+  -->
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="x-apple-disable-message-reformatting" />
+    <meta name="format-detection" content="telephone=no,address=no,email=no,date=no,url=no" />
+    <meta name="color-scheme" content="light" />
+    <meta name="supported-color-schemes" content="light" />
+    <title>Total Hemp | Your cart is waiting</title>
+  </head>
+  <body style="margin:0;padding:0;background-color:#f7f6ad;font-family:Helvetica,Arial,sans-serif;color:#19572d;">
+    <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">
+      Your cart is still saved at Total Hemp. Return anytime to finish checkout.
+    </div>
+
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" bgcolor="#f7f6ad" style="background:linear-gradient(165deg,#f7f6ad 0%,#fef8d9 42%,#f7f6ad 100%);padding:30px 10px;">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width:620px;background:#ffffff;border-radius:16px;overflow:hidden;border:1px solid #d8d8b1;box-shadow:0 18px 34px rgba(25,87,45,0.12);">
+            <tr>
+              <td style="height:6px;background:#19572d;background:linear-gradient(90deg,#19572d 0%,#12a67a 35%,#f4c53f 68%,#e66a2b 100%);font-size:0;line-height:0;">&nbsp;</td>
+            </tr>
+
+            <tr>
+              <td align="center" bgcolor="#fffdf0" style="padding:22px 26px 10px;background:#fffdf0;">
+                <img src="https://YOUR_SENDGRID_CDN/top-wordmark.png" alt="Total Hemp" width="198" style="display:block;width:198px;max-width:100%;height:auto;border:0;" />
+              </td>
+            </tr>
+
+            <tr>
+              <td align="center" bgcolor="#19572d" style="padding:24px 26px 18px;background:linear-gradient(140deg,#19572d 0%,#166f40 54%,#12a67a 100%);color:#f7f6ad;">
+                <p style="margin:0 0 12px;font-size:12px;letter-spacing:1.2px;text-transform:uppercase;font-weight:700;opacity:0.92;">Total Hemp Cart Reminder</p>
+                <h1 style="margin:0 0 10px;font-size:29px;line-height:1.2;font-weight:700;">You left something good in your cart.</h1>
+                <p style="margin:0;font-size:15px;line-height:1.62;opacity:0.95;">
+                  {{#if customer.first_name}}Hi {{customer.first_name}},{{else}}Hi there,{{/if}} your items are still saved, and checkout takes just a minute.
+                </p>
+              </td>
+            </tr>
+
+            <tr>
+              <td align="center" bgcolor="#ffffff" style="padding:22px 26px 8px;background:#ffffff;">
+                <p style="margin:0 0 14px;font-size:15px;line-height:1.6;color:#19572d;">
+                  Resume where you left off whenever you are ready.
+                </p>
+                {{#if recover_url}}
+                <a href="{{recover_url}}" style="display:inline-block;background:#19572d;color:#f7f6ad;text-decoration:none;font-size:15px;font-weight:700;padding:12px 20px;border-radius:999px;border:2px solid #19572d;">Return to cart</a>
+                {{else}}
+                <a href="{{#if links.website_url}}{{links.website_url}}/cart{{else}}https://www.totalhemp.co/cart{{/if}}" style="display:inline-block;background:#19572d;color:#f7f6ad;text-decoration:none;font-size:15px;font-weight:700;padding:12px 20px;border-radius:999px;border:2px solid #19572d;">Return to cart</a>
+                {{/if}}
+                <p style="margin:14px 0 0;font-size:12px;color:#6d3a2d;">Cart reference: {{cart_id}}</p>
+              </td>
+            </tr>
+
+            <tr>
+              <td align="center" bgcolor="#ffffff" style="padding:6px 26px 8px;background:#ffffff;">
+                <h2 style="margin:8px 0 12px;font-size:16px;color:#19572d;">Items in your cart</h2>
+                {{#if items}}
+                {{#each items}}
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="border:1px solid #e5ddb8;border-radius:12px;margin:0 0 10px;background:#fffdf4;">
+                  <tr>
+                    <td style="padding:10px 12px;width:74px;vertical-align:top;text-align:center;">
+                      {{#if thumbnail}}
+                      <img src="{{thumbnail}}" alt="{{title}}" width="64" style="display:block;border-radius:8px;margin:0 auto;" />
+                      {{/if}}
+                    </td>
+                    <td style="padding:10px 12px 10px 0;vertical-align:top;text-align:center;">
+                      <p style="margin:0 0 4px;font-size:14px;font-weight:700;color:#19572d;">{{title}}</p>
+                      <p style="margin:0;font-size:13px;color:#6d3a2d;">Qty: {{quantity}} | Price: {{#if unit_price_display}}{{unit_price_display}}{{else}}{{unit_price}}{{/if}}</p>
+                    </td>
+                  </tr>
+                </table>
+                {{/each}}
+                {{else}}
+                <p style="margin:0 0 10px;font-size:13px;color:#6d3a2d;">Your saved cart is ready to review.</p>
+                {{/if}}
+              </td>
+            </tr>
+
+            <tr>
+              <td align="center" bgcolor="#ffffff" style="padding:4px 26px 6px;background:#ffffff;">
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="border:1px solid #f4c53f;border-radius:12px;background:#fff8df;">
+                  <tr>
+                    <td style="padding:12px 14px;font-size:13px;line-height:1.5;color:#19572d;text-align:center;">
+                      Hemp-crafted products. Transparent quality. Reliable support.
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr>
+              <td align="center" bgcolor="#fffdf0" style="padding:20px 26px 12px;background:#fffdf0;border-top:1px solid #efe8c8;">
+                <img src="https://YOUR_SENDGRID_CDN/footer-full-logo.png" alt="Total Hemp" width="146" style="display:block;width:146px;max-width:100%;height:auto;border:0;margin:0 auto 10px;" />
+                <p style="margin:0 0 6px;font-size:12px;line-height:1.6;color:#6d3a2d;">
+                  Shop online at
+                  <a href="{{#if links.website_url}}{{links.website_url}}{{else}}https://www.totalhemp.co{{/if}}" target="_blank" style="color:#19572d;text-decoration:underline;">www.totalhemp.co</a>
+                </p>
+                <p style="margin:0 0 10px;font-size:12px;line-height:1.6;color:#6d3a2d;">
+                  Need help? <a href="{{#if links.support_url}}{{links.support_url}}{{else}}https://www.totalhemp.co/content/contact{{/if}}" style="color:#19572d;text-decoration:underline;">Contact support</a>.
+                </p>
+                <p style="margin:0 0 10px;font-size:11px;line-height:1.5;color:#8a6a4a;">Total Hemp Consumables | Lab-tested hemp products</p>
+              </td>
+            </tr>
+
+            <tr>
+              <td align="center" bgcolor="#fffdf0" style="padding:0 26px 22px;font-size:12px;color:#6d3a2d;line-height:1.6;background:#fffdf0;">
+                <p style="margin:0;">
+                  <a href="{{{unsubscribe}}}" target="_blank" style="color:#19572d;text-decoration:underline;">Unsubscribe</a>
+                  &nbsp;|&nbsp;
+                  <a href="{{{unsubscribe_preferences}}}" target="_blank" style="color:#19572d;text-decoration:underline;">Unsubscribe Preferences</a>
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

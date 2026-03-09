@@ -1,0 +1,228 @@
+## Immediate Production Tasks
+- Wave 1 Recovery Freeze (2026-03-02):
+  - Gate status: FAIL (updated after post-hotfix rerun).
+  - Lock sequence now:
+    - Agent A backend hotfix pass completed and manager-reviewed.
+    - Abandoned-cart admin process runtime blocker validated cleared (authenticated admin probes now return HTTP 200 for dry/live).
+    - Remaining blocker lane is storefront UX acceptance evidence (reorder + first-purchase + targeted reviews/wishlist evidence closure).
+    - Next: Agent B focused UX-acceptance remediation -> Agent D targeted rerun.
+  - Backend hotfix targets:
+    - eliminate workflow-path `500 unknown_error` on reviews/wishlist/reorder/first-purchase/feed
+    - resolve transaction orchestrator undefined-id crash path
+    - fix wishlist runtime DB state (`wishlist` table exists in active environment)
+    - reconcile reviews list optional `order` query contract
+  - QA rerun must produce:
+    - `/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/docs/finalization-phases/evidence/phase-wave1-YYYY-MM-DD-post-hotfix.md`
+    - full auth/ownership matrix + contract table + go/no-go verdict
+  - follow-up prompts:
+    - `/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/docs/finalization-phases/agent-prompts/agent-b-wave1-ux-acceptance-remediation.md`
+    - `/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/docs/finalization-phases/agent-prompts/agent-d-wave1-targeted-rerun.md`
+- Change ShipStation API Key to Proleve.
+- Configure abandoned-cart email template for SendGrid:
+  - create/confirm transactional template in SendGrid for abandoned-cart flow
+  - set backend env `ABANDONED_CART_TEMPLATE_ID=<sendgrid-template-guid>`
+  - run admin validation probe:
+    - `POST /admin/abandoned-carts/process` with `dry_run=false`
+    - confirm `processed_count > 0` when candidates exist
+- Next shipping-notification advancement (Phase 13B1): ShipStation webhook integration.
+  - dispatch prompt: `/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/docs/finalization-phases/agent-dispatch/active/sendgrid-shipstation-webhook-agent.md`
+  - expected evidence: `/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/docs/finalization-phases/evidence/phase-13b1-shipstation-webhook-YYYY-MM-DD.md`
+- Historical decision 2026-02-27 (now superseded by Phase 13B1 dispatch): keep checkout in `pickup_only` mode for QA/launch readiness; defer ShipStation sandbox integration until carrier options are finalized.
+- Completed 2026-02-27: backend loyalty migrations in `/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables` via `npx medusa db:migrate` (module up-to-date).
+- HIGH URGENCY (2026-02-27): auth entry UX overhaul (sign in / join / sign up):
+  - replace current Medusa-template account auth screens with a branded, first-time onboarding experience for sign-up.
+  - remove returning-member language from sign-up flow (e.g., no "Welcome Back" on join/create-account route).
+  - keep distinct copy and visual treatment between returning member sign-in and first-time user sign-up.
+  - implement mobile-first responsive polish for auth routes and states (`/account` login tab, signup tab, form validation/errors, post-auth redirect feedback).
+
+## Packet 1 QA Gate (Must Pass)
+- Backend loyalty route verification:
+  - `GET /store/customers/me/loyalty-points` auth behavior (401 guest, 200 signed-in)
+  - `GET /store/customers/me/loyalty-points/history` auth behavior and shape
+  - `POST /store/carts/:id/loyalty-points` ownership and validation checks
+  - `DELETE /store/carts/:id/loyalty-points` ownership and validation checks
+  - resolved (2026-02-27): strict API matrix pass on `:9000`:
+    - guest `GET` loyalty routes return `401`
+    - authenticated `GET` loyalty routes return `200` with expected payload shape
+    - invalid cart ids return `404` on loyalty `POST`/`DELETE`
+    - ownership-denied loyalty `POST`/`DELETE` now return `403` consistently after workflow step-order fix in `src/workflows/loyalty/apply-loyalty-on-cart.ts`
+    - authenticated loyalty apply/remove on owned cart returns `200`
+- Event + workflow verification:
+  - `order.placed` updates loyalty balance/transaction history correctly
+  - complete-cart validation hook blocks checkout when loyalty points are insufficient
+  - resolved (2026-02-27): pickup-only shipping options seeded for QA and full loyalty checkout/order validation now possible
+  - resolved (2026-02-27): complete-cart loyalty validation hook verified with live API test:
+    - completion blocked with `400` and message `Insufficient loyalty points. Required: 42, Available: 0`
+    - post-test balance restored to pre-test value
+  - resolved (2026-02-27): loyalty redemption order path verified:
+    - cart with applied loyalty completed successfully (`type=order`)
+    - customer points decreased from `255` to `213` (42-point deduction) confirming `order.placed` loyalty deduction path
+  - pending:
+    - run one paid (non-zero total) order completion pass to reconfirm the pure "earn points" path in the current payment-session flow:
+      - payment session init now succeeds, but completion returns `payment_authorization_error` on `pp_authorizenet_authorizenet` without browser Accept.js tokenization
+      - perform this verification in browser checkout flow (or with an automated Accept.js-capable E2E harness)
+- Storefront loyalty verification:
+  - guest checkout shows sign-in CTA in loyalty section
+  - signed-in customer can apply/remove loyalty points in checkout summary
+  - account dashboard renders loyalty balance + history preview
+  - loyalty promo row is not duplicated in discount-code display
+  - resolved (2026-02-27): scripted live loyalty smoke added in storefront:
+    - command: `LOYALTY_TEST_EMAIL=... LOYALTY_TEST_PASSWORD=... yarn qa:loyalty-live`
+    - verifies auth, points/history routes, ownership guard (`403`), and apply/remove loyalty cycle on owned cart
+    - reference: `/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables-storefront/docs/loyalty-live-testing.md`
+- Funnel hardening verification:
+  - resolved (2026-02-27): order confirmation now includes next-steps timeline and valid support paths (email/account orders)
+  - resolved (2026-02-27): delivery summary block is responsive and uses safe currency formatting/types
+- Normalization verification:
+  - no frontend `/100` price scaling remains in checkout/cart totals
+  - shipping mode flag defaults to pickup-only and full mode path remains available
+  - `check:commerce-rules` passes
+  - resolved (2026-02-27): storefront `yarn lint`, `yarn build`, and `yarn check:commerce-rules` all pass after loyalty + pickup-only normalization updates
+  - pickup-only backend path enabled for QA:
+    - manual fulfillment provider added in backend config
+    - `yarn shipping:ensure:pickup` seeds temporary pickup options
+    - validated on active `:9000` runtime
+- Responsive verification:
+  - automated capture run completed (2026-02-27): `/us/cart`, `/us/checkout`, `/us/account` screenshots at:
+    - `390x844`
+    - `1024x768`
+    - `1440x900`
+  - artifacts: `/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables-storefront/artifacts/responsive/20260226-214054`
+  - pending: manual visual signoff on the captured screenshots
+  - rerun completed (2026-02-27): `/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables-storefront/artifacts/responsive/20260226-215908`
+  - note: current captures hit the age gate, which confirms gate behavior but blocks route UI assessment
+  - rerun completed with QA age-gate bypass (2026-02-27): `/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables-storefront/artifacts/responsive/20260226-233017`
+  - rerun completed with rebuilt frontend (2026-02-27): `/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables-storefront/artifacts/responsive/20260226-233801`
+
+## Route UI Backlog (Post Age-Gate Session)
+- Run UI review after passing age gate for:
+  - `/us/cart`
+  - `/us/checkout`
+  - `/us/account`
+- pending (2026-02-27): execute full cart UI rebuild with shadcn/tailwind semantic theme tokens to match the checkout redesign (legibility, spacing, responsive polish, and theme parity).
+- Improve responsive UI polish at:
+  - `390x844`
+  - `1024x768`
+  - `1440x900`
+- Manual review outcome (2026-02-27):
+  - cart, checkout, and account route UI needs additional polish across the tested breakpoints
+  - prioritize mobile-first sizing/spacing fixes, then tablet/desktop alignment cleanup
+- Re-capture screenshots after UI updates and complete manual visual signoff.
+- resolved (2026-02-27): dev-only QA age-gate bypass added for responsive smoke captures via `qa_age_verified=1` query parameter.
+- UI polish pass applied (2026-02-27) for mobile spacing on cart/account:
+  - `src/modules/cart/components/empty-cart-message/index.tsx`
+  - `src/modules/cart/components/sign-in-prompt/index.tsx`
+  - `src/modules/account/components/login/index.tsx`
+  - `src/modules/account/templates/login-template.tsx`
+  - `src/modules/account/templates/account-layout.tsx`
+- latest responsive captures after UI pass:
+  - rerun required on active `:8000` storefront process after restart to finalize visual signoff
+  - note: one capture run against the prior `:8000` process generated internal-error pages, indicating a stale/bad runtime state during capture
+- decision (2026-02-27): deprioritize further screenshot-capture QA loops for now and focus on live checkout/account testing until next dedicated visual QA pass.
+
+## Skills Integration Continuation (Post-Packet 1)
+- Continue full skills implementation order in `/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables-storefront/docs/full-build-implementation-order.md`:
+  - prioritize funnel hardening phases 6-8 (cart, checkout, confirmation)
+  - then execute account retention, static/compliance pages, promotions/wishlist, and final SEO/mobile/perf release gates
+- resolved (2026-02-27): Phase 10 static/compliance baseline routes now exist and are wired:
+  - `/[countryCode]/content`
+  - `/[countryCode]/content/{about,contact,faq,privacy-policy,shipping-returns,terms-of-use}`
+  - footer and post-order help links now point to these routes
+- remaining Phase 10 work:
+  - resolved (2026-02-27): shipping/returns, terms, and privacy pages upgraded to production-ready v1 copy, including explicit ship-to jurisdiction list and privacy-rights request flow.
+  - resolved (2026-02-27): compliance bar content and UI refreshed to align with policy pages, with direct links to full Shipping, Terms, and Privacy routes plus permit PDF access.
+  - resolved (2026-02-27): compliance bar now uses compact mobile mode (`<sm`) with a popout sheet to reduce footprint on large/small phone screens while preserving full desktop/tablet layout.
+  - pending: legal counsel review/final signoff on policy language before production go-live.
+  - post-age-gate UI polish/review for static pages at launch breakpoints
+
+## Phase 11 Promotions/Wishlist
+- resolved (2026-02-27): promotions transparency improved for post-purchase/account order views:
+  - order summary now reads adjustment lines and surfaces applied promotion labels/codes with discount amounts
+  - order confirmation now uses the same order summary block for consistent promotion visibility
+  - order data queries now request item/shipping adjustment relations needed for promotion breakdowns
+- resolved (2026-03-02): wishlist storefront integration delivered against backend module/routes:
+  - PDP add/remove wishlist actions wired through storefront data layer and authenticated guest-path handling
+  - wishlist list consistency maintained with optimistic UX + canonical re-fetch after mutation
+  - contract-shape remediation completed for backend responses:
+    - GET `/store/customers/me/wishlists` -> `{ wishlist, items }` (item `variant` normalized in storefront)
+    - POST `/store/customers/me/wishlists/items` -> `{ wishlist_id, item }`
+    - DELETE `/store/customers/me/wishlists/items/:id` -> `{ id, removed }`
+
+## Wave 1 Agent B Status (Storefront Conversion)
+- resolved (2026-03-02): Agent B storefront conversion lane implementation completed and manager-approved.
+- completed scope:
+  - Reviews on PDP:
+    - list + authenticated submission UX with loading/empty/error/success states
+    - pending moderation note surfaced after successful submission
+    - backend-compatible response typing for optional `average_rating`
+  - Wishlist on PDP:
+    - authenticated add/remove + guest sign-in prompt path
+    - loading/error/empty/success handling and consistent post-mutation state
+  - Reorder on order-details:
+    - consumed reorder endpoint with backend-aligned `cart_id` contract
+    - renders `added_items[]`, `unavailable_items[]`, `suggested_variants[]`
+    - explicit no auto-substitution behavior retained
+  - First-purchase discount UX:
+    - consumed `/store/carts/:id/first-purchase-discount`
+    - robust disabled/not-eligible/already-applied/success/error state classification
+    - guest auth gate hardened (apply button disabled for unauthenticated users while sign-in CTA remains visible)
+- storefront quality gates (latest Agent B pass):
+  - `yarn lint`: pass
+  - `yarn build`: pass
+- remarks:
+  - `yarn tsc --noEmit` still fails on pre-existing unrelated type issue in `src/components/layout/topbar.tsx` (unchanged by Agent B scope).
+
+## Loyalty Education Surfaces
+- resolved (2026-02-27): loyalty explainer content route added:
+  - `/[countryCode]/content/loyalty-rewards`
+- resolved (2026-02-27): loyalty education links distributed across key surfaces:
+  - checkout loyalty section now includes in-context "How it works" popover + guide link
+  - account overview/account loyalty/account nav include rewards guide links
+  - footer, side menu, and post-order help include loyalty rewards guide links
+  - help center index and sitemap include loyalty rewards route
+
+## Phase 12 SEO/Release Baseline
+- resolved (2026-02-27): added production SEO foundation in storefront:
+  - global metadata defaults with OG/Twitter in root layout
+  - dynamic `robots.txt` route (`src/app/robots.ts`)
+  - dynamic `sitemap.xml` route covering static, catalog, collection, category, and product URLs (`src/app/sitemap.ts`)
+  - PDP canonical metadata + Product/Breadcrumb JSON-LD schema output
+  - homepage Organization JSON-LD output
+  - canonical metadata normalized for store/category/collection routes to avoid query-parameter duplicate indexing
+- pending:
+  - submit sitemap in Google Search Console
+  - run Lighthouse/PageSpeed pass and Core Web Vitals review on launch environment
+
+## Typecheck Status
+- resolved (2026-02-27): storefront `yarn tsc --noEmit` now passes after fixing outstanding type issues in brand, analytics, account address/register flows, and PDP/PLP product typing.
+
+## Wave 1 Agent C Status (Catalog/Presentation)
+- resolved (2026-03-02): Agent C storefront catalog/presentation lane implementation completed and manager-approved.
+- completed scope:
+  - category image integration on storefront catalog/category surfaces with safe fallback handling for missing metadata/images.
+  - consumed backend image contract via storefront data layer (`GET /store/product-categories/:id/images` through `src/lib/data/categories.ts`).
+  - added operator/dev verification documentation for meta feed route:
+    - `/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables-storefront/docs/meta-product-feed-verification.md`
+  - low-risk optimization pass completed:
+    - reduced `listCatalogCategoryMediaCards` request fan-out from per-category calls to a single category fetch with metadata-derived thumbnails.
+- storefront quality gates (latest Agent C pass):
+  - `yarn lint`: pass
+  - `yarn build`: pass
+
+## Backlog (Non-Blocking, Post-Wave1)
+- [ ] Optimize `/admin/abandoned-carts/visibility` for scale.
+  - Current behavior is correctness-first and scans carts to compute candidate-accurate pagination/count.
+  - Goal: move filtering/counting to a query/indexed approach to avoid full-scan behavior on large cart volumes.
+  - Keep response contract unchanged: `{ carts, count, limit, offset }`.
+  - Owner: Backend
+  - Priority: Medium
+- [ ] Finalize abandoned-cart unsubscribe/suppression strategy (SendGrid).
+  - Decide policy boundary: abandoned-cart treated as transactional vs marketing/re-engagement.
+  - If re-engagement/marketing: enforce suppression-group behavior (ASM) so unsubscribe/preferences are guaranteed.
+  - Current Medusa SendGrid provider path does not explicitly pass ASM group fields; evaluate:
+    - account-level SendGrid subscription tracking only, or
+    - custom provider extension to pass `asm.group_id` per message.
+  - Validate template placeholders/links (`unsubscribe`, `unsubscribe_preferences`) render correctly in real sends.
+  - Document final operator runbook and verification steps.
+  - Owner: SendGrid/Ops
+  - Priority: Medium

@@ -188,6 +188,14 @@ describe("processOrderTransactionalEmailStep", () => {
         to: "buyer@example.com",
         template: "d-order-confirm",
         data: expect.objectContaining({
+          order: expect.objectContaining({
+            items: expect.arrayContaining([
+              expect.objectContaining({
+                unit_price: 40,
+                unit_price_display: "$40.00",
+              }),
+            ]),
+          }),
           links: expect.objectContaining({
             order_url: "https://store.example.com/account/orders/details/order_1",
             support_url: "https://store.example.com/content/contact",
@@ -328,6 +336,7 @@ describe("processOrderTransactionalEmailStep", () => {
         template: "d-refund-confirm",
         data: expect.objectContaining({
           refund: expect.objectContaining({
+            amount_display: "$40.00",
             timestamp: expect.any(String),
           }),
         }),

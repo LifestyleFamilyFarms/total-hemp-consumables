@@ -21,12 +21,16 @@ describe("sendAbandonedNotificationsStep", () => {
   const originalStorefrontUrl = process.env.STOREFRONT_URL
   const originalWebsiteUrl = process.env.SENDGRID_WEBSITE_URL
   const originalSupportUrl = process.env.SENDGRID_SUPPORT_URL
+  const originalRecoverySecret = process.env.SENDGRID_ABANDONED_CART_RECOVERY_SECRET
+  const originalRecoveryTtlHours = process.env.SENDGRID_ABANDONED_CART_RECOVERY_TTL_HOURS
 
   afterEach(() => {
     process.env.SENDGRID_TEMPLATE_ABANDONED_CART = originalTemplate
     process.env.STOREFRONT_URL = originalStorefrontUrl
     process.env.SENDGRID_WEBSITE_URL = originalWebsiteUrl
     process.env.SENDGRID_SUPPORT_URL = originalSupportUrl
+    process.env.SENDGRID_ABANDONED_CART_RECOVERY_SECRET = originalRecoverySecret
+    process.env.SENDGRID_ABANDONED_CART_RECOVERY_TTL_HOURS = originalRecoveryTtlHours
     jest.clearAllMocks()
   })
 
@@ -105,6 +109,7 @@ describe("sendAbandonedNotificationsStep", () => {
     process.env.STOREFRONT_URL = "https://store.example.com/"
     process.env.SENDGRID_WEBSITE_URL = ""
     process.env.SENDGRID_SUPPORT_URL = ""
+    process.env.SENDGRID_ABANDONED_CART_RECOVERY_SECRET = ""
     const warn = jest.fn()
     const createNotifications = jest
       .fn()
@@ -114,7 +119,18 @@ describe("sendAbandonedNotificationsStep", () => {
     const result = await invokeSendAbandonedNotificationsStep(
       {
         carts: [
-          { id: "cart_1", email: "alice@example.com" },
+          {
+            id: "cart_1",
+            email: "alice@example.com",
+            currency_code: "usd",
+            items: [
+              {
+                title: "Delta-9 THC Chocolate Brownie",
+                quantity: 1,
+                unit_price: 15,
+              },
+            ],
+          },
           { id: "cart_2", email: "bob@example.com" },
         ],
       },
@@ -132,6 +148,12 @@ describe("sendAbandonedNotificationsStep", () => {
           to: "alice@example.com",
           data: expect.objectContaining({
             recover_url: "https://store.example.com/cart",
+            items: expect.arrayContaining([
+              expect.objectContaining({
+                unit_price: 15,
+                unit_price_display: "$15.00",
+              }),
+            ]),
           }),
         }),
       ]
@@ -139,6 +161,32 @@ describe("sendAbandonedNotificationsStep", () => {
     expect(createNotifications).toHaveBeenCalledTimes(2)
     expect(warn).toHaveBeenCalledWith(
       expect.stringContaining("Failed to send notification for cart cart_2")
+    )
+  })
+
+  it("builds signed recover URL when abandoned-cart recovery secret is configured", async () => {
+    process.env.SENDGRID_TEMPLATE_ABANDONED_CART = "d-template"
+    process.env.STOREFRONT_URL = "https://store.example.com/"
+    process.env.SENDGRID_WEBSITE_URL = "https://www.totalhemp.co"
+    process.env.SENDGRID_ABANDONED_CART_RECOVERY_SECRET = "super-secret"
+    process.env.SENDGRID_ABANDONED_CART_RECOVERY_TTL_HOURS = "72"
+
+    const warn = jest.fn()
+    const createNotifications = jest.fn().mockResolvedValueOnce([{ id: "notif_1" }])
+
+    await invokeSendAbandonedNotificationsStep(
+      {
+        carts: [{ id: "cart_1", email: "alice@example.com" }],
+      },
+      buildContext({ warn, createNotifications }) as never
+    )
+
+    const payload = createNotifications.mock.calls[0]?.[0]?.[0]
+    expect(payload?.data?.recover_url).toMatch(
+      /^https:\/\/www\.totalhemp\.co\/cart\/recover\?token=.+/
+    )
+    expect(warn).not.toHaveBeenCalledWith(
+      expect.stringContaining("Failed to send notification")
     )
   })
 })
