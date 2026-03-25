@@ -38,5 +38,6 @@ docs/*-dry-run.json
 docs/media-s3-gc.log
 docs/media-s3-gc.json
 
-.agents
-.cursor
+/.agents
+/.cursor
+/.codex

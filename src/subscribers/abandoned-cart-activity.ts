@@ -5,15 +5,23 @@ export default async function abandonedCartActivitySubscriber({
   event: { data },
   container,
 }: SubscriberArgs<{ id: string }>) {
-  if (!data?.id) {
+  try {
+    if (!data?.id) {
+      return
+    }
+
+    await markCartActivityWorkflow(container).run({
+      input: {
+        cart_id: data.id,
+      },
+    })
+  } catch (error) {
+    console.error(
+      `[abandoned-cart-activity] Failed for cart_id=${data?.id}:`,
+      error
+    )
     return
   }
-
-  await markCartActivityWorkflow(container).run({
-    input: {
-      cart_id: data.id,
-    },
-  })
 }
 
 export const config: SubscriberConfig = {

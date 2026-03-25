@@ -14,6 +14,8 @@ If you need to run implementation agents or release orchestration, start here:
 
 ## Shared References
 
+- Durable project memory:
+  - `/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/MEMORY.md`
 - SDK references:
   - `/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/docs/js-sdk`
 - Wave 1 backend references:

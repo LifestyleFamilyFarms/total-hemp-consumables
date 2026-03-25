@@ -19,6 +19,7 @@ import {
   GetShippingRatesResponse,
   Rate,
   ShipStationAddress,
+  ShipStationApiError,
 } from "./types"
 
 export type ShipStationOptions = {
@@ -36,6 +37,32 @@ class ShipStationProviderService extends AbstractFulfillmentProviderService {
 
     this.options_ = options
     this.client = new ShipStationClient(options)
+  }
+
+  /**
+   * Converts ShipStationApiError into MedusaError so the framework
+   * returns a structured HTTP response instead of a raw 500.
+   * Preserves upstream status, request-id, and body snippet in the
+   * MedusaError message for operator diagnostics.
+   */
+  private rethrowAsMedusa(err: unknown): never {
+    if (err instanceof ShipStationApiError) {
+      const parts = [err.message]
+      if (err.requestId) parts.push(`request-id: ${err.requestId}`)
+      if (err.upstream) parts.push(`upstream: ${err.upstream.slice(0, 256)}`)
+
+      throw new MedusaError(
+        MedusaError.Types.INVALID_DATA,
+        parts.join(" | ")
+      )
+    }
+
+    if (err instanceof MedusaError) throw err
+
+    throw new MedusaError(
+      MedusaError.Types.UNEXPECTED_STATE,
+      `Unexpected ShipStation error: ${(err as Error)?.message || String(err)}`
+    )
   }
 
   private pickLowestRate(rates?: Rate[]) {
@@ -66,7 +93,12 @@ class ShipStationProviderService extends AbstractFulfillmentProviderService {
   }
 
   async getFulfillmentOptions(): Promise<FulfillmentOption[]> {
-    const { carriers } = await this.client.getCarriers()
+    let carriers
+    try {
+      ;({ carriers } = await this.client.getCarriers())
+    } catch (err) {
+      this.rethrowAsMedusa(err)
+    }
     const fulfillmentOptions: FulfillmentOption[] = []
 
     carriers
@@ -201,23 +233,27 @@ class ShipStationProviderService extends AbstractFulfillmentProviderService {
       carrier_service_code: string
     }
     let rate: Rate | undefined
-    if (!shipment_id) {
-      const shipment = await this.createShipment({
-        carrier_id,
-        carrier_service_code,
-        from_address: {
-          name: context.from_location?.name,
-          address: context.from_location?.address,
-        },
-        to_address: context.shipping_address,
-        items: context.items || [],
-        currency_code: context.currency_code as string,
-      })
-      rate = this.pickLowestRate(shipment.rate_response?.rates)
-    } else {
-      const rateResponses = await this.client.getShipmentRates(shipment_id)
-      const flattened = rateResponses.flatMap((resp) => resp.rates || [])
-      rate = this.pickLowestRate(flattened)
+    try {
+      if (!shipment_id) {
+        const shipment = await this.createShipment({
+          carrier_id,
+          carrier_service_code,
+          from_address: {
+            name: context.from_location?.name,
+            address: context.from_location?.address,
+          },
+          to_address: context.shipping_address,
+          items: context.items || [],
+          currency_code: context.currency_code as string,
+        })
+        rate = this.pickLowestRate(shipment.rate_response?.rates)
+      } else {
+        const rateResponses = await this.client.getShipmentRates(shipment_id)
+        const flattened = rateResponses.flatMap((resp) => resp.rates || [])
+        rate = this.pickLowestRate(flattened)
+      }
+    } catch (err) {
+      this.rethrowAsMedusa(err)
     }
 
     if (process.env.NODE_ENV === "development" && rate) {
@@ -261,38 +297,42 @@ class ShipStationProviderService extends AbstractFulfillmentProviderService {
   //validateFulfillmentData
 
   async validateFulfillmentData(
-    optionData: Record<string, unknown>, 
-    data: Record<string, unknown>, 
+    optionData: Record<string, unknown>,
+    data: Record<string, unknown>,
     context: Record<string, unknown>
   ): Promise<any> {
     let { shipment_id } = (data || {}) as {
       shipment_id?: string
     }
 
-    if (!shipment_id) {
+    try {
+      if (!shipment_id) {
 
-      const { carrier_id, carrier_service_code } = optionData as {
-        carrier_id: string
-        carrier_service_code: string
+        const { carrier_id, carrier_service_code } = optionData as {
+          carrier_id: string
+          carrier_service_code: string
+        }
+
+        const shipment = await this.createShipment({
+          carrier_id,
+          carrier_service_code,
+          from_address: {
+            // @ts-ignore
+            name: context.from_location?.name,
+            // @ts-ignore
+            address: context.from_location?.address,
+          },
+          // @ts-ignore
+          to_address: context.shipping_address,
+          // @ts-ignore
+          items: context.items || [],
+          // @ts-ignore
+          currency_code: context.currency_code,
+        })
+        shipment_id = shipment.shipment_id
       }
-
-      const shipment = await this.createShipment({
-        carrier_id,
-        carrier_service_code,
-        from_address: {
-          // @ts-ignore
-          name: context.from_location?.name,
-          // @ts-ignore
-          address: context.from_location?.address,
-        },
-        // @ts-ignore
-        to_address: context.shipping_address,
-        // @ts-ignore
-        items: context.items || [],
-        // @ts-ignore
-        currency_code: context.currency_code,
-      })
-      shipment_id = shipment.shipment_id
+    } catch (err) {
+      this.rethrowAsMedusa(err)
     }
 
     return {
@@ -304,63 +344,67 @@ class ShipStationProviderService extends AbstractFulfillmentProviderService {
   // createFulfillment
 
   async createFulfillment(
-    data: object, 
-    items: object[], 
-    order: object | undefined, 
+    data: object,
+    items: object[],
+    order: object | undefined,
     fulfillment: Record<string, unknown>
   ): Promise<any> {
     const { shipment_id } = data as {
       shipment_id: string
     }
 
-    const originalShipment = await this.client.getShipment(shipment_id)
-    const orderItemsToFulfill = []
+    try {
+      const originalShipment = await this.client.getShipment(shipment_id)
+      const orderItemsToFulfill = []
 
-    items.map((item) => {
-      // @ts-ignore
-      const orderItem = order.items.find((i) => i.id === item.line_item_id)
-      if (!orderItem) {
-        return
-      }
-      // @ts-ignore
-      orderItemsToFulfill.push({
-        ...orderItem,
+      items.map((item) => {
         // @ts-ignore
-        quantity: item.quantity,
+        const orderItem = order.items.find((i) => i.id === item.line_item_id)
+        if (!orderItem) {
+          return
+        }
+        // @ts-ignore
+        orderItemsToFulfill.push({
+          ...orderItem,
+          // @ts-ignore
+          quantity: item.quantity,
+        })
       })
-    })
 
-    const newShipment = await this.createShipment({
-      carrier_id: originalShipment.carrier_id,
-      carrier_service_code: originalShipment.service_code,
-      from_address: {
-        name: originalShipment.ship_from.name,
-        address: {
-          ...originalShipment.ship_from,
-          address_1: originalShipment.ship_from.address_line1,
-          city: originalShipment.ship_from.city_locality,
-          province: originalShipment.ship_from.state_province,
+      const newShipment = await this.createShipment({
+        carrier_id: originalShipment.carrier_id,
+        carrier_service_code: originalShipment.service_code,
+        from_address: {
+          name: originalShipment.ship_from.name,
+          address: {
+            ...originalShipment.ship_from,
+            address_1: originalShipment.ship_from.address_line1,
+            city: originalShipment.ship_from.city_locality,
+            province: originalShipment.ship_from.state_province,
+          },
         },
-      },
-      to_address: {
-        ...originalShipment.ship_to,
-        address_1: originalShipment.ship_to.address_line1,
-        city: originalShipment.ship_to.city_locality,
-        province: originalShipment.ship_to.state_province,
-      },
-      items: orderItemsToFulfill as OrderLineItemDTO[],
-      // @ts-ignore
-      currency_code: order.currency_code,
-    })
+        to_address: {
+          ...originalShipment.ship_to,
+          address_1: originalShipment.ship_to.address_line1,
+          city: originalShipment.ship_to.city_locality,
+          province: originalShipment.ship_to.state_province,
+        },
+        items: orderItemsToFulfill as OrderLineItemDTO[],
+        // @ts-ignore
+        currency_code: order.currency_code,
+      })
 
-    const label = await this.client.purchaseLabelForShipment(newShipment.shipment_id)
+      const label = await this.client.purchaseLabelForShipment(newShipment.shipment_id)
 
-    return {
-      data: {
-        ...(fulfillment.data as object || {}),
-        label_id: label.label_id,
-        shipment_id: label.shipment_id,
-      },
+      return {
+        data: {
+          ...(fulfillment.data as object || {}),
+          label_id: label.label_id,
+          shipment_id: label.shipment_id,
+        },
+      }
+    } catch (err) {
+      this.rethrowAsMedusa(err)
     }
   }
 
@@ -370,8 +414,12 @@ class ShipStationProviderService extends AbstractFulfillmentProviderService {
       label_id: string
       shipment_id: string
     }
-    await this.client.voidLabel(label_id)
-    await this.client.cancelShipment(shipment_id)
+    try {
+      await this.client.voidLabel(label_id)
+      await this.client.cancelShipment(shipment_id)
+    } catch (err) {
+      this.rethrowAsMedusa(err)
+    }
   }
 
 

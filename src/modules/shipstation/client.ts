@@ -1,6 +1,5 @@
 import { Buffer } from "node:buffer"
 import type { ShipStationOptions } from "./service"
-import { MedusaError } from "@medusajs/framework/utils"
 import {
   CarriersResponse,
   WarehousesResponse,
@@ -9,6 +8,7 @@ import {
   GetShippingRatesResponse,
   RateResponse,
   Shipment,
+  ShipStationApiError,
   VoidLabelResponse
 } from "./types"
 
@@ -45,6 +45,9 @@ export class ShipStationClient {
     }
   }
 
+  /** Max bytes of non-JSON upstream body to include in error diagnostics */
+  private static readonly UPSTREAM_SNIPPET_LIMIT = 512
+
   private async sendRequest(
     url: string,
     data?: {
@@ -56,34 +59,71 @@ export class ShipStationClient {
     const authHeaders = this.buildAuthHeaders()
     const fetchFn = (globalThis as typeof globalThis & { fetch: (...args: any[]) => Promise<any> }).fetch
 
-    return fetchFn(`https://api.shipstation.com/v2${url}`, {
-      ...data,
-      headers: {
-        ...data?.headers,
-        Accept: "application/json",
-        "Content-Type": "application/json",
-        ...authHeaders,
-      },
-    }).then((resp) => {
-      const contentType = resp.headers.get("content-type")
-      if (!contentType?.includes("application/json")) {
-        return resp.text()
-      }
+    let resp: Response
+    try {
+      resp = await fetchFn(`https://api.shipstation.com/v2${url}`, {
+        ...data,
+        headers: {
+          ...data?.headers,
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          ...authHeaders,
+        },
+      })
+    } catch (networkErr: any) {
+      // Network-level failure (DNS, timeout, socket reset)
+      throw new ShipStationApiError({
+        message: `ShipStation request failed (network): ${networkErr?.message || "unknown error"}`,
+        upstream: String(networkErr?.cause || "").slice(0, ShipStationClient.UPSTREAM_SNIPPET_LIMIT) || undefined,
+      })
+    }
 
-      return resp.json()
-    })
-    .then((resp) => {
-      if (typeof resp !== "string" && resp.errors?.length) {
-        throw new MedusaError(
-          MedusaError.Types.INVALID_DATA,
-          `An error occured while sending a request to ShipStation: ${
-            resp.errors.map((error) => error.message)
-          }`
-        )
-      }
+    const status = resp.status
+    const requestId =
+      resp.headers.get("x-shipstation-request-id") ||
+      resp.headers.get("x-request-id") ||
+      undefined
 
-      return resp
-    })
+    const contentType = resp.headers.get("content-type")
+
+    // --- Non-JSON response (HTML error page, 502 gateway, etc.) ---
+    if (!contentType?.includes("application/json")) {
+      const bodyText = (await resp.text()).slice(0, ShipStationClient.UPSTREAM_SNIPPET_LIMIT)
+      throw new ShipStationApiError({
+        message: `ShipStation returned non-JSON response (HTTP ${status})`,
+        status,
+        requestId,
+        upstream: bodyText || undefined,
+      })
+    }
+
+    const body = await resp.json()
+
+    // --- HTTP error with JSON body ---
+    if (!resp.ok) {
+      const msgs = Array.isArray(body?.errors)
+        ? body.errors.map((e: any) => e?.message || String(e)).join("; ")
+        : body?.message || JSON.stringify(body).slice(0, ShipStationClient.UPSTREAM_SNIPPET_LIMIT)
+
+      throw new ShipStationApiError({
+        message: `ShipStation error (HTTP ${status}): ${msgs}`,
+        status,
+        requestId,
+        upstream: msgs,
+      })
+    }
+
+    // --- 2xx JSON but contains an errors array (ShipStation domain error) ---
+    if (Array.isArray(body?.errors) && body.errors.length) {
+      const msgs = body.errors.map((e: any) => e?.message || String(e)).join("; ")
+      throw new ShipStationApiError({
+        message: `ShipStation returned errors: ${msgs}`,
+        status,
+        requestId,
+      })
+    }
+
+    return body
   }
 
   async getCarriers(): Promise<CarriersResponse> {
@@ -97,30 +137,31 @@ export class ShipStationClient {
   async getShippingRates(
     data: GetShippingRatesRequest
   ): Promise<GetShippingRatesResponse> {
-    return await this.sendRequest("/rates", {
+    const resp = await this.sendRequest("/rates", {
       method: "POST",
       body: JSON.stringify(data),
-    }).then((resp) => {
-      const errors = resp?.rate_response?.errors || resp?.errors
-      if (Array.isArray(errors) && errors.length) {
-        throw new MedusaError(
-          MedusaError.Types.INVALID_DATA,
-          `An error occured while retrieving rates from ShipStation: ${errors
-            .map((error: any) => error?.message || error)
-            .join(", ")}`
-        )
-      }
-
-      const rates = resp?.rate_response?.rates
-      if (!Array.isArray(rates) || rates.length === 0) {
-        throw new MedusaError(
-          MedusaError.Types.INVALID_DATA,
-          "ShipStation did not return any shipping rates for this service."
-        )
-      }
-
-      return resp
     })
+
+    // rate_response may carry its own nested errors even on a 200
+    const rateErrors = resp?.rate_response?.errors
+    if (Array.isArray(rateErrors) && rateErrors.length) {
+      const msgs = rateErrors.map((e: any) => e?.message || String(e)).join("; ")
+      throw new ShipStationApiError({
+        message: `ShipStation rate errors: ${msgs}`,
+        status: 200,
+        upstream: msgs,
+      })
+    }
+
+    const rates = resp?.rate_response?.rates
+    if (!Array.isArray(rates) || rates.length === 0) {
+      throw new ShipStationApiError({
+        message: "ShipStation did not return any shipping rates for this service.",
+        status: 200,
+      })
+    }
+
+    return resp
   }
 
   async getShipmentRates(id: string): Promise<RateResponse[]> {

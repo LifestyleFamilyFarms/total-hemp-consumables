@@ -160,3 +160,30 @@ export type GetShippingRatesResponse = {
     message: string
     reason_code?: string
   }
+
+/**
+ * Structured error thrown by ShipStationClient for all upstream failures.
+ * Callers can inspect `status`, `requestId`, and `upstream` for diagnostics
+ * without parsing an error message string.
+ */
+export class ShipStationApiError extends Error {
+  /** HTTP status code from ShipStation (undefined for network errors) */
+  status?: number
+  /** ShipStation request-id header for support escalation */
+  requestId?: string
+  /** Raw upstream body (truncated) for debugging non-JSON responses */
+  upstream?: string
+
+  constructor(opts: {
+    message: string
+    status?: number
+    requestId?: string
+    upstream?: string
+  }) {
+    super(opts.message)
+    this.name = "ShipStationApiError"
+    this.status = opts.status
+    this.requestId = opts.requestId
+    this.upstream = opts.upstream
+  }
+}

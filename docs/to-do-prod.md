@@ -1,22 +1,17 @@
 ## Immediate Production Tasks
-- Wave 1 Recovery Freeze (2026-03-02):
-  - Gate status: FAIL (updated after post-hotfix rerun).
-  - Lock sequence now:
-    - Agent A backend hotfix pass completed and manager-reviewed.
-    - Abandoned-cart admin process runtime blocker validated cleared (authenticated admin probes now return HTTP 200 for dry/live).
-    - Remaining blocker lane is storefront UX acceptance evidence (reorder + first-purchase + targeted reviews/wishlist evidence closure).
-    - Next: Agent B focused UX-acceptance remediation -> Agent D targeted rerun.
-  - Backend hotfix targets:
-    - eliminate workflow-path `500 unknown_error` on reviews/wishlist/reorder/first-purchase/feed
-    - resolve transaction orchestrator undefined-id crash path
-    - fix wishlist runtime DB state (`wishlist` table exists in active environment)
-    - reconcile reviews list optional `order` query contract
-  - QA rerun must produce:
-    - `/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/docs/finalization-phases/evidence/phase-wave1-YYYY-MM-DD-post-hotfix.md`
-    - full auth/ownership matrix + contract table + go/no-go verdict
-  - follow-up prompts:
-    - `/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/docs/finalization-phases/agent-prompts/agent-b-wave1-ux-acceptance-remediation.md`
-    - `/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/docs/finalization-phases/agent-prompts/agent-d-wave1-targeted-rerun.md`
+- Canonical production prioritization:
+  - `/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/docs/finalization-phases/production-punch-list.md`
+- Wave 1 targeted release gate:
+  - Status: PASS.
+  - Latest evidence:
+    - `/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/docs/finalization-phases/evidence/phase-wave1-2026-03-03-targeted-rerun.md`
+  - Current posture:
+    - treat Wave 1 as releaseable unless a new regression is introduced
+    - do not route new work through old Wave 1 recovery prompts unless a fresh blocker appears
+- Phase 13 transactional email foundation:
+  - Status: implementation complete, full QA gate pending.
+  - Latest evidence:
+    - `/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/docs/finalization-phases/evidence/phase-13-transactional-email-foundation-2026-03-03.md`
 - Change ShipStation API Key to Proleve.
 - Configure abandoned-cart email template for SendGrid:
   - create/confirm transactional template in SendGrid for abandoned-cart flow
@@ -27,6 +22,18 @@
 - Next shipping-notification advancement (Phase 13B1): ShipStation webhook integration.
   - dispatch prompt: `/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/docs/finalization-phases/agent-dispatch/active/sendgrid-shipstation-webhook-agent.md`
   - expected evidence: `/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/docs/finalization-phases/evidence/phase-13b1-shipstation-webhook-YYYY-MM-DD.md`
+- Backend review 2026-03-09:
+  - evidence: `/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/docs/finalization-phases/evidence/backend-review-2026-03-09.md`
+  - harden legacy subscribers to fail safely on notification/workflow errors:
+    - `src/subscribers/gamma-signup-customer-created.ts`
+    - `src/subscribers/gamma-signup-customer-updated.ts`
+    - `src/subscribers/order-created.ts`
+    - `src/subscribers/order-placed-loyalty.ts`
+    - `src/subscribers/abandoned-cart-activity.ts`
+  - improve ShipStation client/provider unhappy-path handling:
+    - surface upstream HTTP status/request-id details for non-JSON ShipStation failures
+    - avoid ambiguous string responses flowing into provider callers
+    - add focused tests for ShipStation error normalization and subscriber fail-safe behavior
 - Historical decision 2026-02-27 (now superseded by Phase 13B1 dispatch): keep checkout in `pickup_only` mode for QA/launch readiness; defer ShipStation sandbox integration until carrier options are finalized.
 - Completed 2026-02-27: backend loyalty migrations in `/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables` via `npx medusa db:migrate` (module up-to-date).
 - HIGH URGENCY (2026-02-27): auth entry UX overhaul (sign in / join / sign up):
@@ -170,7 +177,7 @@
   - `yarn lint`: pass
   - `yarn build`: pass
 - remarks:
-  - `yarn tsc --noEmit` still fails on pre-existing unrelated type issue in `src/components/layout/topbar.tsx` (unchanged by Agent B scope).
+  - historical note: at the time of the Agent B pass, `yarn tsc --noEmit` still failed on a pre-existing `topbar` issue; current typecheck status is tracked below.
 
 ## Loyalty Education Surfaces
 - resolved (2026-02-27): loyalty explainer content route added:

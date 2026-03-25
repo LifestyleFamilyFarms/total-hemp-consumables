@@ -493,13 +493,20 @@ export const processOrderTransactionalEmailStep = createStep(
       })
     }
 
-    const orderService = container.resolve("order") as OrderService
-    await orderService.updateOrders(order.id, {
-      metadata: {
-        ...(order.metadata || {}),
-        ...plan.metadata_patch,
-      },
-    })
+    try {
+      const orderService = container.resolve("order") as OrderService
+      await orderService.updateOrders(order.id, {
+        metadata: {
+          ...(order.metadata || {}),
+          ...plan.metadata_patch,
+        },
+      })
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unknown metadata update error"
+      logger.warn(
+        `[transactional-email] Email sent but metadata update failed for ${plan.type} on order ${order.id}: ${message}`
+      )
+    }
 
     return new StepResponse({
       sent: true,

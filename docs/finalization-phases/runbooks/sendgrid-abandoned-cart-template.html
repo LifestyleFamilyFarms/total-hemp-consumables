@@ -1,9 +1,10 @@
 <html>
   <!--
     Template: Abandoned Cart (Re-engagement)
+    SendGrid Template ID: d-828a0a5438e549999e2a6239254200cf
     Recommended Subject: You left something good in your cart
-    Alt Subject: Your Total Hemp cart is still saved
-    Preheader: Your cart is still saved at Total Hemp. Return anytime to finish checkout.
+    Alt Subject: Still thinking it over, {{customer.first_name}}?
+    Preheader: Your cart is saved for a limited time. Come back and finish checkout.
     Required Variables:
       customer.first_name
       cart_id
@@ -17,11 +18,12 @@
       items[].thumbnail
       {{{unsubscribe}}}
       {{{unsubscribe_preferences}}}
-    Manual Substitutions:
-      https://YOUR_SENDGRID_CDN/top-wordmark.png
-      https://YOUR_SENDGRID_CDN/footer-full-logo.png
-    Compliance:
-      Re-engagement email. Unsubscribe and preferences links are allowed.
+    Brand Image URLs (already uploaded to SendGrid CDN):
+      Top wordmark: http://cdn.mcauto-images-production.sendgrid.net/5668ba204a0c5c07/eac9d0ed-2327-4c23-aa09-16c3a84b1dd7/1077x383.png
+      Footer logo:  http://cdn.mcauto-images-production.sendgrid.net/5668ba204a0c5c07/2a24cd60-efb2-4bd2-976f-cb4bf8d08be7/479x479.png
+    CAN-SPAM Compliance:
+      Re-engagement email. Requires: unsubscribe link, preferences link, physical mailing address.
+      Physical address: 29275 Bryan Way, Punta Gorda, FL 33982
   -->
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -34,7 +36,7 @@
   </head>
   <body style="margin:0;padding:0;background-color:#f7f6ad;font-family:Helvetica,Arial,sans-serif;color:#19572d;">
     <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">
-      Your cart is still saved at Total Hemp. Return anytime to finish checkout.
+      Your cart is saved for a limited time. Come back and finish checkout.
     </div>
 
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" bgcolor="#f7f6ad" style="background:linear-gradient(165deg,#f7f6ad 0%,#fef8d9 42%,#f7f6ad 100%);padding:30px 10px;">
@@ -47,7 +49,7 @@
 
             <tr>
               <td align="center" bgcolor="#fffdf0" style="padding:22px 26px 10px;background:#fffdf0;">
-                <img src="https://YOUR_SENDGRID_CDN/top-wordmark.png" alt="Total Hemp" width="198" style="display:block;width:198px;max-width:100%;height:auto;border:0;" />
+                <img src="http://cdn.mcauto-images-production.sendgrid.net/5668ba204a0c5c07/eac9d0ed-2327-4c23-aa09-16c3a84b1dd7/1077x383.png" alt="Total Hemp" width="198" style="display:block;width:198px;max-width:100%;height:auto;border:0;" />
               </td>
             </tr>
 
@@ -56,22 +58,24 @@
                 <p style="margin:0 0 12px;font-size:12px;letter-spacing:1.2px;text-transform:uppercase;font-weight:700;opacity:0.92;">Total Hemp Cart Reminder</p>
                 <h1 style="margin:0 0 10px;font-size:29px;line-height:1.2;font-weight:700;">You left something good in your cart.</h1>
                 <p style="margin:0;font-size:15px;line-height:1.62;opacity:0.95;">
-                  {{#if customer.first_name}}Hi {{customer.first_name}},{{else}}Hi there,{{/if}} your items are still saved, and checkout takes just a minute.
+                  {{#if customer.first_name}}Hi {{customer.first_name}},{{else}}Hi there,{{/if}} your items are still saved and checkout takes just a minute.
                 </p>
               </td>
             </tr>
 
             <tr>
               <td align="center" bgcolor="#ffffff" style="padding:22px 26px 8px;background:#ffffff;">
-                <p style="margin:0 0 14px;font-size:15px;line-height:1.6;color:#19572d;">
-                  Resume where you left off whenever you are ready.
+                <p style="margin:0 0 6px;font-size:15px;line-height:1.6;color:#19572d;">
+                  Your cart is saved, but it won't last forever.
+                </p>
+                <p style="margin:0 0 14px;font-size:13px;line-height:1.5;color:#6d3a2d;">
+                  Pick up where you left off before your selections expire.
                 </p>
                 {{#if recover_url}}
-                <a href="{{recover_url}}" style="display:inline-block;background:#19572d;color:#f7f6ad;text-decoration:none;font-size:15px;font-weight:700;padding:12px 20px;border-radius:999px;border:2px solid #19572d;">Return to cart</a>
+                <a href="{{recover_url}}" style="display:inline-block;background:#19572d;color:#f7f6ad;text-decoration:none;font-size:15px;font-weight:700;padding:14px 28px;border-radius:999px;border:2px solid #19572d;">Return to my cart</a>
                 {{else}}
-                <a href="{{#if links.website_url}}{{links.website_url}}/cart{{else}}https://www.totalhemp.co/cart{{/if}}" style="display:inline-block;background:#19572d;color:#f7f6ad;text-decoration:none;font-size:15px;font-weight:700;padding:12px 20px;border-radius:999px;border:2px solid #19572d;">Return to cart</a>
+                <a href="{{#if links.website_url}}{{links.website_url}}/cart{{else}}https://www.totalhemp.co/cart{{/if}}" style="display:inline-block;background:#19572d;color:#f7f6ad;text-decoration:none;font-size:15px;font-weight:700;padding:14px 28px;border-radius:999px;border:2px solid #19572d;">Return to my cart</a>
                 {{/if}}
-                <p style="margin:14px 0 0;font-size:12px;color:#6d3a2d;">Cart reference: {{cart_id}}</p>
               </td>
             </tr>
 
@@ -89,7 +93,7 @@
                     </td>
                     <td style="padding:10px 12px 10px 0;vertical-align:top;text-align:center;">
                       <p style="margin:0 0 4px;font-size:14px;font-weight:700;color:#19572d;">{{title}}</p>
-                      <p style="margin:0;font-size:13px;color:#6d3a2d;">Qty: {{quantity}} | Price: {{#if unit_price_display}}{{unit_price_display}}{{else}}{{unit_price}}{{/if}}</p>
+                      <p style="margin:0;font-size:13px;color:#6d3a2d;">Qty: {{quantity}} | {{#if unit_price_display}}{{unit_price_display}}{{else}}{{unit_price}}{{/if}}</p>
                     </td>
                   </tr>
                 </table>
@@ -105,7 +109,7 @@
                 <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="border:1px solid #f4c53f;border-radius:12px;background:#fff8df;">
                   <tr>
                     <td style="padding:12px 14px;font-size:13px;line-height:1.5;color:#19572d;text-align:center;">
-                      Hemp-crafted products. Transparent quality. Reliable support.
+                      Every product is lab-tested and third-party verified. Transparent quality, every time.
                     </td>
                   </tr>
                 </table>
@@ -114,7 +118,7 @@
 
             <tr>
               <td align="center" bgcolor="#fffdf0" style="padding:20px 26px 12px;background:#fffdf0;border-top:1px solid #efe8c8;">
-                <img src="https://YOUR_SENDGRID_CDN/footer-full-logo.png" alt="Total Hemp" width="146" style="display:block;width:146px;max-width:100%;height:auto;border:0;margin:0 auto 10px;" />
+                <img src="http://cdn.mcauto-images-production.sendgrid.net/5668ba204a0c5c07/2a24cd60-efb2-4bd2-976f-cb4bf8d08be7/479x479.png" alt="Total Hemp" width="146" style="display:block;width:146px;max-width:100%;height:auto;border:0;margin:0 auto 10px;" />
                 <p style="margin:0 0 6px;font-size:12px;line-height:1.6;color:#6d3a2d;">
                   Shop online at
                   <a href="{{#if links.website_url}}{{links.website_url}}{{else}}https://www.totalhemp.co{{/if}}" target="_blank" style="color:#19572d;text-decoration:underline;">www.totalhemp.co</a>
@@ -122,7 +126,9 @@
                 <p style="margin:0 0 10px;font-size:12px;line-height:1.6;color:#6d3a2d;">
                   Need help? <a href="{{#if links.support_url}}{{links.support_url}}{{else}}https://www.totalhemp.co/content/contact{{/if}}" style="color:#19572d;text-decoration:underline;">Contact support</a>.
                 </p>
-                <p style="margin:0 0 10px;font-size:11px;line-height:1.5;color:#8a6a4a;">Total Hemp Consumables | Lab-tested hemp products</p>
+                <p style="margin:0 0 6px;font-size:11px;line-height:1.5;color:#8a6a4a;">Total Hemp Consumables | Lab-tested hemp products</p>
+                <!-- CAN-SPAM: Physical mailing address required for re-engagement emails -->
+                <p style="margin:0 0 10px;font-size:11px;line-height:1.5;color:#8a6a4a;">29275 Bryan Way, Punta Gorda, FL 33982</p>
               </td>
             </tr>
 
@@ -131,7 +137,7 @@
                 <p style="margin:0;">
                   <a href="{{{unsubscribe}}}" target="_blank" style="color:#19572d;text-decoration:underline;">Unsubscribe</a>
                   &nbsp;|&nbsp;
-                  <a href="{{{unsubscribe_preferences}}}" target="_blank" style="color:#19572d;text-decoration:underline;">Unsubscribe Preferences</a>
+                  <a href="{{{unsubscribe_preferences}}}" target="_blank" style="color:#19572d;text-decoration:underline;">Email Preferences</a>
                 </p>
               </td>
             </tr>

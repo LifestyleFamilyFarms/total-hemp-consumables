@@ -6,6 +6,8 @@ Agents working in this repo must preserve Medusa architecture boundaries, avoid 
 # Canonical Docs
 - Command center (cross-repo dispatch, runbooks, evidence):
   - `/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/docs/finalization-phases`
+- Durable shared memory:
+  - `/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/MEMORY.md`
 - Backend wave references:
   - `/Users/franciscraven/Desktop/total-hemp/total-hemp-consumables/docs/wave-1-docs`
 - Local JS SDK references:

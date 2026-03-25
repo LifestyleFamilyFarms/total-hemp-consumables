@@ -5,33 +5,41 @@ export default async function onCustomerUpdated({
   event: { data },
   container,
 }: SubscriberArgs<{ id: string }>) {
-  const notification = container.resolve(Modules.NOTIFICATION)
-  const query = container.resolve("query")
+  try {
+    const notification = container.resolve(Modules.NOTIFICATION)
+    const query = container.resolve("query")
 
-  const { data: [customer] } = await query.graph({
-    entity: "customer",
-    fields: ["id", "email", "first_name", "metadata"],
-    filters: { id: data.id },
-  })
+    const { data: [customer] } = await query.graph({
+      entity: "customer",
+      fields: ["id", "email", "first_name", "metadata"],
+      filters: { id: data.id },
+    })
 
-  if (!customer?.email) return
-  if (!customer?.metadata?.gamma_gummies_event_2025) return
+    if (!customer?.email) return
+    if (!customer?.metadata?.gamma_gummies_event_2025) return
 
-  const template = process.env.SENDGRID_TEMPLATE_GAMMA_GUMMIES
-  if (!template) return
+    const template = process.env.SENDGRID_TEMPLATE_GAMMA_GUMMIES
+    if (!template) return
 
-  await notification.createNotifications([
-    {
-      to: customer.email,
-      channel: "email",
-      template,
-      data: {
-        firstName: customer.first_name || "friend",
-        eventName: "Gamma Gummies",
-        season: "Fall 2025",
+    await notification.createNotifications([
+      {
+        to: customer.email,
+        channel: "email",
+        template,
+        data: {
+          firstName: customer.first_name || "friend",
+          eventName: "Gamma Gummies",
+          season: "Fall 2025",
+        },
       },
-    },
-  ])
+    ])
+  } catch (error) {
+    console.error(
+      `[gamma-signup-customer-updated] Failed for customer_id=${data.id}:`,
+      error
+    )
+    return
+  }
 }
 
 export const config: SubscriberConfig = {

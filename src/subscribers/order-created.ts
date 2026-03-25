@@ -5,11 +5,19 @@ export default async function orderCreatedHandler({
   event: { data },
   container,
 }: SubscriberArgs<{ id: string }>) {
-  await propagateOrderSalesPersonMetadataWorkflow(container).run({
-    input: {
-      order_id: data.id,
-    },
-  })
+  try {
+    await propagateOrderSalesPersonMetadataWorkflow(container).run({
+      input: {
+        order_id: data.id,
+      },
+    })
+  } catch (error) {
+    console.error(
+      `[order-created] Failed for order_id=${data.id}:`,
+      error
+    )
+    return
+  }
 }
 
 export const config: SubscriberConfig = {
