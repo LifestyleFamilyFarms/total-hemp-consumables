@@ -32,6 +32,12 @@ type CartRecord = {
 const DEFAULT_LOOKBACK_HOURS = 24
 const DEFAULT_LIMIT = 100
 
+/**
+ * TH sales channel ID — only process TH carts.
+ * SS has its own abandoned cart job (ss-process-abandoned-carts.ts).
+ */
+const TH_SALES_CHANNEL_ID = process.env.TH_SALES_CHANNEL_ID || ""
+
 export const findAbandonedCartsStep = createStep(
   "abandoned-cart-find-candidates",
   async (input: FindAbandonedCartsStepInput, { container }) => {
@@ -65,6 +71,7 @@ export const findAbandonedCartsStep = createStep(
           "updated_at",
           "completed_at",
           "metadata",
+          "sales_channel_id",
           "customer.id",
           "customer.first_name",
           "customer.last_name",
@@ -84,6 +91,7 @@ export const findAbandonedCartsStep = createStep(
           email: {
             $ne: null,
           },
+          ...(TH_SALES_CHANNEL_ID ? { sales_channel_id: TH_SALES_CHANNEL_ID } : {}),
         },
         pagination: {
           take: pageSize,
