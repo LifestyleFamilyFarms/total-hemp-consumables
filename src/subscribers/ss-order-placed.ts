@@ -165,6 +165,7 @@ export default async function ssOrderPlacedHandler({
             quantity: item.detail?.quantity ?? item.quantity ?? 0,
             unit_price: item.unit_price,
             unit_price_display: formatCurrency(item.unit_price, cc),
+            line_total_display: formatCurrency((item.detail?.quantity ?? item.quantity ?? 1) * (item.unit_price ?? 0), cc),
             thumbnail: item.thumbnail || null,
           })),
         },
