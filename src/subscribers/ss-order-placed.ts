@@ -62,20 +62,11 @@ export default async function ssOrderPlacedHandler({
     warn: (msg: string) => void
   }
 
-  // DIAGNOSTIC: confirm the event bus delivered this event to the worker
-  logger.info(`[ss-order-placed] EVENT RECEIVED — order.placed for ${data.id}`)
-
   const ssChannelId = getSsSalesChannelId()
-  if (!ssChannelId) {
-    logger.warn(`[ss-order-placed] SS_SALES_CHANNEL_ID not set — skipping`)
-    return
-  }
+  if (!ssChannelId) return
 
   const templateId = (process.env.SS_SENDGRID_TEMPLATE_ORDER_CONFIRMATION || "").trim()
-  if (!templateId) {
-    logger.warn(`[ss-order-placed] SS_SENDGRID_TEMPLATE_ORDER_CONFIRMATION not set — skipping`)
-    return
-  }
+  if (!templateId) return
 
   try {
     const query = container.resolve("query") as {
