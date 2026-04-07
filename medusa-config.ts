@@ -94,7 +94,7 @@ module.exports = defineConfig({
               api_login_id: process.env.AUTHORIZE_NET_API_LOGIN_ID,
               transaction_key: process.env.AUTHORIZE_NET_TRANSACTION_KEY,
               capture: true,
-              environment: process.env.NODE_ENV === "production" ? "production" : "sandbox"
+              environment: process.env.AUTHORIZE_NET_ENVIRONMENT || (process.env.NODE_ENV === "production" ? "production" : "sandbox")
             }
           }
         ]
