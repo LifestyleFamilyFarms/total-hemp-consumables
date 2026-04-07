@@ -82,11 +82,11 @@ export default async function ssOrderPlacedHandler({
         "created_at",
         "sales_channel_id",
         "currency_code",
-        "+total",
-        "+subtotal",
-        "+tax_total",
-        "+shipping_total",
-        "+discount_total",
+        "total",
+        "subtotal",
+        "tax_total",
+        "shipping_total",
+        "discount_total",
         "metadata",
         "customer.first_name",
         "customer.last_name",
@@ -110,6 +110,7 @@ export default async function ssOrderPlacedHandler({
     })
 
     const order = (orders?.[0] || null) as OrderRecord | null
+    console.log("[ss-order-placed] DEBUG order data:", JSON.stringify({ total: order?.total, subtotal: order?.subtotal, items: order?.items?.slice(0, 1) }))
     if (!order) return
 
     // Sales channel gate
