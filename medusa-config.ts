@@ -91,8 +91,12 @@ module.exports = defineConfig({
             resolve: "payment-authorizenet-medusa",
             id: "authorizenet",
             options: {
-              api_login_id: process.env.AUTHORIZE_NET_API_LOGIN_ID,
-              transaction_key: process.env.AUTHORIZE_NET_TRANSACTION_KEY,
+              api_login_id: (process.env.AUTHORIZE_NET_ENVIRONMENT === "sandbox"
+                ? process.env.AUTHORIZE_NET_SANDBOX_API_LOGIN_ID
+                : process.env.AUTHORIZE_NET_API_LOGIN_ID) || process.env.AUTHORIZE_NET_API_LOGIN_ID,
+              transaction_key: (process.env.AUTHORIZE_NET_ENVIRONMENT === "sandbox"
+                ? process.env.AUTHORIZE_NET_SANDBOX_TRANSACTION_KEY
+                : process.env.AUTHORIZE_NET_TRANSACTION_KEY) || process.env.AUTHORIZE_NET_TRANSACTION_KEY,
               capture: true,
               environment: process.env.AUTHORIZE_NET_ENVIRONMENT || (process.env.NODE_ENV === "production" ? "production" : "sandbox")
             }
