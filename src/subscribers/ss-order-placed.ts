@@ -36,6 +36,9 @@ type OrderRecord = {
     quantity?: number | null
     unit_price?: number | null
     thumbnail?: string | null
+    detail?: {
+      quantity?: number | null
+    } | null
   }> | null
 }
 
@@ -105,12 +108,12 @@ export default async function ssOrderPlacedHandler({
         "items.unit_price",
         "items.total",
         "items.thumbnail",
+        "items.detail.quantity",
       ],
       filters: { id: data.id },
     })
 
     const order = (orders?.[0] || null) as OrderRecord | null
-    console.log("[ss-order-placed] DEBUG order data:", JSON.stringify({ total: order?.total, subtotal: order?.subtotal, items: order?.items?.slice(0, 1) }))
     if (!order) return
 
     // Sales channel gate
@@ -133,9 +136,15 @@ export default async function ssOrderPlacedHandler({
           id: order.id,
           display_id: order.display_id ?? null,
           created_at: order.created_at
-            ? typeof order.created_at === "string"
-              ? order.created_at
-              : (order.created_at as Date).toISOString()
+            ? new Date(
+                typeof order.created_at === "string"
+                  ? order.created_at
+                  : (order.created_at as Date).toISOString()
+              ).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })
             : null,
           currency_code: cc,
           totals: {
@@ -153,7 +162,7 @@ export default async function ssOrderPlacedHandler({
           items: (order.items || []).map((item) => ({
             id: item.id,
             title: item.title || "Item",
-            quantity: item.quantity ?? 0,
+            quantity: item.detail?.quantity ?? item.quantity ?? 0,
             unit_price: item.unit_price,
             unit_price_display: formatCurrency(item.unit_price, cc),
             thumbnail: item.thumbnail || null,
@@ -179,6 +188,9 @@ export default async function ssOrderPlacedHandler({
             ? `${storefrontUrl}/account/orders/details/${order.id}`
             : null,
           website_url: storefrontUrl || null,
+          support_url: storefrontUrl
+            ? `${storefrontUrl}/contact`
+            : "mailto:hello@sobersativas.com",
         },
         brand: {
           top_wordmark_url:
