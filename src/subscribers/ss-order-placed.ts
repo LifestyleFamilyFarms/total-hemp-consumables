@@ -126,8 +126,6 @@ export default async function ssOrderPlacedHandler({
     const orderWithTotals = await orderModuleService.retrieveOrder(data.id, {
       select: ["id", "total", "subtotal", "tax_total", "shipping_total", "discount_total"],
     })
-    console.log("[ss-order-placed] totals:", JSON.stringify({ total: orderWithTotals.total, subtotal: orderWithTotals.subtotal, tax_total: orderWithTotals.tax_total, shipping_total: orderWithTotals.shipping_total }))
-
     // Overlay computed totals onto order
     const totals = {
       total: typeof orderWithTotals.total === "number" ? orderWithTotals.total : order.total,
