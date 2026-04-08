@@ -119,6 +119,24 @@ export default async function ssOrderPlacedHandler({
     // Sales channel gate
     if (order.sales_channel_id !== ssChannelId) return
 
+    // query.graph() doesn't return computed totals — fetch via order module service
+    const orderModuleService = container.resolve("order") as unknown as {
+      retrieveOrder: (id: string, config?: Record<string, unknown>) => Promise<Record<string, unknown>>
+    }
+    const orderWithTotals = await orderModuleService.retrieveOrder(data.id, {
+      select: ["id", "total", "subtotal", "tax_total", "shipping_total", "discount_total"],
+    })
+    console.log("[ss-order-placed] totals:", JSON.stringify({ total: orderWithTotals.total, subtotal: orderWithTotals.subtotal, tax_total: orderWithTotals.tax_total, shipping_total: orderWithTotals.shipping_total }))
+
+    // Overlay computed totals onto order
+    const totals = {
+      total: typeof orderWithTotals.total === "number" ? orderWithTotals.total : order.total,
+      subtotal: typeof orderWithTotals.subtotal === "number" ? orderWithTotals.subtotal : order.subtotal,
+      tax_total: typeof orderWithTotals.tax_total === "number" ? orderWithTotals.tax_total : order.tax_total,
+      shipping_total: typeof orderWithTotals.shipping_total === "number" ? orderWithTotals.shipping_total : order.shipping_total,
+      discount_total: typeof orderWithTotals.discount_total === "number" ? orderWithTotals.discount_total : order.discount_total,
+    }
+
     // Idempotency: skip if already sent
     if (order.metadata?.ss_order_confirmation_sent_at) return
 
@@ -148,16 +166,16 @@ export default async function ssOrderPlacedHandler({
             : null,
           currency_code: cc,
           totals: {
-            total: order.total,
-            total_display: formatCurrency(order.total, cc),
-            subtotal: order.subtotal,
-            subtotal_display: formatCurrency(order.subtotal, cc),
-            tax_total: order.tax_total,
-            tax_total_display: formatCurrency(order.tax_total, cc),
-            shipping_total: order.shipping_total,
-            shipping_total_display: formatCurrency(order.shipping_total, cc),
-            discount_total: order.discount_total,
-            discount_total_display: formatCurrency(order.discount_total, cc),
+            total: totals.total,
+            total_display: formatCurrency(totals.total, cc),
+            subtotal: totals.subtotal,
+            subtotal_display: formatCurrency(totals.subtotal, cc),
+            tax_total: totals.tax_total,
+            tax_total_display: formatCurrency(totals.tax_total, cc),
+            shipping_total: totals.shipping_total,
+            shipping_total_display: formatCurrency(totals.shipping_total, cc),
+            discount_total: totals.discount_total,
+            discount_total_display: formatCurrency(totals.discount_total, cc),
           },
           items: (order.items || []).map((item) => ({
             id: item.id,
