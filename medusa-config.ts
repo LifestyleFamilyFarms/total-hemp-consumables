@@ -98,7 +98,8 @@ module.exports = defineConfig({
                 ? process.env.AUTHORIZE_NET_SANDBOX_TRANSACTION_KEY
                 : process.env.AUTHORIZE_NET_TRANSACTION_KEY) || process.env.AUTHORIZE_NET_TRANSACTION_KEY,
               capture: true,
-              environment: process.env.AUTHORIZE_NET_ENVIRONMENT || (process.env.NODE_ENV === "production" ? "production" : "sandbox")
+              environment: process.env.AUTHORIZE_NET_ENVIRONMENT || (process.env.NODE_ENV === "production" ? "production" : "sandbox"),
+              enviornment: process.env.AUTHORIZE_NET_ENVIRONMENT || (process.env.NODE_ENV === "production" ? "production" : "sandbox")
             }
           }
         ]
