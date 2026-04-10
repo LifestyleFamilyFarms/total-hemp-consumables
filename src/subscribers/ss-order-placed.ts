@@ -225,6 +225,57 @@ export default async function ssOrderPlacedHandler({
       return
     }
 
+    // Notify fulfillment/ops team via plain-text email
+    const fulfillmentEmail = (process.env.SS_FULFILLMENT_NOTIFICATION_EMAIL || "").trim()
+    const ssApiKey = (process.env.SS_SENDGRID_API_KEY || "").trim()
+    const ssFrom = (process.env.SS_SENDGRID_FROM || "").trim()
+    if (fulfillmentEmail && ssApiKey && ssFrom) {
+      const items = (order.items || [])
+        .map((i) =>
+          `${i.quantity ?? 1}x ${i.title ?? "Item"}`
+        )
+        .join("\n  ")
+      const sa = order.shipping_address
+      const addr = sa
+        ? `${sa.first_name} ${sa.last_name}\n  ${sa.address_1}${sa.address_2 ? `, ${sa.address_2}` : ""}\n  ${sa.city}, ${sa.province || ""} ${sa.postal_code}`
+        : "No shipping address"
+      const adminUrl = (process.env.MEDUSA_ADMIN_URL || "").trim()
+
+      await fetch("https://api.sendgrid.com/v3/mail/send", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${ssApiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          personalizations: [{ to: [{ email: fulfillmentEmail }] }],
+          from: { email: ssFrom, name: "Sober Sativas Orders" },
+          subject: `🌿 New Order #${order.display_id} — ${formatCurrency(totals.total, cc)}`,
+          content: [{
+            type: "text/plain",
+            value: [
+              `New order on Sober Sativas!`,
+              ``,
+              `Order #${order.display_id}`,
+              `Date: ${new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}`,
+              `Customer: ${email}`,
+              `Total: ${formatCurrency(totals.total, cc)}`,
+              ``,
+              `Items:`,
+              `  ${items}`,
+              ``,
+              `Ship to:`,
+              `  ${addr}`,
+              adminUrl ? `\nView in admin: ${adminUrl}/orders/${order.id}` : "",
+            ].join("\n"),
+          }],
+        }),
+      }).catch((err) => {
+        logger.warn(`[ss-order-placed] Fulfillment notification failed: ${err instanceof Error ? err.message : "unknown"}`)
+      })
+      logger.info(`[ss-order-placed] Fulfillment notification sent to ${fulfillmentEmail} for order ${order.id}`)
+    }
+
     // Mark as sent (idempotency)
     try {
       const orderService = container.resolve("order") as {
