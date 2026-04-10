@@ -104,6 +104,8 @@ export default async function ssOrderPlacedHandler({
         "shipping_address.country_code",
         "items.id",
         "items.title",
+        "items.variant_title",
+        "items.variant_sku",
         "items.quantity",
         "items.unit_price",
         "items.total",
@@ -231,9 +233,14 @@ export default async function ssOrderPlacedHandler({
     const ssFrom = (process.env.SS_SENDGRID_FROM || "").trim()
     if (fulfillmentEmail && ssApiKey && ssFrom) {
       const items = (order.items || [])
-        .map((i) =>
-          `${i.quantity ?? 1}x ${i.title ?? "Item"}`
-        )
+        .map((i) => {
+          const qty = i.quantity ?? 1
+          const title = i.title ?? "Item"
+          const variant = (i as Record<string, unknown>).variant_title as string | null
+          const sku = (i as Record<string, unknown>).variant_sku as string | null
+          const details = [variant, sku].filter(Boolean).join(" · ")
+          return `${qty}x ${title}${details ? ` (${details})` : ""}`
+        })
         .join("\n  ")
       const sa = order.shipping_address
       const addr = sa
@@ -250,7 +257,7 @@ export default async function ssOrderPlacedHandler({
         body: JSON.stringify({
           personalizations: [{ to: [{ email: fulfillmentEmail }] }],
           from: { email: ssFrom, name: "Sober Sativas Orders" },
-          subject: `🌿 New Order #${order.display_id} — ${formatCurrency(totals.total, cc)}`,
+          subject: `🌿 New Order #${order.display_id} — ${formatCurrency(totals.total, cc) ?? "see details"}`,
           content: [{
             type: "text/plain",
             value: [
@@ -259,7 +266,7 @@ export default async function ssOrderPlacedHandler({
               `Order #${order.display_id}`,
               `Date: ${new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}`,
               `Customer: ${email}`,
-              `Total: ${formatCurrency(totals.total, cc)}`,
+              `Total: ${formatCurrency(totals.total, cc) ?? "N/A"}`,
               ``,
               `Items:`,
               `  ${items}`,
