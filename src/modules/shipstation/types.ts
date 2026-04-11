@@ -161,6 +161,43 @@ export type GetShippingRatesResponse = {
     reason_code?: string
   }
 
+export type TrackingEvent = {
+  occurred_at: string
+  carrier_occurred_at?: string
+  description: string
+  city_locality?: string
+  state_province?: string
+  country_code?: string
+  status_code: string
+  signer?: string
+}
+
+export type TrackingInfo = {
+  tracking_number: string
+  tracking_url?: string
+  status_code: "unknown" | "in_transit" | "error" | "delivered" | "exception" | "accepted" | "attempt_failed" | "not_yet_in_system" | "delivery_failed" | "return_to_sender" | "held_by_carrier" | "undeliverable"
+  carrier_status_code?: string
+  carrier_status_description?: string
+  actual_delivery_date?: string
+  exception_description?: string
+  events?: TrackingEvent[]
+}
+
+export type ShipStationWebhookPayload = {
+  resource_url?: string
+  resource_type?: string
+  topic?: string
+  /** ShipStation v2 may include data inline */
+  data?: {
+    label_id?: string
+    shipment_id?: string
+    tracking_number?: string
+    status_code?: string
+    [k: string]: unknown
+  }
+  [k: string]: unknown
+}
+
 /**
  * Structured error thrown by ShipStationClient for all upstream failures.
  * Callers can inspect `status`, `requestId`, and `upstream` for diagnostics
