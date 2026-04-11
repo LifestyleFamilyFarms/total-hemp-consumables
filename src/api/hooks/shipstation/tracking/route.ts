@@ -117,10 +117,10 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
   } else if (payload.resource_url) {
     // Validate resource_url hostname to prevent SSRF
     try {
-      const resourceHost = new URL(payload.resource_url).hostname;
-      if (!ALLOWED_HOSTS.has(resourceHost)) {
+      const parsed = new URL(payload.resource_url);
+      if (parsed.protocol !== "https:" || !ALLOWED_HOSTS.has(parsed.hostname)) {
         logger.warn(
-          `[ss-webhook-tracking] Blocked resource_url with disallowed host: ${resourceHost}`,
+          `[ss-webhook-tracking] Blocked resource_url with disallowed host: ${parsed.hostname}`,
         );
         return;
       }

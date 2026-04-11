@@ -119,6 +119,13 @@ export default async function ssFulfillmentCreatedHandler({
       fulfilledLineItemIds.has(item.id),
     );
 
+    if (!fulfilledItems.length) {
+      logger.warn(
+        `[ss-fulfillment-created] No matching items for fulfillment ${fulfillment.id} — skipping email`,
+      );
+      return;
+    }
+
     const result = await ssSendGridSend({
       to: email,
       templateId,

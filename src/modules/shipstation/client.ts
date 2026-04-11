@@ -14,7 +14,7 @@ import {
 } from "./types";
 
 export class ShipStationClient {
-  options: ShipStationOptions;
+  private readonly options: ShipStationOptions;
 
   constructor(options: ShipStationOptions) {
     this.options = options;
