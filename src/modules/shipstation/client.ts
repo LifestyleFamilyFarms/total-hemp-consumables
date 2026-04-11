@@ -9,6 +9,7 @@ import {
   RateResponse,
   Shipment,
   ShipStationApiError,
+  TrackingInfo,
   VoidLabelResponse
 } from "./types"
 
@@ -194,6 +195,10 @@ export class ShipStationClient {
     return await this.sendRequest(`/shipments/${id}/cancel`, {
       method: "PUT",
     })
+  }
+
+  async getTrackingInfo(labelId: string): Promise<TrackingInfo> {
+    return await this.sendRequest(`/tracking?label_id=${encodeURIComponent(labelId)}`)
   }
 
   //MORE METHODS
