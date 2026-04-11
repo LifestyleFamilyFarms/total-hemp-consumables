@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="x-apple-disable-message-reformatting">
+  <meta name="color-scheme" content="light dark">
+  <meta name="supported-color-schemes" content="light dark">
+  <title>Your Order Has Been Delivered — Sober Sativas</title>
+  <!--[if mso]>
+  <noscript>
+    <xml>
+      <o:OfficeDocumentSettings>
+        <o:AllowPNG/>
+        <o:PixelsPerInch>96</o:PixelsPerInch>
+      </o:OfficeDocumentSettings>
+    </xml>
+  </noscript>
+  <style>
+    td, th, div, p, a, h1, h2, h3, h4, h5, h6 { font-family: Arial, Helvetica, sans-serif; }
+  </style>
+  <![endif]-->
+  <style type="text/css">
+    :root { color-scheme: light dark; supported-color-schemes: light dark; }
+    body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+    table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+    img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
+    body { margin: 0; padding: 0; width: 100% !important; height: 100% !important; background-color: #f5f2ed; }
+    a[x-apple-data-detectors] { color: inherit !important; text-decoration: none !important; }
+    u + #body a { color: inherit; text-decoration: none; }
+    #MessageViewBody a { color: inherit; text-decoration: none; }
+    @media only screen and (max-width: 480px) {
+      .email-container { width: 100% !important; max-width: 100% !important; }
+      .fluid { max-width: 100% !important; height: auto !important; }
+      .stack-column { display: block !important; width: 100% !important; max-width: 100% !important; }
+      .mobile-padding { padding-left: 20px !important; padding-right: 20px !important; }
+      .mobile-text-lg { font-size: 26px !important; line-height: 34px !important; }
+      .mobile-text-md { font-size: 20px !important; line-height: 28px !important; }
+      .mobile-text-sm { font-size: 13px !important; line-height: 20px !important; }
+      .mobile-spacer { height: 32px !important; }
+      .mobile-logo { width: 180px !important; }
+      .mobile-cta a { padding: 16px 32px !important; font-size: 17px !important; }
+    }
+    @media (prefers-color-scheme: dark) {
+      body, .body-bg { background-color: #1a1a1a !important; }
+      .dm-cream-bg { background-color: #2a2723 !important; }
+      .dm-white-bg { background-color: #222222 !important; }
+      .dm-text { color: #e8e2d9 !important; }
+      .dm-text-muted { color: #a89f93 !important; }
+      .dm-border { border-color: #3a3630 !important; }
+    }
+  </style>
+</head>
+<body id="body" class="body-bg" style="margin:0;padding:0;background-color:#f5f2ed;">
+  <span style="display:none;font-size:1px;color:#f5f2ed;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;">
+    Your Sober Sativas order has been delivered! &#8199;&#65279;&#847;
+  </span>
+
+  <center style="width:100%;background-color:#f5f2ed;" class="body-bg">
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="margin:auto;" class="email-container">
+
+      <!-- Logo -->
+      <tr>
+        <td style="padding:32px 40px 24px;text-align:center;" class="mobile-padding dm-cream-bg">
+          {{#if brand.top_wordmark_url}}
+          <img src="{{brand.top_wordmark_url}}" width="220" alt="Sober Sativas" style="display:inline-block;max-width:220px;height:auto;" class="mobile-logo">
+          {{/if}}
+        </td>
+      </tr>
+
+      <!-- Hero -->
+      <tr>
+        <td style="padding:0 40px 32px;background-color:#FAF7F2;text-align:center;" class="mobile-padding dm-cream-bg">
+          <h1 style="margin:0 0 12px;font-family:Georgia,'Times New Roman',serif;font-size:30px;line-height:38px;color:#3d3d3d;font-weight:700;" class="mobile-text-lg dm-text">
+            Your Order Has Arrived
+          </h1>
+          <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:26px;color:#666;" class="dm-text-muted">
+            Order #{{order_number}} was delivered on {{delivery_date}}.
+          </p>
+        </td>
+      </tr>
+
+      <!-- Tracking Reference -->
+      <tr>
+        <td style="padding:0 40px;" class="mobile-padding">
+          <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color:#ffffff;border-radius:12px;border:1px solid #e8e2d9;" class="dm-white-bg dm-border">
+            <tr>
+              <td style="padding:24px;">
+                <p style="margin:0 0 4px;font-family:Arial,Helvetica,sans-serif;font-size:12px;letter-spacing:0.5px;text-transform:uppercase;color:#7C9082;font-weight:700;">
+                  {{tracking.carrier}}
+                </p>
+                <p style="margin:0 0 16px;font-family:'Courier New',monospace;font-size:16px;color:#3d3d3d;letter-spacing:0.5px;" class="dm-text">
+                  <a href="{{tracking.url}}" style="color:#3d3d3d;text-decoration:underline;" class="dm-text">{{tracking.number}}</a>
+                </p>
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" class="mobile-cta">
+                  <tr>
+                    <td style="border-radius:8px;background-color:#7C9082;">
+                      <a href="{{tracking.url}}" target="_blank" style="display:inline-block;padding:12px 28px;font-family:Arial,Helvetica,sans-serif;font-size:15px;font-weight:600;color:#ffffff;text-decoration:none;">
+                        View Tracking Details
+                      </a>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+
+      <!-- Spacer -->
+      <tr><td style="height:24px;" class="mobile-spacer"></td></tr>
+
+      <!-- Order Items -->
+      <tr>
+        <td style="padding:0 40px;" class="mobile-padding">
+          <h2 style="margin:0 0 16px;font-family:Georgia,'Times New Roman',serif;font-size:20px;color:#3d3d3d;font-weight:700;" class="dm-text">
+            What Was Delivered
+          </h2>
+          {{#each order.items}}
+          <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-bottom:12px;">
+            <tr>
+              {{#if this.thumbnail}}
+              <td width="60" valign="top" style="padding-right:16px;">
+                <img src="{{this.thumbnail}}" width="60" height="60" alt="{{this.product_name}}" style="border-radius:8px;object-fit:cover;">
+              </td>
+              {{/if}}
+              <td valign="top" style="font-family:Arial,Helvetica,sans-serif;">
+                <p style="margin:0 0 2px;font-size:15px;font-weight:600;color:#3d3d3d;" class="dm-text">{{this.product_name}}</p>
+                <p style="margin:0;font-size:13px;color:#888;" class="dm-text-muted">Qty: {{this.quantity}} &middot; ${{this.price}}</p>
+              </td>
+            </tr>
+          </table>
+          {{/each}}
+        </td>
+      </tr>
+
+      <!-- Spacer -->
+      <tr><td style="height:32px;" class="mobile-spacer"></td></tr>
+
+      <!-- CTA -->
+      <tr>
+        <td style="padding:0 40px;text-align:center;" class="mobile-padding">
+          <p style="margin:0 0 16px;font-family:Arial,Helvetica,sans-serif;font-size:15px;color:#666;" class="dm-text-muted">
+            Enjoying your CBG flower? We'd love to hear about your experience.
+          </p>
+          <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" class="mobile-cta">
+            <tr>
+              <td style="border-radius:8px;background-color:#C17F59;">
+                <a href="{{links.website_url}}" target="_blank" style="display:inline-block;padding:14px 32px;font-family:Arial,Helvetica,sans-serif;font-size:16px;font-weight:600;color:#ffffff;text-decoration:none;">
+                  Shop Again
+                </a>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+
+      <!-- Spacer -->
+      <tr><td style="height:40px;" class="mobile-spacer"></td></tr>
+
+      <!-- Footer -->
+      <tr>
+        <td style="padding:32px 40px;background-color:#5C6B4F;text-align:center;" class="mobile-padding">
+          {{#if brand.footer_logo_url}}
+          <img src="{{brand.footer_logo_url}}" width="120" alt="Sober Sativas" style="display:inline-block;max-width:120px;height:auto;margin-bottom:16px;">
+          {{/if}}
+          <p style="margin:0 0 8px;font-family:Georgia,'Times New Roman',serif;font-size:14px;font-style:italic;color:#d4c9b8;">
+            "Don't feel bad about feeling good."
+          </p>
+          <p style="margin:0 0 8px;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#a89f93;">
+            Grown at Lifestyle Family Farms &middot; Grass Lake, Michigan
+          </p>
+          <p style="margin:0 0 8px;font-family:Arial,Helvetica,sans-serif;font-size:11px;color:#8a8070;">
+            These statements have not been evaluated by the FDA. This product is not intended to diagnose, treat, cure, or prevent any disease.
+          </p>
+          <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:11px;color:#8a8070;">
+            <a href="{{links.website_url}}" style="color:#d4c9b8;text-decoration:underline;">sobersativas.com</a>
+            &nbsp;&middot;&nbsp;
+            <a href="mailto:hello@sobersativas.com" style="color:#d4c9b8;text-decoration:underline;">hello@sobersativas.com</a>
+          </p>
+        </td>
+      </tr>
+
+    </table>
+  </center>
+</body>
+</html>
