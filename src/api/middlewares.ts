@@ -18,6 +18,7 @@ import { adminAbandonedCartsProcessMiddlewares } from "./admin/abandoned-carts/p
 import { adminAbandonedCartsVisibilityMiddlewares } from "./admin/abandoned-carts/visibility/middlewares"
 import { adminCategoryImagesMiddlewares } from "./admin/product-categories/[id]/images/middlewares"
 import { productFeedMiddlewares } from "./product-feed/middlewares"
+import { shipstationWebhookMiddlewares } from "./hooks/shipstation/tracking/middlewares"
 import { storeCartLoyaltyPointsMiddlewares } from "./store/carts/[id]/loyalty-points/middlewares"
 import { storeFirstPurchaseDiscountMiddlewares } from "./store/carts/[id]/first-purchase-discount/middlewares"
 import { storeCartResetMiddlewares } from "./store/carts/[id]/reset/middlewares"
@@ -797,6 +798,7 @@ export default defineMiddlewares({
     ...storeCartLoyaltyPointsMiddlewares,
     ...storeFirstPurchaseDiscountMiddlewares,
     ...storeCustomerLoyaltyHistoryMiddlewares,
+    ...shipstationWebhookMiddlewares,
     {
       matcher: /^\/admin\/.*/,
       middlewares: [repGuard],
