@@ -104,8 +104,11 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
   if (payload.data?.label_id && payload.data?.status_code) {
     // Inline tracking data
     labelId = payload.data.label_id;
+    const trackingNumber = payload.data.tracking_number || "";
     trackingInfo = {
-      tracking_number: payload.data.tracking_number || "",
+      tracking_number: trackingNumber,
+      tracking_url: (payload.data.tracking_url as string) ||
+        (trackingNumber ? `https://tools.usps.com/go/TrackConfirmAction?tLabels=${trackingNumber}` : undefined),
       status_code: payload.data.status_code as TrackingInfo["status_code"],
       carrier_status_description:
         (payload.data.carrier_status_description as string) || "",
@@ -141,17 +144,23 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
         labelId = urlMatch[1];
         trackingInfo = await client.getTrackingInfo(labelId);
       } else {
-        // Try fetching resource_url directly via the client's auth
-        const resp = await fetch(payload.resource_url, {
-          headers: {
-            "api-key": env.apiKey,
-            Accept: "application/json",
-          },
-        });
+        // Try fetching resource_url directly via the client's auth headers
+        const headers: Record<string, string> = { Accept: "application/json" };
+        if (env.apiSecret) {
+          headers["Authorization"] = `Basic ${Buffer.from(`${env.apiKey}:${env.apiSecret}`).toString("base64")}`;
+        } else {
+          headers["api-key"] = env.apiKey;
+        }
+        const resp = await fetch(payload.resource_url, { headers });
         if (resp.ok) {
           const data = await resp.json();
-          labelId = data.label_id || null;
-          trackingInfo = data as TrackingInfo;
+          // Validate response has required fields before casting
+          if (data && typeof data.status_code === "string" && typeof data.tracking_number === "string") {
+            labelId = data.label_id || null;
+            trackingInfo = data as TrackingInfo;
+          } else {
+            logger.warn(`[ss-webhook-tracking] resource_url response missing required fields`);
+          }
         }
       }
     } catch (err) {

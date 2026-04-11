@@ -37,8 +37,8 @@ type FulfillmentRecord = {
   } | null;
 };
 
-const formatCurrency = (amount: unknown, code?: string | null): string => {
-  if (typeof amount !== "number" || !Number.isFinite(amount)) return "$0.00";
+const formatCurrency = (amount: unknown, code?: string | null): string | null => {
+  if (typeof amount !== "number" || !Number.isFinite(amount)) return null;
   const currency = (code || "USD").toUpperCase();
   try {
     return new Intl.NumberFormat("en-US", {
@@ -71,9 +71,9 @@ export default async function ssReorderNudgeJob(container: MedusaContainer) {
   if (!templateId) return;
 
   const nudgeAfterMs = NUDGE_AFTER_DAYS * 24 * 60 * 60 * 1000;
-  // Window: fulfilled between 21 and 22 days ago (ensures daily job catches each order once)
-  const windowStart = new Date(Date.now() - nudgeAfterMs - 24 * 60 * 60 * 1000);
-  const windowEnd = new Date(Date.now() - nudgeAfterMs);
+  // Query all fulfillments older than 21 days. No upper bound — idempotency
+  // via ss_reorder_nudge_sent_at prevents duplicates even if the job misses a run.
+  const cutoff = new Date(Date.now() - nudgeAfterMs);
 
   const query = container.resolve("query") as {
     graph: (input: Record<string, unknown>) => Promise<{
@@ -114,7 +114,7 @@ export default async function ssReorderNudgeJob(container: MedusaContainer) {
       entity: "fulfillment",
       fields: queryFields,
       filters: {
-        created_at: { $gte: windowStart, $lte: windowEnd },
+        created_at: { $lte: cutoff },
       },
       pagination: { take: DEFAULT_LIMIT, skip: offset },
     });
@@ -185,10 +185,10 @@ export default async function ssReorderNudgeJob(container: MedusaContainer) {
         title: item.title || "CBG Flower",
         product_name: item.title || "CBG Flower",
         quantity: item.quantity ?? 0,
-        price: formatCurrency(item.unit_price, order.currency_code).replace(
+        price: formatCurrency(item.unit_price, order.currency_code)?.replace(
           "$",
           "",
-        ),
+        ) ?? "0.00",
         unit_price_display: formatCurrency(
           item.unit_price,
           order.currency_code,

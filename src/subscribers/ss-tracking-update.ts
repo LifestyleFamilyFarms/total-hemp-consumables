@@ -120,7 +120,7 @@ export default async function ssTrackingUpdateHandler({
         "order.items.thumbnail",
       ],
       pagination: {
-        take: 100,
+        take: 500,
         order: { created_at: "DESC" },
       },
     });
