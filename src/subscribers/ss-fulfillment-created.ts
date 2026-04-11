@@ -109,15 +109,36 @@ export default async function ssFulfillmentCreatedHandler({
       to: email,
       templateId,
       dynamicTemplateData: {
+        // v2 nested
         order: {
           id: order.id,
           display_id: order.display_id ?? null,
           items: (order.items || []).map((item) => ({
             id: item.id,
             title: item.title || "Item",
+            product_name: item.title || "Item",
             quantity: item.quantity ?? 0,
+            price: item.unit_price != null ? (item.unit_price / 1).toFixed(2) : "0.00",
             thumbnail: item.thumbnail || null,
           })),
+        },
+        // v1 flat aliases (template uses {{tracking.*}}, {{items}}, {{estimated_delivery}})
+        tracking: {
+          carrier: "USPS",
+          number: tracking?.tracking_number || "",
+          url: tracking?.url || "#",
+        },
+        estimated_delivery: "3–5 business days",
+        order_number: order.display_id ?? null,
+        items: (order.items || []).map((item) => ({
+          product_name: item.title || "Item",
+          quantity: item.quantity ?? 0,
+          price: item.unit_price != null ? (item.unit_price / 1).toFixed(2) : "0.00",
+        })),
+        // v2 nested (kept for forward compat)
+        shipping: {
+          tracking_number: tracking?.tracking_number || null,
+          tracking_url: tracking?.url || null,
         },
         customer: {
           first_name:
@@ -129,10 +150,6 @@ export default async function ssFulfillmentCreatedHandler({
             order.shipping_address?.last_name ||
             "",
           email,
-        },
-        shipping: {
-          tracking_number: tracking?.tracking_number || null,
-          tracking_url: tracking?.url || null,
         },
         links: {
           order_url: storefrontUrl

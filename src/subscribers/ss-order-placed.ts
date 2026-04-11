@@ -146,24 +146,42 @@ export default async function ssOrderPlacedHandler({
     const cc = order.currency_code
     const storefrontUrl = (process.env.SS_STOREFRONT_URL || "").trim().replace(/\/+$/, "")
 
+    const sa = order.shipping_address
+    const orderDate = order.created_at
+      ? new Date(
+          typeof order.created_at === "string"
+            ? order.created_at
+            : (order.created_at as Date).toISOString()
+        ).toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        })
+      : null
+    const orderUrl = storefrontUrl
+      ? `${storefrontUrl}/account/orders/details/${order.id}`
+      : null
+    const mappedItems = (order.items || []).map((item) => ({
+      id: item.id,
+      title: item.title || "Item",
+      product_name: item.title || "Item",
+      quantity: item.detail?.quantity ?? item.quantity ?? 0,
+      unit_price: item.unit_price,
+      unit_price_display: formatCurrency(item.unit_price, cc),
+      price: formatCurrency(item.unit_price, cc)?.replace("$", "") ?? "0.00",
+      line_total_display: formatCurrency((item.detail?.quantity ?? item.quantity ?? 1) * (item.unit_price ?? 0), cc),
+      thumbnail: item.thumbnail || null,
+    }))
+
     const result = await ssSendGridSend({
       to: email,
       templateId,
       dynamicTemplateData: {
+        // v2 nested structure
         order: {
           id: order.id,
           display_id: order.display_id ?? null,
-          created_at: order.created_at
-            ? new Date(
-                typeof order.created_at === "string"
-                  ? order.created_at
-                  : (order.created_at as Date).toISOString()
-              ).toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })
-            : null,
+          created_at: orderDate,
           currency_code: cc,
           totals: {
             total: totals.total,
@@ -177,35 +195,42 @@ export default async function ssOrderPlacedHandler({
             discount_total: totals.discount_total,
             discount_total_display: formatCurrency(totals.discount_total, cc),
           },
-          items: (order.items || []).map((item) => ({
-            id: item.id,
-            title: item.title || "Item",
-            quantity: item.detail?.quantity ?? item.quantity ?? 0,
-            unit_price: item.unit_price,
-            unit_price_display: formatCurrency(item.unit_price, cc),
-            line_total_display: formatCurrency((item.detail?.quantity ?? item.quantity ?? 1) * (item.unit_price ?? 0), cc),
-            thumbnail: item.thumbnail || null,
-          })),
+          items: mappedItems,
         },
+        // v1 flat aliases (legacy template compatibility)
+        order_number: order.display_id ?? null,
+        order_date: orderDate,
+        order_url: orderUrl,
+        subtotal: formatCurrency(totals.subtotal, cc),
+        tax: formatCurrency(totals.tax_total, cc),
+        shipping: formatCurrency(totals.shipping_total, cc),
+        total: formatCurrency(totals.total, cc),
+        items: mappedItems,
+        shipping_name: sa ? `${sa.first_name || ""} ${sa.last_name || ""}`.trim() : "",
+        shipping_address_1: sa?.address_1 || "",
+        shipping_address_2: sa?.address_2 || "",
+        shipping_city: sa?.city || "",
+        shipping_state: sa?.province || "",
+        shipping_zip: sa?.postal_code || "",
         customer: {
-          first_name: order.customer?.first_name || order.shipping_address?.first_name || "",
-          last_name: order.customer?.last_name || order.shipping_address?.last_name || "",
+          first_name: order.customer?.first_name || sa?.first_name || "",
+          last_name: order.customer?.last_name || sa?.last_name || "",
           email,
         },
-        shipping_address: order.shipping_address
+        shipping_address: sa
           ? {
-              address_1: order.shipping_address.address_1 || "",
-              address_2: order.shipping_address.address_2 || "",
-              city: order.shipping_address.city || "",
-              province: order.shipping_address.province || "",
-              postal_code: order.shipping_address.postal_code || "",
-              country_code: order.shipping_address.country_code || "",
+              first_name: sa.first_name || "",
+              last_name: sa.last_name || "",
+              address_1: sa.address_1 || "",
+              address_2: sa.address_2 || "",
+              city: sa.city || "",
+              province: sa.province || "",
+              postal_code: sa.postal_code || "",
+              country_code: sa.country_code || "",
             }
           : null,
         links: {
-          order_url: storefrontUrl
-            ? `${storefrontUrl}/account/orders/details/${order.id}`
-            : null,
+          order_url: orderUrl,
           website_url: storefrontUrl || null,
           support_url: storefrontUrl
             ? `${storefrontUrl}/contact`
