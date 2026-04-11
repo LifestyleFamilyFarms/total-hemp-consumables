@@ -1,80 +1,85 @@
-import type { SubscriberArgs, SubscriberConfig } from "@medusajs/framework"
-import { ContainerRegistrationKeys } from "@medusajs/framework/utils"
-import { ssSendGridSend, getSsSalesChannelId } from "../utils/ss-sendgrid"
+import type { SubscriberArgs, SubscriberConfig } from "@medusajs/framework";
+import { ContainerRegistrationKeys } from "@medusajs/framework/utils";
+import { ssSendGridSend, getSsSalesChannelId } from "../utils/ss-sendgrid";
 
 type OrderRecord = {
-  id: string
-  display_id?: string | number | null
-  email?: string | null
-  created_at?: string | Date | null
-  sales_channel_id?: string | null
-  currency_code?: string | null
-  total?: number | null
-  subtotal?: number | null
-  tax_total?: number | null
-  shipping_total?: number | null
-  discount_total?: number | null
-  metadata?: Record<string, unknown> | null
+  id: string;
+  display_id?: string | number | null;
+  email?: string | null;
+  created_at?: string | Date | null;
+  sales_channel_id?: string | null;
+  currency_code?: string | null;
+  total?: number | null;
+  subtotal?: number | null;
+  tax_total?: number | null;
+  shipping_total?: number | null;
+  discount_total?: number | null;
+  metadata?: Record<string, unknown> | null;
   customer?: {
-    first_name?: string | null
-    last_name?: string | null
-    email?: string | null
-  } | null
+    first_name?: string | null;
+    last_name?: string | null;
+    email?: string | null;
+  } | null;
   shipping_address?: {
-    first_name?: string | null
-    last_name?: string | null
-    address_1?: string | null
-    address_2?: string | null
-    city?: string | null
-    province?: string | null
-    postal_code?: string | null
-    country_code?: string | null
-  } | null
+    first_name?: string | null;
+    last_name?: string | null;
+    address_1?: string | null;
+    address_2?: string | null;
+    city?: string | null;
+    province?: string | null;
+    postal_code?: string | null;
+    country_code?: string | null;
+  } | null;
   items?: Array<{
-    id: string
-    title?: string | null
-    quantity?: number | null
-    unit_price?: number | null
-    thumbnail?: string | null
+    id: string;
+    title?: string | null;
+    quantity?: number | null;
+    unit_price?: number | null;
+    thumbnail?: string | null;
     detail?: {
-      quantity?: number | null
-    } | null
-  }> | null
-}
+      quantity?: number | null;
+    } | null;
+  }> | null;
+};
 
-const formatCurrency = (amount: unknown, code?: string | null): string | null => {
-  if (typeof amount !== "number" || !Number.isFinite(amount)) return null
-  const currency = (code || "USD").toUpperCase()
+const formatCurrency = (
+  amount: unknown,
+  code?: string | null,
+): string | null => {
+  if (typeof amount !== "number" || !Number.isFinite(amount)) return null;
+  const currency = (code || "USD").toUpperCase();
   try {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
       currency,
       minimumFractionDigits: 2,
-    }).format(amount)
+    }).format(amount);
   } catch {
-    return `$${(amount as number).toFixed(2)}`
+    return `$${(amount as number).toFixed(2)}`;
   }
-}
+};
 
 export default async function ssOrderPlacedHandler({
   event: { data },
   container,
 }: SubscriberArgs<{ id: string }>) {
   const logger = container.resolve(ContainerRegistrationKeys.LOGGER) as {
-    info: (msg: string) => void
-    warn: (msg: string) => void
-  }
+    info: (msg: string) => void;
+    warn: (msg: string) => void;
+  };
 
-  const ssChannelId = getSsSalesChannelId()
-  if (!ssChannelId) return
+  const ssChannelId = getSsSalesChannelId();
+  if (!ssChannelId) return;
 
-  const templateId = (process.env.SS_SENDGRID_TEMPLATE_ORDER_CONFIRMATION || "").trim()
-  if (!templateId) return
+  const templateId = (
+    process.env.SS_SENDGRID_TEMPLATE_ORDER_CONFIRMATION || ""
+  ).trim();
+  if (!templateId) return;
 
   try {
     const query = container.resolve("query") as {
-      graph: (input: Record<string, unknown>) => Promise<{ data: unknown[] }>
-    }
+      graph: (input: Record<string, unknown>) => Promise<{ data: unknown[] }>;
+    };
 
     const { data: orders } = await query.graph({
       entity: "order",
@@ -113,54 +118,81 @@ export default async function ssOrderPlacedHandler({
         "items.detail.quantity",
       ],
       filters: { id: data.id },
-    })
+    });
 
-    const order = (orders?.[0] || null) as OrderRecord | null
-    if (!order) return
+    const order = (orders?.[0] || null) as OrderRecord | null;
+    if (!order) return;
 
     // Sales channel gate
-    if (order.sales_channel_id !== ssChannelId) return
+    if (order.sales_channel_id !== ssChannelId) return;
 
     // query.graph() doesn't return computed totals — fetch via order module service
     const orderModuleService = container.resolve("order") as unknown as {
-      retrieveOrder: (id: string, config?: Record<string, unknown>) => Promise<Record<string, unknown>>
-    }
+      retrieveOrder: (
+        id: string,
+        config?: Record<string, unknown>,
+      ) => Promise<Record<string, unknown>>;
+    };
     const orderWithTotals = await orderModuleService.retrieveOrder(data.id, {
-      select: ["id", "total", "subtotal", "tax_total", "shipping_total", "discount_total"],
-    })
+      select: [
+        "id",
+        "total",
+        "subtotal",
+        "tax_total",
+        "shipping_total",
+        "discount_total",
+      ],
+    });
     // Overlay computed totals onto order
     const totals = {
-      total: typeof orderWithTotals.total === "number" ? orderWithTotals.total : order.total,
-      subtotal: typeof orderWithTotals.subtotal === "number" ? orderWithTotals.subtotal : order.subtotal,
-      tax_total: typeof orderWithTotals.tax_total === "number" ? orderWithTotals.tax_total : order.tax_total,
-      shipping_total: typeof orderWithTotals.shipping_total === "number" ? orderWithTotals.shipping_total : order.shipping_total,
-      discount_total: typeof orderWithTotals.discount_total === "number" ? orderWithTotals.discount_total : order.discount_total,
-    }
+      total:
+        typeof orderWithTotals.total === "number"
+          ? orderWithTotals.total
+          : order.total,
+      subtotal:
+        typeof orderWithTotals.subtotal === "number"
+          ? orderWithTotals.subtotal
+          : order.subtotal,
+      tax_total:
+        typeof orderWithTotals.tax_total === "number"
+          ? orderWithTotals.tax_total
+          : order.tax_total,
+      shipping_total:
+        typeof orderWithTotals.shipping_total === "number"
+          ? orderWithTotals.shipping_total
+          : order.shipping_total,
+      discount_total:
+        typeof orderWithTotals.discount_total === "number"
+          ? orderWithTotals.discount_total
+          : order.discount_total,
+    };
 
     // Idempotency: skip if already sent
-    if (order.metadata?.ss_order_confirmation_sent_at) return
+    if (order.metadata?.ss_order_confirmation_sent_at) return;
 
-    const email = order.email || order.customer?.email
-    if (!email) return
+    const email = order.email || order.customer?.email;
+    if (!email) return;
 
-    const cc = order.currency_code
-    const storefrontUrl = (process.env.SS_STOREFRONT_URL || "").trim().replace(/\/+$/, "")
+    const cc = order.currency_code;
+    const storefrontUrl = (process.env.SS_STOREFRONT_URL || "")
+      .trim()
+      .replace(/\/+$/, "");
 
-    const sa = order.shipping_address
+    const sa = order.shipping_address;
     const orderDate = order.created_at
       ? new Date(
           typeof order.created_at === "string"
             ? order.created_at
-            : (order.created_at as Date).toISOString()
+            : (order.created_at as Date).toISOString(),
         ).toLocaleDateString("en-US", {
           year: "numeric",
           month: "long",
           day: "numeric",
         })
-      : null
+      : null;
     const orderUrl = storefrontUrl
       ? `${storefrontUrl}/account/orders/details/${order.id}`
-      : null
+      : null;
     const mappedItems = (order.items || []).map((item) => ({
       id: item.id,
       title: item.title || "Item",
@@ -169,9 +201,12 @@ export default async function ssOrderPlacedHandler({
       unit_price: item.unit_price,
       unit_price_display: formatCurrency(item.unit_price, cc),
       price: formatCurrency(item.unit_price, cc)?.replace("$", "") ?? "0.00",
-      line_total_display: formatCurrency((item.detail?.quantity ?? item.quantity ?? 1) * (item.unit_price ?? 0), cc),
+      line_total_display: formatCurrency(
+        (item.detail?.quantity ?? item.quantity ?? 1) * (item.unit_price ?? 0),
+        cc,
+      ),
       thumbnail: item.thumbnail || null,
-    }))
+    }));
 
     const result = await ssSendGridSend({
       to: email,
@@ -206,7 +241,9 @@ export default async function ssOrderPlacedHandler({
         shipping: formatCurrency(totals.shipping_total, cc),
         total: formatCurrency(totals.total, cc),
         items: mappedItems,
-        shipping_name: sa ? `${sa.first_name || ""} ${sa.last_name || ""}`.trim() : "",
+        shipping_name: sa
+          ? `${sa.first_name || ""} ${sa.last_name || ""}`.trim()
+          : "",
         shipping_address_1: sa?.address_1 || "",
         shipping_address_2: sa?.address_2 || "",
         shipping_city: sa?.city || "",
@@ -238,129 +275,177 @@ export default async function ssOrderPlacedHandler({
         },
         brand: {
           top_wordmark_url:
-            (process.env.SS_SENDGRID_BRAND_TOP_WORDMARK_URL || "").trim() || null,
+            (process.env.SS_SENDGRID_BRAND_TOP_WORDMARK_URL || "").trim() ||
+            null,
           footer_logo_url:
-            (process.env.SS_SENDGRID_BRAND_FOOTER_LOGO_URL || "").trim() || null,
+            (process.env.SS_SENDGRID_BRAND_FOOTER_LOGO_URL || "").trim() ||
+            null,
         },
       },
-    })
+    });
 
     if (!result.success) {
       logger.warn(
-        `[ss-order-placed] SendGrid send failed for order ${order.id}: ${result.error}`
-      )
-      return
+        `[ss-order-placed] SendGrid send failed for order ${order.id}: ${result.error}`,
+      );
+      return;
     }
 
     // Notify fulfillment/ops team via plain-text email
-    const fulfillmentEmail = (process.env.SS_FULFILLMENT_NOTIFICATION_EMAIL || "").trim()
-    const ssApiKey = (process.env.SS_SENDGRID_API_KEY || "").trim()
-    const ssFrom = (process.env.SS_SENDGRID_FROM || "").trim()
+    const fulfillmentEmail = (
+      process.env.SS_FULFILLMENT_NOTIFICATION_EMAIL || ""
+    ).trim();
+    const ssApiKey = (process.env.SS_SENDGRID_API_KEY || "").trim();
+    const ssFrom = (process.env.SS_SENDGRID_FROM || "").trim();
     if (fulfillmentEmail && ssApiKey && ssFrom) {
       const items = (order.items || [])
         .map((i) => {
-          const qty = i.quantity ?? 1
-          const title = i.title ?? "Item"
-          const variant = (i as Record<string, unknown>).variant_title as string | null
-          const sku = (i as Record<string, unknown>).variant_sku as string | null
-          const details = [variant, sku].filter(Boolean).join(" · ")
-          return `${qty}x ${title}${details ? ` (${details})` : ""}`
+          const qty = i.quantity ?? 1;
+          const title = i.title ?? "Item";
+          const variant = (i as Record<string, unknown>).variant_title as
+            | string
+            | null;
+          const sku = (i as Record<string, unknown>).variant_sku as
+            | string
+            | null;
+          const details = [variant, sku].filter(Boolean).join(" · ");
+          return `${qty}x ${title}${details ? ` (${details})` : ""}`;
         })
-        .join("\n  ")
-      const sa = order.shipping_address
+        .join("\n  ");
       const addr = sa
         ? `${sa.first_name} ${sa.last_name}\n  ${sa.address_1}${sa.address_2 ? `, ${sa.address_2}` : ""}\n  ${sa.city}, ${sa.province || ""} ${sa.postal_code}`
-        : "No shipping address"
-      const adminUrl = (process.env.MEDUSA_ADMIN_URL || "").trim()
+        : "No shipping address";
+      const adminUrl = (process.env.MEDUSA_ADMIN_URL || "").trim();
 
-      await fetch("https://api.sendgrid.com/v3/mail/send", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${ssApiKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          personalizations: [{ to: [{ email: fulfillmentEmail }] }],
-          from: { email: ssFrom, name: "Sober Sativas Orders" },
-          subject: `🌿 New Order #${order.display_id} — ${formatCurrency(totals.total, cc) ?? "see details"}`,
-          content: [{
-            type: "text/plain",
-            value: [
-              `New order on Sober Sativas!`,
-              ``,
-              `Order #${order.display_id}`,
-              `Date: ${new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}`,
-              `Customer: ${email}`,
-              `Total: ${formatCurrency(totals.total, cc) ?? "N/A"}`,
-              ``,
-              `Items:`,
-              `  ${items}`,
-              ``,
-              `Ship to:`,
-              `  ${addr}`,
-              adminUrl ? `\nView in admin: ${adminUrl}/orders/${order.id}` : "",
-            ].join("\n"),
-          }],
-        }),
-      }).catch((err) => {
-        logger.warn(`[ss-order-placed] Fulfillment notification failed: ${err instanceof Error ? err.message : "unknown"}`)
-      })
-      logger.info(`[ss-order-placed] Fulfillment notification sent to ${fulfillmentEmail} for order ${order.id}`)
+      try {
+        const res = await fetch("https://api.sendgrid.com/v3/mail/send", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${ssApiKey}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            personalizations: [{ to: [{ email: fulfillmentEmail }] }],
+            from: { email: ssFrom, name: "Sober Sativas Orders" },
+            subject: `🌿 New Order #${order.display_id} — ${formatCurrency(totals.total, cc) ?? "see details"}`,
+            content: [
+              {
+                type: "text/plain",
+                value: [
+                  `New order on Sober Sativas!`,
+                  ``,
+                  `Order #${order.display_id}`,
+                  `Date: ${new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}`,
+                  `Customer: ${email}`,
+                  `Total: ${formatCurrency(totals.total, cc) ?? "N/A"}`,
+                  ``,
+                  `Items:`,
+                  `  ${items}`,
+                  ``,
+                  `Ship to:`,
+                  `  ${addr}`,
+                  adminUrl
+                    ? `\nView in admin: ${adminUrl}/orders/${order.id}`
+                    : "",
+                ].join("\n"),
+              },
+            ],
+          }),
+        });
+        if (res.ok) {
+          logger.info(
+            `[ss-order-placed] Fulfillment notification sent to ${fulfillmentEmail} for order ${order.id}`,
+          );
+        } else {
+          logger.warn(
+            `[ss-order-placed] Fulfillment notification failed for order ${order.id}: status ${res.status}`,
+          );
+        }
+      } catch (err) {
+        logger.warn(
+          `[ss-order-placed] Fulfillment notification failed: ${err instanceof Error ? err.message : "unknown"}`,
+        );
+      }
     }
 
     // Mark as sent (idempotency)
     try {
       const orderService = container.resolve("order") as {
-        updateOrders: (id: string, data: Record<string, unknown>) => Promise<unknown>
-      }
+        updateOrders: (
+          id: string,
+          data: Record<string, unknown>,
+        ) => Promise<unknown>;
+      };
       await orderService.updateOrders(order.id, {
         metadata: {
           ...(order.metadata || {}),
           ss_order_confirmation_sent_at: new Date().toISOString(),
         },
-      })
+      });
     } catch (metaErr) {
       logger.warn(
-        `[ss-order-placed] Email sent but metadata update failed for order ${order.id}`
-      )
+        `[ss-order-placed] Email sent but metadata update failed for order ${order.id}`,
+      );
     }
 
-    logger.info(`[ss-order-placed] Order confirmation sent for order ${order.id}`)
+    logger.info(
+      `[ss-order-placed] Order confirmation sent for order ${order.id}`,
+    );
 
     // Add to newsletter list if customer opted in
-    const marketingOptIn = order.metadata?.marketing_opt_in === true || order.metadata?.marketing_opt_in === "true"
-    const newsletterListId = (process.env.SS_SENDGRID_NEWSLETTER_LIST_ID || "").trim()
+    const marketingOptIn =
+      order.metadata?.marketing_opt_in === true ||
+      order.metadata?.marketing_opt_in === "true";
+    const newsletterListId = (
+      process.env.SS_SENDGRID_NEWSLETTER_LIST_ID || ""
+    ).trim();
     if (marketingOptIn && ssApiKey && email && newsletterListId) {
-      const sa = order.shipping_address
-      await fetch("https://api.sendgrid.com/v3/marketing/contacts", {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${ssApiKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          list_ids: [newsletterListId],
-          contacts: [{
-            email,
-            first_name: sa?.first_name || "",
-            last_name: sa?.last_name || "",
-            city: sa?.city || "",
-            state_province_region: sa?.province || "",
-            postal_code: sa?.postal_code || "",
-            country: sa?.country_code?.toUpperCase() || "",
-          }],
-        }),
-      }).catch((err) => {
-        logger.warn(`[ss-order-placed] Newsletter signup failed: ${err instanceof Error ? err.message : "unknown"}`)
-      })
-      logger.info(`[ss-order-placed] Added ${email} to newsletter list for order ${order.id}`)
+      try {
+        const res = await fetch(
+          "https://api.sendgrid.com/v3/marketing/contacts",
+          {
+            method: "PUT",
+            headers: {
+              Authorization: `Bearer ${ssApiKey}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              list_ids: [newsletterListId],
+              contacts: [
+                {
+                  email,
+                  first_name: sa?.first_name || "",
+                  last_name: sa?.last_name || "",
+                  city: sa?.city || "",
+                  state_province_region: sa?.province || "",
+                  postal_code: sa?.postal_code || "",
+                  country: sa?.country_code?.toUpperCase() || "",
+                },
+              ],
+            }),
+          },
+        );
+        if (res.ok) {
+          logger.info(
+            `[ss-order-placed] Added ${email} to newsletter list for order ${order.id}`,
+          );
+        } else {
+          logger.warn(
+            `[ss-order-placed] Newsletter signup failed for order ${order.id}: status ${res.status}`,
+          );
+        }
+      } catch (err) {
+        logger.warn(
+          `[ss-order-placed] Newsletter signup failed: ${err instanceof Error ? err.message : "unknown"}`,
+        );
+      }
     }
   } catch (error) {
-    const msg = error instanceof Error ? error.message : "Unknown error"
-    logger.warn(`[ss-order-placed] Failed for order ${data.id}: ${msg}`)
+    const msg = error instanceof Error ? error.message : "Unknown error";
+    logger.warn(`[ss-order-placed] Failed for order ${data.id}: ${msg}`);
   }
 }
 
 export const config: SubscriberConfig = {
   event: "order.placed",
-}
+};
