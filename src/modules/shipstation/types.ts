@@ -1,202 +1,225 @@
 export type Carrier = {
-    carrier_id: string
-    disabled_by_billing_plan: boolean
-    friendly_name: string
-    services: {
-        service_code: string
-        name: string
-    }[]
-    packages: {
-        package_code: string
-    }[]
-    [k: string]: unknown
-}
+  carrier_id: string;
+  disabled_by_billing_plan: boolean;
+  friendly_name: string;
+  services: {
+    service_code: string;
+    name: string;
+  }[];
+  packages: {
+    package_code: string;
+  }[];
+  [k: string]: unknown;
+};
 
 export type CarriersResponse = {
-    carriers: Carrier[]
-}
+  carriers: Carrier[];
+};
 
 export type Warehouse = {
-  warehouse_id: string
-  name: string
-  created_at?: string
+  warehouse_id: string;
+  name: string;
+  created_at?: string;
   origin_address?: {
-    name?: string
-    phone?: string
-    company_name?: string
-    address_line1?: string
-    address_line2?: string
-    city_locality?: string
-    state_province?: string
-    postal_code?: string
-    country_code?: string
-  }
-  [k: string]: unknown
-}
+    name?: string;
+    phone?: string;
+    company_name?: string;
+    address_line1?: string;
+    address_line2?: string;
+    city_locality?: string;
+    state_province?: string;
+    postal_code?: string;
+    country_code?: string;
+  };
+  [k: string]: unknown;
+};
 
 export type WarehousesResponse = {
-  warehouses: Warehouse[]
-}
+  warehouses: Warehouse[];
+};
 
 export type ShipStationAddress = {
-    name: string
-    phone: string
-    email?: string | null
-    company_name?: string | null
-    address_line1: string
-    address_line2?: string | null
-    address_line3?: string | null
-    city_locality: string
-    state_province: string
-    postal_code: string
-    country_code: string
-    address_residential_indicator: "unknown" | "yes" | "no"
-    instructions?: string | null
-    geolocation?: {
-      type?: string
-      value?: string
-    }[]
-}
+  name: string;
+  phone: string;
+  email?: string | null;
+  company_name?: string | null;
+  address_line1: string;
+  address_line2?: string | null;
+  address_line3?: string | null;
+  city_locality: string;
+  state_province: string;
+  postal_code: string;
+  country_code: string;
+  address_residential_indicator: "unknown" | "yes" | "no";
+  instructions?: string | null;
+  geolocation?: {
+    type?: string;
+    value?: string;
+  }[];
+};
 
 export type Rate = {
-    rate_id: string
-    shipping_amount: {
-      currency: string
-      amount: number
-    }
-    insurance_amount: {
-      currency: string
-      amount: number
-    }
-    confirmation_amount: {
-      currency: string
-      amount: number
-    }
-    other_amount: {
-      currency: string
-      amount: number
-    }
-    tax_amount: {
-      currency: string
-      amount: number
-    }
-}
+  rate_id: string;
+  shipping_amount: {
+    currency: string;
+    amount: number;
+  };
+  insurance_amount: {
+    currency: string;
+    amount: number;
+  };
+  confirmation_amount: {
+    currency: string;
+    amount: number;
+  };
+  other_amount: {
+    currency: string;
+    amount: number;
+  };
+  tax_amount: {
+    currency: string;
+    amount: number;
+  };
+};
 
 export type RateResponse = {
-    rates: Rate[]
-}
+  rates: Rate[];
+};
 
 export type GetShippingRatesRequest = {
-    shipment_id?: string
-    shipment?: Omit<Shipment, "shipment_id" | "shipment_status">
-    rate_options: {
-      carrier_ids: string[]
-      service_codes: string[]
-      preferred_currency: string
-    }  
-}
+  shipment_id?: string;
+  shipment?: Omit<Shipment, "shipment_id" | "shipment_status">;
+  rate_options: {
+    carrier_ids: string[];
+    service_codes: string[];
+    preferred_currency: string;
+  };
+};
 
 export type GetShippingRatesResponse = {
-    shipment_id: string
-    carrier_id?: string
-    service_code?: string
-    external_order_id?: string
-    rate_response: RateResponse
-  }
+  shipment_id: string;
+  carrier_id?: string;
+  service_code?: string;
+  external_order_id?: string;
+  rate_response: RateResponse;
+};
 
-  export type Shipment = {
-    shipment_id: string
-    carrier_id: string
-    service_code: string
-    ship_to: ShipStationAddress
-    return_to?: ShipStationAddress
-    is_return?: boolean
-    ship_from: ShipStationAddress
-    items?: [
-      {
-        name?: string
-        quantity?: number
-        sku?: string
-      }
-    ]
-    warehouse_id?: string
-    shipment_status: "pending" | "processing" | "label_purchased" | "cancelled"
-    [k: string]: unknown
-  }
+export type Shipment = {
+  shipment_id: string;
+  carrier_id: string;
+  service_code: string;
+  ship_to: ShipStationAddress;
+  return_to?: ShipStationAddress;
+  is_return?: boolean;
+  ship_from: ShipStationAddress;
+  items?: Array<{
+    name?: string;
+    quantity?: number;
+    sku?: string;
+  }>;
+  warehouse_id?: string;
+  validate_address?: "no_validation" | "validate_only" | "validate_and_clean";
+  packages?: Array<{
+    weight?: { value: number; unit: string };
+    dimensions?: {
+      length: number;
+      width: number;
+      height: number;
+      unit: string;
+    };
+  }>;
+  customs?: {
+    contents?: string;
+    non_delivery?: string;
+  };
+  shipment_status: "pending" | "processing" | "label_purchased" | "cancelled";
+};
 
-  export type Label = {
-    label_id: string
-    status: "processing" | "completed" | "error" | "voided"
-    shipment_id: string
-    ship_date: Date
-    shipment_cost: {
-      currency: string
-      amount: number
-    }
-    insurance_cost: {
-      currency: string
-      amount: number
-    }
-    confirmation_amount: {
-      currency: string
-      amount: number
-    }
-    tracking_number: string
-    is_return_label: boolean
-    carrier_id: string
-    service_code: string
-    trackable: string
-    tracking_status: "unknown" | "in_transit" | "error" | "delivered"
-    label_download: {
-      href: string
-      pdf: string
-      png: string
-      zpl: string
-    }
-  }
+export type Label = {
+  label_id: string;
+  status: "processing" | "completed" | "error" | "voided";
+  shipment_id: string;
+  ship_date: string;
+  shipment_cost: {
+    currency: string;
+    amount: number;
+  };
+  insurance_cost: {
+    currency: string;
+    amount: number;
+  };
+  confirmation_amount: {
+    currency: string;
+    amount: number;
+  };
+  tracking_number: string;
+  is_return_label: boolean;
+  carrier_id: string;
+  service_code: string;
+  trackable: boolean;
+  tracking_status: "unknown" | "in_transit" | "error" | "delivered";
+  label_download: {
+    href: string;
+    pdf: string;
+    png: string;
+    zpl: string;
+  };
+};
 
-  export type VoidLabelResponse = {
-    approved: boolean
-    message: string
-    reason_code?: string
-  }
+export type VoidLabelResponse = {
+  approved: boolean;
+  message: string;
+  reason_code?: string;
+};
 
 export type TrackingEvent = {
-  occurred_at: string
-  carrier_occurred_at?: string
-  description: string
-  city_locality?: string
-  state_province?: string
-  country_code?: string
-  status_code: string
-  signer?: string
-}
+  occurred_at: string;
+  carrier_occurred_at?: string;
+  description: string;
+  city_locality?: string;
+  state_province?: string;
+  country_code?: string;
+  status_code: string;
+  signer?: string;
+};
 
 export type TrackingInfo = {
-  tracking_number: string
-  tracking_url?: string
-  status_code: "unknown" | "in_transit" | "error" | "delivered" | "exception" | "accepted" | "attempt_failed" | "not_yet_in_system" | "delivery_failed" | "return_to_sender" | "held_by_carrier" | "undeliverable"
-  carrier_status_code?: string
-  carrier_status_description?: string
-  actual_delivery_date?: string
-  exception_description?: string
-  events?: TrackingEvent[]
-}
+  tracking_number: string;
+  tracking_url?: string;
+  status_code:
+    | "unknown"
+    | "in_transit"
+    | "error"
+    | "delivered"
+    | "exception"
+    | "accepted"
+    | "attempt_failed"
+    | "not_yet_in_system"
+    | "delivery_failed"
+    | "return_to_sender"
+    | "held_by_carrier"
+    | "undeliverable";
+  carrier_status_code?: string;
+  carrier_status_description?: string;
+  actual_delivery_date?: string;
+  exception_description?: string;
+  events?: TrackingEvent[];
+};
 
 export type ShipStationWebhookPayload = {
-  resource_url?: string
-  resource_type?: string
-  topic?: string
+  resource_url?: string;
+  resource_type?: string;
+  topic?: string;
   /** ShipStation v2 may include data inline */
   data?: {
-    label_id?: string
-    shipment_id?: string
-    tracking_number?: string
-    status_code?: string
-    [k: string]: unknown
-  }
-  [k: string]: unknown
-}
+    label_id?: string;
+    shipment_id?: string;
+    tracking_number?: string;
+    status_code?: string;
+    [k: string]: unknown;
+  };
+  [k: string]: unknown;
+};
 
 /**
  * Structured error thrown by ShipStationClient for all upstream failures.
@@ -205,22 +228,22 @@ export type ShipStationWebhookPayload = {
  */
 export class ShipStationApiError extends Error {
   /** HTTP status code from ShipStation (undefined for network errors) */
-  status?: number
+  status?: number;
   /** ShipStation request-id header for support escalation */
-  requestId?: string
+  requestId?: string;
   /** Raw upstream body (truncated) for debugging non-JSON responses */
-  upstream?: string
+  upstream?: string;
 
   constructor(opts: {
-    message: string
-    status?: number
-    requestId?: string
-    upstream?: string
+    message: string;
+    status?: number;
+    requestId?: string;
+    upstream?: string;
   }) {
-    super(opts.message)
-    this.name = "ShipStationApiError"
-    this.status = opts.status
-    this.requestId = opts.requestId
-    this.upstream = opts.upstream
+    super(opts.message);
+    this.name = "ShipStationApiError";
+    this.status = opts.status;
+    this.requestId = opts.requestId;
+    this.upstream = opts.upstream;
   }
 }
