@@ -301,6 +301,35 @@ export default async function ssOrderPlacedHandler({
     }
 
     logger.info(`[ss-order-placed] Order confirmation sent for order ${order.id}`)
+
+    // Add to newsletter list if customer opted in
+    const marketingOptIn = order.metadata?.marketing_opt_in === true || order.metadata?.marketing_opt_in === "true"
+    const newsletterListId = (process.env.SS_SENDGRID_NEWSLETTER_LIST_ID || "").trim()
+    if (marketingOptIn && ssApiKey && email && newsletterListId) {
+      const sa = order.shipping_address
+      await fetch("https://api.sendgrid.com/v3/marketing/contacts", {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${ssApiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          list_ids: [newsletterListId],
+          contacts: [{
+            email,
+            first_name: sa?.first_name || "",
+            last_name: sa?.last_name || "",
+            city: sa?.city || "",
+            state_province_region: sa?.province || "",
+            postal_code: sa?.postal_code || "",
+            country: sa?.country_code?.toUpperCase() || "",
+          }],
+        }),
+      }).catch((err) => {
+        logger.warn(`[ss-order-placed] Newsletter signup failed: ${err instanceof Error ? err.message : "unknown"}`)
+      })
+      logger.info(`[ss-order-placed] Added ${email} to newsletter list for order ${order.id}`)
+    }
   } catch (error) {
     const msg = error instanceof Error ? error.message : "Unknown error"
     logger.warn(`[ss-order-placed] Failed for order ${data.id}: ${msg}`)
