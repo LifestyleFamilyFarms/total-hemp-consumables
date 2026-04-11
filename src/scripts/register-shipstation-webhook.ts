@@ -9,6 +9,7 @@
  *   - MEDUSA_BACKEND_URL (the public Railway URL)
  */
 import { ExecArgs } from "@medusajs/framework/types"
+import { resolveShipstationEnv } from "../utils/shipstation-env"
 
 export default async function registerShipStationWebhook({ container }: ExecArgs) {
   const logger = container.resolve("logger") as {
@@ -30,7 +31,6 @@ export default async function registerShipStationWebhook({ container }: ExecArgs
   }
 
   // Resolve ShipStation credentials
-  const { resolveShipstationEnv } = await import("../utils/shipstation-env")
   const env = resolveShipstationEnv(process.env.NODE_ENV)
 
   if (!env.apiKey) {
