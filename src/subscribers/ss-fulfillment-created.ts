@@ -1,63 +1,66 @@
-import type { SubscriberArgs, SubscriberConfig } from "@medusajs/framework"
-import { ContainerRegistrationKeys } from "@medusajs/framework/utils"
-import { ssSendGridSend, getSsSalesChannelId } from "../utils/ss-sendgrid"
+import type { SubscriberArgs, SubscriberConfig } from "@medusajs/framework";
+import { ContainerRegistrationKeys, Modules } from "@medusajs/framework/utils";
+import { ssSendGridSend, getSsSalesChannelId } from "../utils/ss-sendgrid";
 
 type FulfillmentRecord = {
-  id: string
+  id: string;
   tracking_links?: Array<{
-    tracking_number?: string | null
-    url?: string | null
-  }> | null
+    tracking_number?: string | null;
+    url?: string | null;
+  }> | null;
   items?: Array<{
-    title?: string | null
-    quantity?: number | null
-  }> | null
-  metadata?: Record<string, unknown> | null
+    line_item_id?: string | null;
+    title?: string | null;
+    quantity?: number | null;
+  }> | null;
+  metadata?: Record<string, unknown> | null;
   order?: {
-    id: string
-    display_id?: string | number | null
-    email?: string | null
-    sales_channel_id?: string | null
-    currency_code?: string | null
-    metadata?: Record<string, unknown> | null
+    id: string;
+    display_id?: string | number | null;
+    email?: string | null;
+    sales_channel_id?: string | null;
+    currency_code?: string | null;
+    metadata?: Record<string, unknown> | null;
     customer?: {
-      first_name?: string | null
-      last_name?: string | null
-      email?: string | null
-    } | null
+      first_name?: string | null;
+      last_name?: string | null;
+      email?: string | null;
+    } | null;
     shipping_address?: {
-      first_name?: string | null
-      last_name?: string | null
-    } | null
+      first_name?: string | null;
+      last_name?: string | null;
+    } | null;
     items?: Array<{
-      id: string
-      title?: string | null
-      quantity?: number | null
-      unit_price?: number | null
-      thumbnail?: string | null
-    }> | null
-  } | null
-}
+      id: string;
+      title?: string | null;
+      quantity?: number | null;
+      unit_price?: number | null;
+      thumbnail?: string | null;
+    }> | null;
+  } | null;
+};
 
 export default async function ssFulfillmentCreatedHandler({
   event: { data },
   container,
 }: SubscriberArgs<{ id: string }>) {
   const logger = container.resolve(ContainerRegistrationKeys.LOGGER) as {
-    info: (msg: string) => void
-    warn: (msg: string) => void
-  }
+    info: (msg: string) => void;
+    warn: (msg: string) => void;
+  };
 
-  const ssChannelId = getSsSalesChannelId()
-  if (!ssChannelId) return
+  const ssChannelId = getSsSalesChannelId();
+  if (!ssChannelId) return;
 
-  const templateId = (process.env.SS_SENDGRID_TEMPLATE_SHIPPING_CONFIRMATION || "").trim()
-  if (!templateId) return
+  const templateId = (
+    process.env.SS_SENDGRID_TEMPLATE_SHIPPING_CONFIRMATION || ""
+  ).trim();
+  if (!templateId) return;
 
   try {
     const query = container.resolve("query") as {
-      graph: (input: Record<string, unknown>) => Promise<{ data: unknown[] }>
-    }
+      graph: (input: Record<string, unknown>) => Promise<{ data: unknown[] }>;
+    };
 
     const { data: fulfillments } = await query.graph({
       entity: "fulfillment",
@@ -65,6 +68,7 @@ export default async function ssFulfillmentCreatedHandler({
         "id",
         "tracking_links.tracking_number",
         "tracking_links.url",
+        "items.line_item_id",
         "items.title",
         "items.quantity",
         "metadata",
@@ -86,24 +90,34 @@ export default async function ssFulfillmentCreatedHandler({
         "order.items.thumbnail",
       ],
       filters: { id: data.id },
-    })
+    });
 
-    const fulfillment = (fulfillments?.[0] || null) as FulfillmentRecord | null
-    if (!fulfillment?.order) return
+    const fulfillment = (fulfillments?.[0] || null) as FulfillmentRecord | null;
+    if (!fulfillment?.order) return;
 
-    const order = fulfillment.order
+    const order = fulfillment.order;
 
     // Sales channel gate
-    if (order.sales_channel_id !== ssChannelId) return
+    if (order.sales_channel_id !== ssChannelId) return;
 
     // Idempotency: skip if this fulfillment already triggered a send
-    if (fulfillment.metadata?.ss_shipping_confirmation_sent_at) return
+    if (fulfillment.metadata?.ss_shipping_confirmation_sent_at) return;
 
-    const email = order.email || order.customer?.email
-    if (!email) return
+    const email = order.email || order.customer?.email;
+    if (!email) return;
 
-    const tracking = fulfillment.tracking_links?.[0]
-    const storefrontUrl = (process.env.SS_STOREFRONT_URL || "").trim().replace(/\/+$/, "")
+    const tracking = fulfillment.tracking_links?.[0];
+    const storefrontUrl = (process.env.SS_STOREFRONT_URL || "")
+      .trim()
+      .replace(/\/+$/, "");
+
+    // Cross-reference fulfillment items with order items for partial fulfillment support
+    const fulfilledLineItemIds = new Set(
+      (fulfillment.items || []).map((fi) => fi.line_item_id).filter(Boolean),
+    );
+    const fulfilledItems = (order.items || []).filter((item) =>
+      fulfilledLineItemIds.has(item.id),
+    );
 
     const result = await ssSendGridSend({
       to: email,
@@ -113,12 +127,13 @@ export default async function ssFulfillmentCreatedHandler({
         order: {
           id: order.id,
           display_id: order.display_id ?? null,
-          items: (order.items || []).map((item) => ({
+          items: fulfilledItems.map((item) => ({
             id: item.id,
             title: item.title || "Item",
             product_name: item.title || "Item",
             quantity: item.quantity ?? 0,
-            price: item.unit_price != null ? (item.unit_price / 1).toFixed(2) : "0.00",
+            price:
+              item.unit_price != null ? item.unit_price.toFixed(2) : "0.00",
             thumbnail: item.thumbnail || null,
           })),
         },
@@ -130,10 +145,10 @@ export default async function ssFulfillmentCreatedHandler({
         },
         estimated_delivery: "3–5 business days",
         order_number: order.display_id ?? null,
-        items: (order.items || []).map((item) => ({
+        items: fulfilledItems.map((item) => ({
           product_name: item.title || "Item",
           quantity: item.quantity ?? 0,
-          price: item.unit_price != null ? (item.unit_price / 1).toFixed(2) : "0.00",
+          price: item.unit_price != null ? item.unit_price.toFixed(2) : "0.00",
         })),
         // v2 nested (kept for forward compat)
         shipping: {
@@ -159,29 +174,55 @@ export default async function ssFulfillmentCreatedHandler({
         },
         brand: {
           top_wordmark_url:
-            (process.env.SS_SENDGRID_BRAND_TOP_WORDMARK_URL || "").trim() || null,
+            (process.env.SS_SENDGRID_BRAND_TOP_WORDMARK_URL || "").trim() ||
+            null,
           footer_logo_url:
-            (process.env.SS_SENDGRID_BRAND_FOOTER_LOGO_URL || "").trim() || null,
+            (process.env.SS_SENDGRID_BRAND_FOOTER_LOGO_URL || "").trim() ||
+            null,
         },
       },
-    })
+    });
 
     if (!result.success) {
       logger.warn(
-        `[ss-fulfillment-created] SendGrid send failed for fulfillment ${fulfillment.id}: ${result.error}`
-      )
-      return
+        `[ss-fulfillment-created] SendGrid send failed for fulfillment ${fulfillment.id}: ${result.error}`,
+      );
+      return;
     }
 
     logger.info(
-      `[ss-fulfillment-created] Shipping confirmation sent for fulfillment ${fulfillment.id} (order ${order.id})`
-    )
+      `[ss-fulfillment-created] Shipping confirmation sent for fulfillment ${fulfillment.id} (order ${order.id})`,
+    );
+
+    // Write idempotency flag so replays skip the send
+    try {
+      const fulfillmentModule = container.resolve(Modules.FULFILLMENT) as {
+        updateFulfillment: (
+          id: string,
+          data: Record<string, unknown>,
+        ) => Promise<unknown>;
+      };
+      await fulfillmentModule.updateFulfillment(fulfillment.id, {
+        metadata: {
+          ...fulfillment.metadata,
+          ss_shipping_confirmation_sent_at: new Date().toISOString(),
+        },
+      });
+    } catch (metaErr) {
+      const metaMsg =
+        metaErr instanceof Error ? metaErr.message : "Unknown error";
+      logger.warn(
+        `[ss-fulfillment-created] Metadata write failed for fulfillment ${fulfillment.id}: ${metaMsg}`,
+      );
+    }
   } catch (error) {
-    const msg = error instanceof Error ? error.message : "Unknown error"
-    logger.warn(`[ss-fulfillment-created] Failed for fulfillment ${data.id}: ${msg}`)
+    const msg = error instanceof Error ? error.message : "Unknown error";
+    logger.warn(
+      `[ss-fulfillment-created] Failed for fulfillment ${data.id}: ${msg}`,
+    );
   }
 }
 
 export const config: SubscriberConfig = {
   event: "fulfillment.created",
-}
+};
