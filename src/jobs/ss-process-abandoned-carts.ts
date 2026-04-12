@@ -10,6 +10,7 @@ type CartRecord = {
   id: string
   email?: string | null
   currency_code?: string | null
+  total?: number | null
   updated_at?: string | Date | null
   metadata?: Record<string, unknown> | null
   customer?: {
@@ -25,6 +26,12 @@ type CartRecord = {
     quantity?: number | null
     unit_price?: number | null
     thumbnail?: string | null
+    variant?: {
+      title?: string | null
+    } | null
+    product?: {
+      handle?: string | null
+    } | null
   }> | null
 }
 
@@ -122,10 +129,13 @@ export default async function ssProcessAbandonedCartsJob(
         "customer.last_name",
         "shipping_address.first_name",
         "shipping_address.last_name",
+        "+total",
         "items.title",
         "items.quantity",
         "items.unit_price",
         "items.thumbnail",
+        "items.variant.title",
+        "items.product.handle",
       ],
       filters: {
         updated_at: { $lte: cutoff },
@@ -182,6 +192,31 @@ export default async function ssProcessAbandonedCartsJob(
       recoveryTtlHours
     )
 
+    const mappedItems = (cart.items || []).map((item) => {
+      const handle = item.product?.handle
+      const productUrl = handle && storefrontUrl
+        ? `${storefrontUrl}/us/products/${handle}`
+        : storefrontUrl ? `${storefrontUrl}/us/store` : null
+      const price = formatUnitPrice(item.unit_price, cart.currency_code)
+
+      return {
+        // v2 template field names
+        product_name: item.title || "CBG Flower",
+        product_url: productUrl,
+        image_url: item.thumbnail || null,
+        variant: item.variant?.title || "",
+        quantity: item.quantity ?? 1,
+        price: price?.replace("$", "") ?? "0.00",
+        // v1 backwards compat
+        title: item.title,
+        unit_price: item.unit_price,
+        unit_price_display: price,
+        thumbnail: item.thumbnail,
+      }
+    })
+
+    const cartTotal = formatUnitPrice(cart.total, cart.currency_code)
+
     const result = await ssSendGridSend({
       to: cart.email,
       templateId,
@@ -197,14 +232,17 @@ export default async function ssProcessAbandonedCartsJob(
             "",
         },
         cart_id: cart.id,
+        // v2 template uses recovery_url, v1 uses cart_url
+        recovery_url: recoverUrl,
         recover_url: recoverUrl,
-        items: (cart.items || []).map((item) => ({
-          title: item.title,
-          quantity: item.quantity,
-          unit_price: item.unit_price,
-          unit_price_display: formatUnitPrice(item.unit_price, cart.currency_code),
-          thumbnail: item.thumbnail,
-        })),
+        cart_url: recoverUrl,
+        // v2 template uses cart.items and cart.total
+        cart: {
+          items: mappedItems,
+          total: cartTotal?.replace("$", "") ?? null,
+        },
+        // v1 flat items array
+        items: mappedItems,
         links: {
           website_url: storefrontUrl,
         },
