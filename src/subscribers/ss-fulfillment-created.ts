@@ -4,9 +4,9 @@ import { ssSendGridSend, getSsSalesChannelId } from "../utils/ss-sendgrid";
 
 type FulfillmentRecord = {
   id: string;
-  tracking_links?: Array<{
+  labels?: Array<{
     tracking_number?: string | null;
-    url?: string | null;
+    tracking_url?: string | null;
   }> | null;
   items?: Array<{
     line_item_id?: string | null;
@@ -66,8 +66,8 @@ export default async function ssFulfillmentCreatedHandler({
       entity: "fulfillment",
       fields: [
         "id",
-        "tracking_links.tracking_number",
-        "tracking_links.url",
+        "labels.tracking_number",
+        "labels.tracking_url",
         "items.line_item_id",
         "items.title",
         "items.quantity",
@@ -106,7 +106,7 @@ export default async function ssFulfillmentCreatedHandler({
     const email = order.email || order.customer?.email;
     if (!email) return;
 
-    const tracking = fulfillment.tracking_links?.[0];
+    const tracking = fulfillment.labels?.[0];
     const storefrontUrl = (process.env.SS_STOREFRONT_URL || "")
       .trim()
       .replace(/\/+$/, "");
@@ -148,7 +148,7 @@ export default async function ssFulfillmentCreatedHandler({
         tracking: {
           carrier: "USPS",
           number: tracking?.tracking_number || "",
-          url: tracking?.url || "#",
+          url: tracking?.tracking_url || "#",
         },
         estimated_delivery: "3–5 business days",
         order_number: order.display_id ?? null,
@@ -160,7 +160,7 @@ export default async function ssFulfillmentCreatedHandler({
         // v2 nested (kept for forward compat)
         shipping: {
           tracking_number: tracking?.tracking_number || null,
-          tracking_url: tracking?.url || null,
+          tracking_url: tracking?.tracking_url || null,
         },
         customer: {
           first_name:
